@@ -83,6 +83,10 @@ func (x *xfg) Search() error {
 			return fmt.Errorf("something went wrong within path `%s` at `%s`: %w", sPath, fPath, err)
 		}
 
+		if fInfo.IsDir() && fInfo.Name() == ".git" {
+			return filepath.SkipDir
+		}
+
 		if !strings.Contains(fPath, x.SearchPath) {
 			return nil
 		}

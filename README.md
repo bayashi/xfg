@@ -26,7 +26,9 @@ $ xfg service-a --grep memory
 find . -type f | grep "service-a" | xargs grep "memory" -n
 ```
 
-Name `xfg` came from Cross(**X**) **F**ind and **G**rep.
+## Notes
+
+* `.git` directory is ignored
 
 ## Installation
 
