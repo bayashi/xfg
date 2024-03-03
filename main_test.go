@@ -17,7 +17,7 @@ func TestRunner_OK(t *testing.T) {
 	}{
 		"service-b": {
 			opt: &options{
-				path: "service-b",
+				searchPath: "service-b",
 			},
 			expect: here.Doc(`
                 testdata/service-b
@@ -26,8 +26,8 @@ func TestRunner_OK(t *testing.T) {
 		},
 		"service-b grep": {
 			opt: &options{
-				path: "service-b",
-				grep: "func",
+				searchPath: "service-b",
+				searchGrep: "func",
 			},
 			expect: here.Doc(`
                 testdata/service-b
@@ -37,8 +37,8 @@ func TestRunner_OK(t *testing.T) {
 		},
 		"service grep relax": {
 			opt: &options{
-				path:  "main",
-				grep:  "package b",
+				searchPath:  "main",
+				searchGrep:  "package b",
 				relax: true,
 			},
 			expect: here.Doc(`
@@ -56,7 +56,7 @@ func TestRunner_OK(t *testing.T) {
 				out: &o,
 			}
 
-			tt.opt.start = "./testdata"
+			tt.opt.searchStart = "./testdata"
 
 			cli.xfg(tt.opt)
 

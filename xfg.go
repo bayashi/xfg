@@ -23,22 +23,18 @@ type path struct {
 }
 
 type xfg struct {
+	options *options
+
 	pathHighlightColor *color.Color
 	grepHighlightColor *color.Color
-	NoColor            bool
-
-	Relax bool
-	Abs   bool
-
-	SearchPath  string
-	SearchGrep  string
-	SearchStart string
 
 	result []path
 }
 
-func NewX(pathHighlightColor *color.Color, grepHighlightColor *color.Color) *xfg {
-	x := &xfg{}
+func NewX(o *options, pathHighlightColor *color.Color, grepHighlightColor *color.Color) *xfg {
+	x := &xfg{
+		options: o,
+	}
 	if pathHighlightColor != nil {
 		x.pathHighlightColor = pathHighlightColor
 	}
@@ -59,7 +55,7 @@ func (x *xfg) Show(w io.Writer) error {
 				return err
 			}
 		}
-		if x.Relax && len(p.content) > 0 {
+		if x.options.relax && len(p.content) > 0 {
 			if _, err := fmt.Fprint(w, "\n"); err != nil {
 				return err
 			}
@@ -70,13 +66,13 @@ func (x *xfg) Show(w io.Writer) error {
 }
 
 func (x *xfg) Search() error {
-	sPath, err := validateStartPath(x.SearchStart)
+	sPath, err := validateStartPath(x.options.searchStart)
 	if err != nil {
 		return err
 	}
 
-	hPath := x.pathHighlightColor.Sprintf(x.SearchPath)
-	hGrep := x.grepHighlightColor.Sprintf(x.SearchGrep)
+	hPath := x.pathHighlightColor.Sprintf(x.options.searchPath)
+	hGrep := x.grepHighlightColor.Sprintf(x.options.searchGrep)
 
 	var paths []path
 	walkErr := filepath.Walk(sPath, func(fPath string, fInfo os.FileInfo, err error) error {
@@ -88,7 +84,7 @@ func (x *xfg) Search() error {
 			return filepath.SkipDir
 		}
 
-		if !strings.Contains(fPath, x.SearchPath) {
+		if !strings.Contains(fPath, x.options.searchPath) {
 			return nil
 		}
 
@@ -96,7 +92,7 @@ func (x *xfg) Search() error {
 			info: fInfo,
 		}
 
-		if x.Abs {
+		if x.options.abs {
 			absPath, err := filepath.Abs(fPath)
 			if err != nil {
 				return err
@@ -104,22 +100,22 @@ func (x *xfg) Search() error {
 			fPath = absPath
 		}
 
-		if x.NoColor {
+		if x.options.noColor {
 			matchedPath.path = fPath
 		} else {
-			matchedPath.path = strings.ReplaceAll(fPath, x.SearchPath, hPath)
+			matchedPath.path = strings.ReplaceAll(fPath, x.options.searchPath, hPath)
 		}
 
-		if !fInfo.IsDir() && x.SearchGrep != "" {
-			matchedContents, err := matchedContents(fPath, x.SearchGrep)
+		if !fInfo.IsDir() && x.options.searchGrep != "" {
+			matchedContents, err := matchedContents(fPath, x.options.searchGrep)
 			if err != nil {
 				return err
 			}
 
-			if x.NoColor {
+			if x.options.noColor {
 				matchedPath.content = matchedContents
 			} else {
-				matchedPath.content = colorMatchedContents(matchedContents, x.SearchGrep, hGrep)
+				matchedPath.content = colorMatchedContents(matchedContents, x.options.searchGrep, hGrep)
 			}
 		}
 
