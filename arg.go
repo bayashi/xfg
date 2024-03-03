@@ -17,9 +17,9 @@ var (
 )
 
 type options struct {
-	path  string
-	grep  string
-	start string
+	searchPath  string
+	searchGrep  string
+	searchStart string
 
 	relax   bool
 	noColor bool
@@ -33,9 +33,9 @@ func (cli *runner) parseArgs() *options {
 
 	var flagHelp bool
 	var flagVersion bool
-	flag.StringVarP(&o.path, "path", "p", "", "A path string of a root to find")
-	flag.StringVarP(&o.grep, "grep", "g", "", "A string to search for contents")
-	flag.StringVarP(&o.start, "start", "s", ".", "A location to start searching")
+	flag.StringVarP(&o.searchPath, "path", "p", "", "A path string of a root to find")
+	flag.StringVarP(&o.searchGrep, "grep", "g", "", "A string to search for contents")
+	flag.StringVarP(&o.searchStart, "start", "s", ".", "A location to start searching")
 	flag.BoolVarP(&o.noColor, "no-color", "", false, "disable colors for matched words")
 	flag.BoolVarP(&o.relax, "relax", "", false, "Insert blank space between contents for relaxing view")
 	flag.BoolVarP(&o.abs, "abs", "", false, "Show absolute paths")
@@ -60,7 +60,7 @@ func (cli *runner) parseArgs() *options {
 }
 
 func (o *options) targetPathFromArgs(cli *runner) {
-	if o.path != "" {
+	if o.searchPath != "" {
 		return
 	}
 
@@ -70,10 +70,10 @@ func (o *options) targetPathFromArgs(cli *runner) {
 
 	arg := flag.Args()[0]
 	if arg != "-" && arg != "--" {
-		o.path = arg
+		o.searchPath = arg
 	}
 
-	if o.path == "" {
+	if o.searchPath == "" {
 		cli.putHelp(errNeedToSetPath)
 	}
 }
