@@ -1,0 +1,31 @@
+builds:
+  - env:
+      - CGO_ENABLED=0
+    id: "xfg"
+    binary: xfg
+    goos:
+      - linux
+      - darwin
+      - windows
+    ldflags: -s -w -X main.version={{.Version}} -X "main.installFrom=Binary"
+archives:
+  - format_overrides:
+      - goos: windows
+        format: zip
+changelog:
+  use: github
+  filters:
+    exclude:
+    - Merge pull request
+    - Merge remote-tracking branch
+    - Merge branch
+brews:
+  - tap:
+      owner: bayashi
+      name: homebrew-tap
+      token: "{{ .Env.HOMEBREW_TAP_GITHUB_TOKEN }}"
+    folder: Formula
+    homepage: https://github.com/bayashi/xfg
+    description: "Do `find` paths by a keyword, and also search for contents like a `grep` in one command."
+    test: |
+      system "#{bin}/xfg", '--version'
