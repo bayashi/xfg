@@ -37,9 +37,9 @@ func TestRunner_OK(t *testing.T) {
 		},
 		"service grep relax": {
 			opt: &options{
-				searchPath:  "main",
-				searchGrep:  "package b",
-				relax: true,
+				searchPath: "main",
+				searchGrep: "package b",
+				relax:      true,
 			},
 			expect: here.Doc(`
                 testdata/service-a/main.go
