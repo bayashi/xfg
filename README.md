@@ -31,7 +31,7 @@ Name `xfg` came from Cross(**X**) **F**ind and **G**rep.
 ## Installation
 
 ```cmd
-go install github.com/bayashi/xfg/cmd/xfg@latest
+go install github.com/bayashi/xfg@latest
 ```
 
 ## License
