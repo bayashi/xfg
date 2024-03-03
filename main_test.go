@@ -2,6 +2,8 @@ package main
 
 import (
 	"bytes"
+	"os"
+	"strings"
 	"testing"
 
 	here "github.com/MakeNowJust/heredoc/v2"
@@ -57,6 +59,11 @@ func TestRunner_OK(t *testing.T) {
 			tt.opt.start = "./testdata"
 
 			cli.xfg(tt.opt)
+
+			if os.Getenv("RUNNER_OS") == "Windows" {
+				// BK: override path delimiter for Windows
+				tt.expect = strings.ReplaceAll(tt.expect, "/", "\\")
+			}
 
 			a.Got(o.String()).Expect(tt.expect).X().Same(t)
 		})
