@@ -44,6 +44,7 @@ func (cli *runner) xfg(o *options) error {
 
 	x.Relax = o.relax
 	x.NoColor = o.noColor
+	x.Abs = o.abs
 
 	if err := x.Search(); err != nil {
 		return fmt.Errorf("error during Search %w", err)

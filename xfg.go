@@ -28,6 +28,7 @@ type xfg struct {
 	NoColor            bool
 
 	Relax bool
+	Abs   bool
 
 	SearchPath  string
 	SearchGrep  string
@@ -93,6 +94,14 @@ func (x *xfg) Search() error {
 
 		matchedPath := path{
 			info: fInfo,
+		}
+
+		if x.Abs {
+			absPath, err := filepath.Abs(fPath)
+			if err != nil {
+				return err
+			}
+			fPath = absPath
 		}
 
 		if x.NoColor {
