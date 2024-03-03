@@ -23,7 +23,7 @@ $ xfg service-a --grep memory
 `xfg` is the shorthand and enhancement of below one-liner.
 
 ```go
-find . -type f | grep "service-id" | xargs grep "memory" -n
+find . -type f | grep "service-a" | xargs grep "memory" -n
 ```
 
 Name `xfg` came from Cross(**X**) **F**ind and **G**rep.
