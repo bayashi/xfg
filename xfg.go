@@ -103,7 +103,6 @@ func (x *xfg) Search() error {
 			}
 			fPath = absPath
 		}
-	
 
 		if x.NoColor {
 			matchedPath.path = fPath
