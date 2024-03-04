@@ -12,8 +12,9 @@ import (
 )
 
 type line struct {
-	lc      int
+	lc      int32
 	content string
+	matched bool
 }
 
 type path struct {
@@ -50,8 +51,8 @@ func (x *xfg) Show(w io.Writer) error {
 		if _, err := fmt.Fprintf(w, "%s\n", p.path); err != nil {
 			return err
 		}
-		for _, lines := range p.content {
-			if _, err := fmt.Fprintf(w, "  %d: %s\n", lines.lc, lines.content); err != nil {
+		for _, line := range p.content {
+			if _, err := fmt.Fprintf(w, "  %d: %s\n", line.lc, line.content); err != nil {
 				return err
 			}
 		}
@@ -107,7 +108,7 @@ func (x *xfg) Search() error {
 		}
 
 		if !fInfo.IsDir() && x.options.searchGrep != "" {
-			matchedContents, err := matchedContents(fPath, x.options.searchGrep)
+			matchedContents, err := x.grepContents(fPath)
 			if err != nil {
 				return err
 			}
@@ -142,27 +143,65 @@ func colorMatchedContents(matchedContents []line, old string, new string) []line
 	return newContents
 }
 
-func matchedContents(fPath string, g string) ([]line, error) {
+func (x *xfg) grepContents(fPath string) ([]line, error) {
 	fh, err := os.Open(fPath)
 	if err != nil {
 		return nil, fmt.Errorf("could not open file `%s`: %w", fPath, err)
 	}
 	defer fh.Close()
 
-	scanner := bufio.NewScanner(fh)
-	var matchedContents []line
-	lc := 0
-	scanner.Err()
+	matchedContents, err := x._grepContents(bufio.NewScanner(fh), fPath)
+	if err != nil {
+		return nil, err
+	}
+
+	return matchedContents, nil
+}
+
+func (x *xfg) _grepContents(scanner *bufio.Scanner, fPath string) ([]line, error) {
+	var (
+		lc int32 = 0 // line count
+		matchedContents []line
+
+		blines = make([]line, x.options.contextLines) // slice for before lines
+		aline uint32 // the count for after lines
+
+		optC = x.options.contextLines > 0
+	)
+
 	for scanner.Scan() {
-		l := scanner.Text()
 		lc++
+		l := scanner.Text()
 		if err := scanner.Err(); err != nil {
 			return nil, fmt.Errorf("could not scan file `%s` line %d: %w", fPath, lc, err)
 		}
-		if !strings.Contains(l, g) {
-			continue
+		if strings.Contains(l, x.options.searchGrep) {
+			if optC {
+				for _, b := range blines {
+					if b.lc == 0 {
+						continue // skip
+					}
+					matchedContents = append(matchedContents, b)
+				}
+			}
+
+			matchedContents = append(matchedContents, line{lc: lc, content: l, matched: true})
+
+			if optC {
+				aline = x.options.contextLines // start countdown for `aline`
+			}
+		} else {
+			if optC {
+				if aline > 0 {
+					aline--
+					matchedContents = append(matchedContents, line{lc: lc, content: l})
+				} else {
+					// lotate blines
+					// join "2nd to last elements of `blines`" and "current `line`"
+					blines = append(blines[1:], line{lc: lc, content: l})
+				}
+			}
 		}
-		matchedContents = append(matchedContents, line{lc: lc, content: l})
 	}
 
 	return matchedContents, nil

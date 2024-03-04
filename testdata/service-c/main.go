@@ -1,3 +1,5 @@
 package c
 
-func main() {}
+func main() {
+	// baz
+}

@@ -32,7 +32,7 @@ func TestRunner_OK(t *testing.T) {
 			expect: here.Doc(`
                 testdata/service-b
                 testdata/service-b/main.go
-                  3: func main() {}
+                  3: func main() {
 			`),
 		},
 		"service grep relax": {
@@ -47,6 +47,36 @@ func TestRunner_OK(t *testing.T) {
                   1: package b
 
                 testdata/service-c/main.go
+			`),
+		},
+		"service-b grep bar with C1": {
+			opt: &options{
+				searchPath:   "service-b",
+				searchGrep:   "main",
+				contextLines: 1,
+			},
+			expect: here.Doc(`
+				testdata/service-b
+				testdata/service-b/main.go
+				  2: 
+				  3: func main() {
+				  4: 	// bar
+			`),
+		},
+		"service-b grep bar with C2": {
+			opt: &options{
+				searchPath:   "service-b",
+				searchGrep:   "main",
+				contextLines: 2,
+			},
+			expect: here.Doc(`
+				testdata/service-b
+				testdata/service-b/main.go
+				  1: package b
+				  2: 
+				  3: func main() {
+				  4: 	// bar
+				  5: }
 			`),
 		},
 	} {
