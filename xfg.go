@@ -27,9 +27,9 @@ type xfg struct {
 	options *options
 
 	pathHighlitColor *color.Color
-	pathHighlighter string
+	pathHighlighter  string
 	grepHighlitColor *color.Color
-	grepHighlighter string
+	grepHighlighter  string
 
 	result []path
 }
