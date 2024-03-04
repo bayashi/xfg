@@ -160,11 +160,11 @@ func (x *xfg) grepContents(fPath string) ([]line, error) {
 
 func (x *xfg) _grepContents(scanner *bufio.Scanner, fPath string) ([]line, error) {
 	var (
-		lc int32 = 0 // line count
+		lc              int32 = 0 // line count
 		matchedContents []line
 
 		blines = make([]line, x.options.contextLines) // slice for before lines
-		aline uint32 // the count for after lines
+		aline  uint32                                 // the count for after lines
 
 		optC = x.options.contextLines > 0
 	)
