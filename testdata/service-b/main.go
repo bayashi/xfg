@@ -1,3 +1,5 @@
 package b
 
-func main() {}
+func main() {
+	bar := 34
+}

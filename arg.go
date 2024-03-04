@@ -24,6 +24,8 @@ type options struct {
 	relax   bool
 	noColor bool
 	abs     bool
+
+	contextLines uint32
 }
 
 func (cli *runner) parseArgs() *options {
@@ -39,6 +41,7 @@ func (cli *runner) parseArgs() *options {
 	flag.BoolVarP(&o.noColor, "no-color", "", false, "disable colors for matched words")
 	flag.BoolVarP(&o.relax, "relax", "", false, "Insert blank space between contents for relaxing view")
 	flag.BoolVarP(&o.abs, "abs", "", false, "Show absolute paths")
+	flag.Uint32VarP(&o.contextLines, "context", "C", 0, "Show several lines before and after the matched one")
 	flag.BoolVarP(&flagHelp, "help", "h", false, "Show help (This message) and exit")
 	flag.BoolVarP(&flagVersion, "version", "v", false, "Show version and build command info and exit")
 

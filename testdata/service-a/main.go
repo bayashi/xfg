@@ -1,3 +1,5 @@
 package a
 
-func main() {}
+func main() {
+	foo := 12
+}
