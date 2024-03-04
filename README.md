@@ -1,6 +1,6 @@
 # xfg
 
-Do `find` paths by a keyword, and also search for contents like a `grep` in one command.
+Do `find` paths by a keyword, and also search for contents like a `grep` in one command, gracefully.
 
 <a href="https://github.com/bayashi/xfg/actions" title="xfg CI"><img src="https://github.com/bayashi/xfg/workflows/main/badge.svg" alt="xfg CI"></a>
 <a href="https://goreportcard.com/report/github.com/bayashi/xfg" title="xfg report card" target="_blank"><img src="https://goreportcard.com/badge/github.com/bayashi/xfg" alt="xfg report card"></a>
@@ -8,22 +8,56 @@ Do `find` paths by a keyword, and also search for contents like a `grep` in one 
 
 ## Usage of `xfg` command
 
-Search for directories and files that include `service-a` in those path.
+For example, there are directories and files like below:
 
-```go
-$ xfg service-a
+```
+.
+├── service-a
+│   └── main.go
+├── service-b
+│   └── main.go
+└── service-c
+    └── main.go
 ```
 
-Search for directories and files that match the `service-a` in those path and extract content that matches the `memory`.
+Search for directories and files that include `service-b` in those path.
 
-```go
-$ xfg service-a --grep memory
+```sh
+$ xfg service-b
 ```
 
-`xfg` is the shorthand and enhancement of below one-liner.
+Specific:
 
-```go
-find . -type f | grep "service-a" | xargs grep "memory" -n
+```sh
+$ xfg --path service-b
+```
+
+Output:
+
+```
+$ xfg service-b
+service-b
+service-b/main.go
+```
+
+Search for directories and files that match the `service-b` in those path and extract content that matches the `bar`.
+
+```sh
+$ xfg service-b bar
+```
+
+Specific:
+
+```
+$ xfg --path service-b --grep bar
+```
+
+Output:
+
+```
+service-b
+service-b/main.go
+  4:    bar := 34
 ```
 
 ## Notes

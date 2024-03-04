@@ -71,13 +71,14 @@ func (o *options) targetPathFromArgs(cli *runner) {
 		cli.putHelp(errNeedToSetPath)
 	}
 
-	arg := flag.Args()[0]
-	if arg != "-" && arg != "--" {
-		o.searchPath = arg
-	}
+	o.searchPath = flag.Args()[0]
 
 	if o.searchPath == "" {
 		cli.putHelp(errNeedToSetPath)
+	}
+
+	if len(flag.Args()) == 2 {
+		o.searchGrep = flag.Args()[1]
 	}
 }
 
