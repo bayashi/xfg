@@ -113,7 +113,7 @@ func (x *xfg) Search() error {
 		}
 
 		if !fInfo.IsDir() && x.options.searchGrep != "" {
-			matchedPath.content, err = x.grepContents(fPath)
+			matchedPath.content, err = x.grep(fPath)
 			if err != nil {
 				return err
 			}
@@ -132,14 +132,14 @@ func (x *xfg) Search() error {
 	return nil
 }
 
-func (x *xfg) grepContents(fPath string) ([]line, error) {
+func (x *xfg) grep(fPath string) ([]line, error) {
 	fh, err := os.Open(fPath)
 	if err != nil {
 		return nil, fmt.Errorf("could not open file `%s`: %w", fPath, err)
 	}
 	defer fh.Close()
 
-	matchedContents, err := x._grepContents(bufio.NewScanner(fh), fPath)
+	matchedContents, err := x.grepFile(bufio.NewScanner(fh), fPath)
 	if err != nil {
 		return nil, err
 	}
@@ -147,7 +147,7 @@ func (x *xfg) grepContents(fPath string) ([]line, error) {
 	return matchedContents, nil
 }
 
-func (x *xfg) _grepContents(scanner *bufio.Scanner, fPath string) ([]line, error) {
+func (x *xfg) grepFile(scanner *bufio.Scanner, fPath string) ([]line, error) {
 	var (
 		lc              int32 = 0 // line count
 		matchedContents []line
