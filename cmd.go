@@ -21,7 +21,7 @@ func (cli *runner) putErr(message ...interface{}) {
 }
 
 func (cli *runner) putUsage() {
-	cli.putErr(fmt.Sprintf("Usage: %s [OPTIONS]", cmdName))
+	cli.putErr(fmt.Sprintf("Usage: %s [SEARCH_PATH_KEYWORD] [SEARCH_CONTENT_KEYWORD] [OPTIONS]", cmdName))
 }
 
 func (cli *runner) putHelp(message string) {
