@@ -26,8 +26,8 @@ type path struct {
 type xfg struct {
 	options *options
 
-	pathHighlightColor *color.Color
-	grepHighlightColor *color.Color
+	pathHighlighter string
+	grepHighlighter string
 
 	result []path
 }
@@ -37,10 +37,10 @@ func NewX(o *options, pathHighlightColor *color.Color, grepHighlightColor *color
 		options: o,
 	}
 	if pathHighlightColor != nil {
-		x.pathHighlightColor = pathHighlightColor
+		x.pathHighlighter = pathHighlightColor.Sprintf(x.options.searchPath)
 	}
 	if grepHighlightColor != nil {
-		x.grepHighlightColor = grepHighlightColor
+		x.grepHighlighter = grepHighlightColor.Sprintf(x.options.searchGrep)
 	}
 
 	return x
@@ -72,9 +72,6 @@ func (x *xfg) Search() error {
 		return err
 	}
 
-	hPath := x.pathHighlightColor.Sprintf(x.options.searchPath)
-	hGrep := x.grepHighlightColor.Sprintf(x.options.searchGrep)
-
 	var paths []path
 	walkErr := filepath.Walk(sPath, func(fPath string, fInfo os.FileInfo, err error) error {
 		if err != nil {
@@ -104,19 +101,13 @@ func (x *xfg) Search() error {
 		if x.options.noColor {
 			matchedPath.path = fPath
 		} else {
-			matchedPath.path = strings.ReplaceAll(fPath, x.options.searchPath, hPath)
+			matchedPath.path = strings.ReplaceAll(fPath, x.options.searchPath, x.pathHighlighter)
 		}
 
 		if !fInfo.IsDir() && x.options.searchGrep != "" {
-			matchedContents, err := x.grepContents(fPath)
+			matchedPath.content, err = x.grepContents(fPath)
 			if err != nil {
 				return err
-			}
-
-			if x.options.noColor {
-				matchedPath.content = matchedContents
-			} else {
-				matchedPath.content = colorMatchedContents(matchedContents, x.options.searchGrep, hGrep)
 			}
 		}
 
@@ -131,16 +122,6 @@ func (x *xfg) Search() error {
 	x.result = paths
 
 	return nil
-}
-
-func colorMatchedContents(matchedContents []line, old string, new string) []line {
-	var newContents []line
-	for _, mc := range matchedContents {
-		mc.content = strings.ReplaceAll(mc.content, old, new)
-		newContents = append(newContents, mc)
-	}
-
-	return newContents
 }
 
 func (x *xfg) grepContents(fPath string) ([]line, error) {
@@ -183,6 +164,10 @@ func (x *xfg) _grepContents(scanner *bufio.Scanner, fPath string) ([]line, error
 					}
 					matchedContents = append(matchedContents, b)
 				}
+			}
+
+			if !x.options.noColor {
+				l = strings.ReplaceAll(l, x.options.searchGrep, x.grepHighlighter)
 			}
 
 			matchedContents = append(matchedContents, line{lc: lc, content: l, matched: true})
