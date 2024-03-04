@@ -28,6 +28,7 @@ find . -type f | grep "service-a" | xargs grep "memory" -n
 
 ## Notes
 
+* Not follow symbolic links
 * `.git` directory is ignored
 
 ## Installation
