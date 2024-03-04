@@ -26,8 +26,10 @@ type path struct {
 type xfg struct {
 	options *options
 
-	pathHighlighter string
-	grepHighlighter string
+	pathHighlitColor *color.Color
+	pathHighlighter  string
+	grepHighlitColor *color.Color
+	grepHighlighter  string
 
 	result []path
 }
@@ -37,9 +39,11 @@ func NewX(o *options, pathHighlightColor *color.Color, grepHighlightColor *color
 		options: o,
 	}
 	if pathHighlightColor != nil {
+		x.pathHighlitColor = pathHighlightColor
 		x.pathHighlighter = pathHighlightColor.Sprintf(x.options.searchPath)
 	}
 	if grepHighlightColor != nil {
+		x.grepHighlitColor = grepHighlightColor
 		x.grepHighlighter = grepHighlightColor.Sprintf(x.options.searchGrep)
 	}
 
@@ -52,7 +56,11 @@ func (x *xfg) Show(w io.Writer) error {
 			return err
 		}
 		for _, line := range p.content {
-			if _, err := fmt.Fprintf(w, "  %d: %s\n", line.lc, line.content); err != nil {
+			lc := fmt.Sprintf("%d", line.lc)
+			if !x.options.noColor && line.matched {
+				lc = x.grepHighlitColor.Sprint(lc)
+			}
+			if _, err := fmt.Fprintf(w, "  %s: %s\n", lc, line.content); err != nil {
 				return err
 			}
 		}
