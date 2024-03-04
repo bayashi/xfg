@@ -1,5 +1,5 @@
 package c
 
 func main() {
-	// baz
+	baz := 56
 }

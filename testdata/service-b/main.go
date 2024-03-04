@@ -1,5 +1,5 @@
 package b
 
 func main() {
-	// bar
+	bar := 34
 }

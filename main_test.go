@@ -60,7 +60,7 @@ func TestRunner_OK(t *testing.T) {
 				testdata/service-b/main.go
 				  2: 
 				  3: func main() {
-				  4: 	// bar
+				  4: 	bar := 34
 			`),
 		},
 		"service-b grep bar with C2": {
@@ -75,7 +75,7 @@ func TestRunner_OK(t *testing.T) {
 				  1: package b
 				  2: 
 				  3: func main() {
-				  4: 	// bar
+				  4: 	bar := 34
 				  5: }
 			`),
 		},

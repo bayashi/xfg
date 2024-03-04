@@ -1,5 +1,5 @@
 package a
 
 func main() {
-	// foo
+	foo := 12
 }
