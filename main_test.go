@@ -96,6 +96,17 @@ func TestRunner_OK(t *testing.T) {
 				  7: 	foo()
 			`),
 		},
+		"service-b grep onlyMatch": {
+			opt: &options{
+				searchPath: "service-b",
+				searchGrep: "func",
+				onlyMatch:  true,
+			},
+			expect: here.Doc(`
+                testdata/service-b/main.go
+                  3: func main() {
+			`),
+		},
 	} {
 		t.Run(tname, func(t *testing.T) {
 			var o bytes.Buffer
