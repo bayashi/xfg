@@ -172,6 +172,7 @@ func (x *xfg) grepFile(scanner *bufio.Scanner, fPath string) ([]line, error) {
 					}
 					matchedContents = append(matchedContents, b)
 				}
+				blines = make([]line, x.options.contextLines)
 			}
 
 			if !x.options.noColor {
