@@ -120,7 +120,7 @@ func (x *xfg) Search() error {
 			matchedPath.path = strings.ReplaceAll(fPath, x.options.searchPath, x.pathHighlighter)
 		}
 
-		if !fInfo.IsDir() && x.options.searchGrep != "" {
+		if !fInfo.IsDir() && x.options.searchGrep != "" && fInfo.Size() > 0 {
 			matchedPath.content, err = x.grep(fPath)
 			if err != nil {
 				return err
@@ -147,12 +147,38 @@ func (x *xfg) grep(fPath string) ([]line, error) {
 	}
 	defer fh.Close()
 
+	isBinary, err := x.isBinary(fh)
+	if err != nil {
+		return nil, err
+	}
+	if isBinary {
+		return nil, nil
+	}
+
+	fh.Seek(0, 0)
+
 	matchedContents, err := x.grepFile(bufio.NewScanner(fh), fPath)
 	if err != nil {
 		return nil, err
 	}
 
 	return matchedContents, nil
+}
+
+func (x *xfg) isBinary(fh *os.File) (bool, error) {
+	dat := make([]byte, 8000)
+	n, err := fh.Read(dat)
+	if err != nil {
+		return false, err
+	}
+
+	for _, c := range dat[:n] {
+		if c == 0x00 {
+			return true, nil
+		}
+	}
+
+	return false, nil
 }
 
 func (x *xfg) grepFile(scanner *bufio.Scanner, fPath string) ([]line, error) {
