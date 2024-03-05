@@ -20,7 +20,7 @@ func TestRunner_OK(t *testing.T) {
 				searchPath: "service-b",
 			},
 			expect: here.Doc(`
-                testdata/service-b
+                testdata/service-b/
                 testdata/service-b/main.go
 			`),
 		},
@@ -30,7 +30,7 @@ func TestRunner_OK(t *testing.T) {
 				searchGrep: "func",
 			},
 			expect: here.Doc(`
-                testdata/service-b
+                testdata/service-b/
                 testdata/service-b/main.go
                   3: func main() {
 			`),
@@ -56,7 +56,7 @@ func TestRunner_OK(t *testing.T) {
 				contextLines: 1,
 			},
 			expect: here.Doc(`
-				testdata/service-b
+				testdata/service-b/
 				testdata/service-b/main.go
 				  2: 
 				  3: func main() {
@@ -70,7 +70,7 @@ func TestRunner_OK(t *testing.T) {
 				contextLines: 2,
 			},
 			expect: here.Doc(`
-				testdata/service-b
+				testdata/service-b/
 				testdata/service-b/main.go
 				  1: package b
 				  2: 
@@ -86,7 +86,7 @@ func TestRunner_OK(t *testing.T) {
 				contextLines: 2,
 			},
 			expect: here.Doc(`
-				testdata/service-c
+				testdata/service-c/
 				testdata/service-c/main.go
 				  2: 
 				  3: func main() {
