@@ -93,7 +93,7 @@ func TestRunner_OK(t *testing.T) {
 				  4: 	baz := 56
 				  5: 	bag := 56
 				  6: 
-				  7: 	// some comment
+				  7: 	foo()
 			`),
 		},
 	} {
