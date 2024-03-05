@@ -95,15 +95,14 @@ func (x *xfg) Search() error {
 		}
 
 		if fInfo.IsDir() {
+			if x.options.onlyMatch {
+				return nil // not pick up
+			}
 			fPath = fPath + string(filepath.Separator)
 		}
 
 		if !strings.Contains(fPath, x.options.searchPath) {
 			return nil
-		}
-
-		matchedPath := path{
-			info: fInfo,
 		}
 
 		if x.options.abs {
@@ -114,10 +113,8 @@ func (x *xfg) Search() error {
 			fPath = absPath
 		}
 
-		if x.options.noColor {
-			matchedPath.path = fPath
-		} else {
-			matchedPath.path = strings.ReplaceAll(fPath, x.options.searchPath, x.pathHighlighter)
+		matchedPath := path{
+			info: fInfo,
 		}
 
 		if !fInfo.IsDir() && x.options.searchGrep != "" && fInfo.Size() > 0 {
@@ -125,6 +122,15 @@ func (x *xfg) Search() error {
 			if err != nil {
 				return err
 			}
+			if x.options.onlyMatch && len(matchedPath.content) == 0 {
+				return nil // not pick up
+			}
+		}
+
+		if x.options.noColor {
+			matchedPath.path = fPath
+		} else {
+			matchedPath.path = strings.ReplaceAll(fPath, x.options.searchPath, x.pathHighlighter)
 		}
 
 		paths = append(paths, matchedPath)
