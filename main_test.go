@@ -79,6 +79,23 @@ func TestRunner_OK(t *testing.T) {
 				  5: }
 			`),
 		},
+		"service-c grep 56 with C2. Match 2 consecutive lines": {
+			opt: &options{
+				searchPath:   "service-c",
+				searchGrep:   "56",
+				contextLines: 2,
+			},
+			expect: here.Doc(`
+				testdata/service-c
+				testdata/service-c/main.go
+				  2: 
+				  3: func main() {
+				  4: 	baz := 56
+				  5: 	bag := 56
+				  6: 
+				  7: 	foo()
+			`),
+		},
 	} {
 		t.Run(tname, func(t *testing.T) {
 			var o bytes.Buffer
