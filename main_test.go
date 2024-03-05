@@ -79,7 +79,7 @@ func TestRunner_OK(t *testing.T) {
 				  5: }
 			`),
 		},
-		"service-c grep 56 with C2": {
+		"service-c grep 56 with C2. Match 2 consecutive lines": {
 			opt: &options{
 				searchPath:   "service-c",
 				searchGrep:   "56",
