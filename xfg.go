@@ -94,6 +94,10 @@ func (x *xfg) Search() error {
 			return filepath.SkipDir
 		}
 
+		if fInfo.IsDir() {
+			fPath = fPath + string(filepath.Separator)
+		}
+
 		if !strings.Contains(fPath, x.options.searchPath) {
 			return nil
 		}
