@@ -170,11 +170,11 @@ func (x *xfg) grepFile(scanner *bufio.Scanner, fPath string) ([]line, error) {
 		}
 		if strings.Contains(l, x.options.searchGrep) {
 			if optC {
-				for _, b := range blines {
-					if b.lc == 0 {
+				for _, bl := range blines {
+					if bl.lc == 0 {
 						continue // skip
 					}
-					matchedContents = append(matchedContents, b)
+					matchedContents = append(matchedContents, bl)
 				}
 				blines = make([]line, x.options.contextLines)
 			}
