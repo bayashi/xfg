@@ -35,7 +35,7 @@ func (cli *runner) parseArgs() *options {
 
 	var flagHelp bool
 	var flagVersion bool
-	flag.StringVarP(&o.searchPath, "path", "p", "", "A path string of a root to find")
+	flag.StringVarP(&o.searchPath, "path", "p", "", "A string to find paths")
 	flag.StringVarP(&o.searchGrep, "grep", "g", "", "A string to search for contents")
 	flag.StringVarP(&o.searchStart, "start", "s", ".", "A location to start searching")
 	flag.BoolVarP(&o.noColor, "no-color", "", false, "disable colors for matched words")
