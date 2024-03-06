@@ -21,10 +21,13 @@ type options struct {
 	searchGrep  string
 	searchStart string
 
-	relax     bool
-	noColor   bool
-	abs       bool
-	onlyMatch bool
+	groupSeparator string
+
+	relax            bool
+	noColor          bool
+	abs              bool
+	onlyMatch        bool
+	noGroupSeparator bool
 
 	contextLines uint32
 }
@@ -39,10 +42,12 @@ func (cli *runner) parseArgs() *options {
 	flag.StringVarP(&o.searchPath, "path", "p", "", "A string to find paths")
 	flag.StringVarP(&o.searchGrep, "grep", "g", "", "A string to search for contents")
 	flag.StringVarP(&o.searchStart, "start", "s", ".", "A location to start searching")
+	flag.StringVarP(&o.groupSeparator, "group-separator", "", "--", "When -C is in use, print this string instead of `--` between groups of lines")
 	flag.BoolVarP(&o.noColor, "no-color", "", false, "disable colors for matched words")
 	flag.BoolVarP(&o.relax, "relax", "", false, "Insert blank space between contents for relaxing view")
 	flag.BoolVarP(&o.abs, "abs", "", false, "Show absolute paths")
 	flag.BoolVarP(&o.onlyMatch, "only-match", "o", false, "Show paths only matched contents by grep")
+	flag.BoolVarP(&o.noGroupSeparator, "no-group-separator", "", false, "When -C is in use, do not print a separator between groups of lines")
 	flag.Uint32VarP(&o.contextLines, "context", "C", 0, "Show several lines before and after the matched one")
 	flag.BoolVarP(&flagHelp, "help", "h", false, "Show help (This message) and exit")
 	flag.BoolVarP(&flagVersion, "version", "v", false, "Show version and build command info and exit")
