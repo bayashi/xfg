@@ -120,6 +120,20 @@ func TestRunner_OK(t *testing.T) {
                   4: 	foo := 12
 			`),
 		},
+		"service-c grep foo": {
+			opt: &options{
+				searchPath:     "service-c",
+				searchGrep:     "foo",
+				groupSeparator: "--",
+			},
+			expect: here.Doc(`
+                testdata/service-c/
+                testdata/service-c/main.go
+                  7: 	foo()
+                  --
+                  10: func foo() {
+			`),
+		},
 	} {
 		t.Run(tname, func(t *testing.T) {
 			var o bytes.Buffer

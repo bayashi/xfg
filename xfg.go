@@ -56,7 +56,13 @@ func (x *xfg) Show(w io.Writer) error {
 		if _, err := fmt.Fprintf(writer, "%s\n", p.path); err != nil {
 			return err
 		}
+		var blc int32 = 0
 		for _, line := range p.content {
+			if blc != 0 && line.lc-blc > 1 {
+				if _, err := fmt.Fprint(writer, "  "+x.options.groupSeparator+"\n"); err != nil {
+					return err
+				}
+			}
 			lc := fmt.Sprintf("%d", line.lc)
 			if !x.options.noColor && line.matched {
 				lc = x.grepHighlitColor.Sprint(lc)
@@ -64,6 +70,7 @@ func (x *xfg) Show(w io.Writer) error {
 			if _, err := fmt.Fprintf(writer, "  %s: %s\n", lc, line.content); err != nil {
 				return err
 			}
+			blc = line.lc
 		}
 		if x.options.relax && len(p.content) > 0 {
 			if _, err := fmt.Fprint(writer, "\n"); err != nil {
