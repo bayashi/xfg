@@ -20,7 +20,7 @@ type line struct {
 type path struct {
 	path    string
 	info    os.FileInfo
-	content []line
+	contents []line
 }
 
 type xfg struct {
@@ -60,10 +60,10 @@ func (x *xfg) Show(w io.Writer) error {
 			return err
 		}
 
-		if len(p.content) > 0 {
-			x.showContent(writer, p.content)
+		if len(p.contents) > 0 {
+			x.showContent(writer, p.contents)
 		}
-		if x.options.relax && len(p.content) > 0 {
+		if x.options.relax && len(p.contents) > 0 {
 			if _, err := fmt.Fprint(writer, "\n"); err != nil {
 				return err
 			}
@@ -139,11 +139,11 @@ func (x *xfg) Search() error {
 		}
 
 		if x.options.searchGrep != "" && isRegularFile(fInfo) {
-			matchedPath.content, err = x.grep(fPath)
+			matchedPath.contents, err = x.grep(fPath)
 			if err != nil {
 				return fmt.Errorf("error during grep: %w", err)
 			}
-			if x.options.onlyMatch && len(matchedPath.content) == 0 {
+			if x.options.onlyMatch && len(matchedPath.contents) == 0 {
 				return nil // not pick up
 			}
 		}
