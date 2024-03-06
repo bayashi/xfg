@@ -117,7 +117,7 @@ func (x *xfg) Search() error {
 			info: fInfo,
 		}
 
-		if !fInfo.IsDir() && x.options.searchGrep != "" && fInfo.Size() > 0 {
+		if x.options.searchGrep != "" && !fInfo.IsDir() && fInfo.Size() > 0 {
 			matchedPath.content, err = x.grep(fPath)
 			if err != nil {
 				return fmt.Errorf("error during grep: %w", err)
@@ -155,13 +155,15 @@ func (x *xfg) grep(fPath string) ([]line, error) {
 
 	isBinary, err := x.isBinary(fh)
 	if err != nil {
-		return nil, fmt.Errorf("error during isBinary: %w", err)
+		return nil, fmt.Errorf("error during isBinary file `%s`: %w", fPath, err)
 	}
 	if isBinary {
 		return nil, nil
 	}
 
-	fh.Seek(0, 0)
+	if _, err := fh.Seek(0, 0); err != nil {
+		return nil, fmt.Errorf("could not seek `%s`: %w", fPath, err)
+	}
 
 	matchedContents, err := x.grepFile(bufio.NewScanner(fh), fPath)
 	if err != nil {
