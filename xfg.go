@@ -108,7 +108,7 @@ func (x *xfg) Search() error {
 		if x.options.abs {
 			absPath, err := filepath.Abs(fPath)
 			if err != nil {
-				return err
+				return fmt.Errorf("failed to get absolute path from `%s`: %w", fPath, err)
 			}
 			fPath = absPath
 		}
@@ -120,7 +120,7 @@ func (x *xfg) Search() error {
 		if !fInfo.IsDir() && x.options.searchGrep != "" && fInfo.Size() > 0 {
 			matchedPath.content, err = x.grep(fPath)
 			if err != nil {
-				return err
+				return fmt.Errorf("error during grep: %w", err)
 			}
 			if x.options.onlyMatch && len(matchedPath.content) == 0 {
 				return nil // not pick up
@@ -138,7 +138,7 @@ func (x *xfg) Search() error {
 		return nil
 	})
 	if walkErr != nil {
-		return walkErr
+		return fmt.Errorf("failed to walk: %w", walkErr)
 	}
 
 	x.result = paths
@@ -155,7 +155,7 @@ func (x *xfg) grep(fPath string) ([]line, error) {
 
 	isBinary, err := x.isBinary(fh)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("error during isBinary: %w", err)
 	}
 	if isBinary {
 		return nil, nil
@@ -175,7 +175,7 @@ func (x *xfg) isBinary(fh *os.File) (bool, error) {
 	dat := make([]byte, 8000)
 	n, err := fh.Read(dat)
 	if err != nil {
-		return false, err
+		return false, fmt.Errorf("could not read fh: %w", err)
 	}
 
 	for _, c := range dat[:n] {
