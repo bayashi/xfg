@@ -18,9 +18,9 @@ type line struct {
 }
 
 type path struct {
-	path    string
-	info    os.FileInfo
-	content []line
+	path     string
+	info     os.FileInfo
+	contents []line
 }
 
 type xfg struct {
@@ -59,30 +59,41 @@ func (x *xfg) Show(w io.Writer) error {
 		if _, err := fmt.Fprintf(writer, "%s\n", p.path); err != nil {
 			return err
 		}
-		var blc int32 = 0
-		for _, line := range p.content {
-			if blc != 0 && line.lc-blc > 1 {
-				if _, err := fmt.Fprint(writer, x.options.indent+x.options.groupSeparator+"\n"); err != nil {
-					return err
-				}
-			}
-			lc := fmt.Sprintf("%d", line.lc)
-			if !x.options.noColor && line.matched {
-				lc = x.grepHighlitColor.Sprint(lc)
-			}
-			if _, err := fmt.Fprintf(writer, "%s%s: %s\n", x.options.indent, lc, line.content); err != nil {
-				return err
-			}
-			blc = line.lc
+
+		if len(p.contents) > 0 {
+			x.showContent(writer, p.contents)
 		}
-		if x.options.relax && len(p.content) > 0 {
+		if x.options.relax && len(p.contents) > 0 {
 			if _, err := fmt.Fprint(writer, "\n"); err != nil {
 				return err
 			}
 		}
+
 		if err := writer.Flush(); err != nil {
 			return err
 		}
+
+	}
+
+	return nil
+}
+
+func (x *xfg) showContent(writer *bufio.Writer, contents []line) error {
+	var blc int32 = 0
+	for _, line := range contents {
+		if blc != 0 && line.lc-blc > 1 {
+			if _, err := fmt.Fprint(writer, x.options.indent+x.options.groupSeparator+"\n"); err != nil {
+				return err
+			}
+		}
+		lc := fmt.Sprintf("%d", line.lc)
+		if !x.options.noColor && line.matched {
+			lc = x.grepHighlitColor.Sprint(lc)
+		}
+		if _, err := fmt.Fprintf(writer, "%s%s: %s\n", x.options.indent, lc, line.content); err != nil {
+			return err
+		}
+		blc = line.lc
 	}
 
 	return nil
@@ -128,11 +139,11 @@ func (x *xfg) Search() error {
 		}
 
 		if x.options.searchGrep != "" && isRegularFile(fInfo) {
-			matchedPath.content, err = x.grep(fPath)
+			matchedPath.contents, err = x.grep(fPath)
 			if err != nil {
 				return fmt.Errorf("error during grep: %w", err)
 			}
-			if x.options.onlyMatch && len(matchedPath.content) == 0 {
+			if x.options.onlyMatch && len(matchedPath.contents) == 0 {
 				return nil // not pick up
 			}
 		}
