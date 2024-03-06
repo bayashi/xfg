@@ -18,8 +18,8 @@ type line struct {
 }
 
 type path struct {
-	path    string
-	info    os.FileInfo
+	path     string
+	info     os.FileInfo
 	contents []line
 }
 
