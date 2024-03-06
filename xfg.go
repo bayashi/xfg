@@ -117,7 +117,7 @@ func (x *xfg) Search() error {
 			info: fInfo,
 		}
 
-		if x.options.searchGrep != "" && !fInfo.IsDir() && fInfo.Size() > 0 {
+		if x.options.searchGrep != "" && isRegularFile(fInfo) {
 			matchedPath.content, err = x.grep(fPath)
 			if err != nil {
 				return fmt.Errorf("error during grep: %w", err)
@@ -241,6 +241,10 @@ func (x *xfg) grepFile(scanner *bufio.Scanner, fPath string) ([]line, error) {
 	}
 
 	return matchedContents, nil
+}
+
+func isRegularFile(fInfo os.FileInfo) bool {
+	return fInfo.Size() > 0 && fInfo.Mode().Type() == 0
 }
 
 func validateStartPath(startPath string) (string, error) {
