@@ -51,6 +51,9 @@ func NewX(o *options, pathHighlightColor *color.Color, grepHighlightColor *color
 }
 
 func (x *xfg) Show(w io.Writer) error {
+	if x.options.noIndent {
+		x.options.indent = ""
+	}
 	writer := bufio.NewWriter(w)
 	for _, p := range x.result {
 		if _, err := fmt.Fprintf(writer, "%s\n", p.path); err != nil {
@@ -59,7 +62,7 @@ func (x *xfg) Show(w io.Writer) error {
 		var blc int32 = 0
 		for _, line := range p.content {
 			if blc != 0 && line.lc-blc > 1 {
-				if _, err := fmt.Fprint(writer, "  "+x.options.groupSeparator+"\n"); err != nil {
+				if _, err := fmt.Fprint(writer, x.options.indent+x.options.groupSeparator+"\n"); err != nil {
 					return err
 				}
 			}
@@ -67,7 +70,7 @@ func (x *xfg) Show(w io.Writer) error {
 			if !x.options.noColor && line.matched {
 				lc = x.grepHighlitColor.Sprint(lc)
 			}
-			if _, err := fmt.Fprintf(writer, "  %s: %s\n", lc, line.content); err != nil {
+			if _, err := fmt.Fprintf(writer, "%s%s: %s\n", x.options.indent, lc, line.content); err != nil {
 				return err
 			}
 			blc = line.lc

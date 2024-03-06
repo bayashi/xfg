@@ -18,6 +18,7 @@ func TestRunner_OK(t *testing.T) {
 		"service-b": {
 			opt: &options{
 				searchPath: "service-b",
+				indent:     "  ",
 			},
 			expect: here.Doc(`
                 testdata/service-b/
@@ -28,6 +29,7 @@ func TestRunner_OK(t *testing.T) {
 			opt: &options{
 				searchPath: "service-b",
 				searchGrep: "func",
+				indent:     "  ",
 			},
 			expect: here.Doc(`
                 testdata/service-b/
@@ -39,6 +41,7 @@ func TestRunner_OK(t *testing.T) {
 			opt: &options{
 				searchPath: "main",
 				searchGrep: "package b",
+				indent:     "  ",
 				relax:      true,
 			},
 			expect: here.Doc(`
@@ -53,6 +56,7 @@ func TestRunner_OK(t *testing.T) {
 			opt: &options{
 				searchPath:   "service-b",
 				searchGrep:   "main",
+				indent:       "  ",
 				contextLines: 1,
 			},
 			expect: here.Doc(`
@@ -67,6 +71,7 @@ func TestRunner_OK(t *testing.T) {
 			opt: &options{
 				searchPath:   "service-b",
 				searchGrep:   "main",
+				indent:       "  ",
 				contextLines: 2,
 			},
 			expect: here.Doc(`
@@ -83,6 +88,7 @@ func TestRunner_OK(t *testing.T) {
 			opt: &options{
 				searchPath:   "service-c",
 				searchGrep:   "56",
+				indent:       "  ",
 				contextLines: 2,
 			},
 			expect: here.Doc(`
@@ -100,6 +106,7 @@ func TestRunner_OK(t *testing.T) {
 			opt: &options{
 				searchPath: "service-b",
 				searchGrep: "func",
+				indent:     "  ",
 				onlyMatch:  true,
 			},
 			expect: here.Doc(`
@@ -111,6 +118,7 @@ func TestRunner_OK(t *testing.T) {
 			opt: &options{
 				searchPath: "service-a",
 				searchGrep: "foo",
+				indent:     "  ",
 			},
 			expect: here.Doc(`
                 testdata/service-a/
@@ -125,6 +133,7 @@ func TestRunner_OK(t *testing.T) {
 				searchPath:     "service-c",
 				searchGrep:     "foo",
 				groupSeparator: "--",
+				indent:         "  ",
 			},
 			expect: here.Doc(`
                 testdata/service-c/
@@ -132,6 +141,34 @@ func TestRunner_OK(t *testing.T) {
                   7: 	foo()
                   --
                   10: func foo() {
+			`),
+		},
+		"service-c grep foo noIndent": {
+			opt: &options{
+				searchPath:     "service-c",
+				searchGrep:     "foo",
+				groupSeparator: "--",
+				indent:         "  ",
+				noIndent:       true,
+			},
+			expect: here.Doc(`
+                testdata/service-c/
+                testdata/service-c/main.go
+                7: 	foo()
+                --
+                10: func foo() {
+			`),
+		},
+		"service-b grep custom indent string": {
+			opt: &options{
+				searchPath: "service-b",
+				searchGrep: "func",
+				indent:     "	",
+			},
+			expect: here.Doc(`
+                testdata/service-b/
+                testdata/service-b/main.go
+                	3: func main() {
 			`),
 		},
 	} {
