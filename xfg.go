@@ -167,7 +167,7 @@ func (x *xfg) grep(fPath string) ([]line, error) {
 
 	matchedContents, err := x.grepFile(bufio.NewScanner(fh), fPath)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("could not grepFile `%s`: %w", fPath, err)
 	}
 
 	return matchedContents, nil
