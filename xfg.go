@@ -120,6 +120,8 @@ func (x *xfg) Search() error {
 				return nil // not pick up
 			}
 			fPath = fPath + string(filepath.Separator)
+		} else if fInfo.Name() == ".gitkeep" {
+			return nil // skip
 		}
 
 		if !strings.Contains(fPath, x.options.searchPath) {
