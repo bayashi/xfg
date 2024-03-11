@@ -171,6 +171,14 @@ func TestRunner_OK(t *testing.T) {
                 	3: func main() {
 			`),
 		},
+		"service-d ignore .gitkeep": {
+			opt: &options{
+				searchPath: "service-d",
+			},
+			expect: here.Doc(`
+                testdata/service-d/
+			`),
+		},
 	} {
 		t.Run(tname, func(t *testing.T) {
 			var o bytes.Buffer
