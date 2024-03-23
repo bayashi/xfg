@@ -31,6 +31,7 @@ type options struct {
 	noGroupSeparator bool
 	noIndent         bool
 	hidden           bool
+	skipGitIgnore    bool
 
 	contextLines uint32
 }
@@ -54,6 +55,7 @@ func (cli *runner) parseArgs() *options {
 	flag.BoolVarP(&o.noGroupSeparator, "no-group-separator", "", false, "When -C is in use, do not print a separator between groups of lines")
 	flag.BoolVarP(&o.noIndent, "no-indent", "", false, "Do not print an indent string")
 	flag.BoolVarP(&o.hidden, "hidden", "", false, "Search hidden files")
+	flag.BoolVarP(&o.skipGitIgnore, "skip-git-ignore", "", false, "Search files and directories if these match a line of .gitignore")
 	flag.Uint32VarP(&o.contextLines, "context", "C", 0, "Show several lines before and after the matched one")
 	flag.BoolVarP(&flagHelp, "help", "h", false, "Show help (This message) and exit")
 	flag.BoolVarP(&flagVersion, "version", "v", false, "Show version and build command info and exit")

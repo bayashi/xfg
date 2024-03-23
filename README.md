@@ -65,8 +65,11 @@ service-b/main.go
 ## Notes
 
 * Not follow symbolic links
-* Files and directories whose names start with a dot are ignored
-* Support .gitignore file to ignore files and directories
+* Files and directories whose names start with a dot are ignored by default
+    * Use `--hidden` option to search for hidden-files/directories
+        * Still ignore `.git` and `.gitkeep`
+* Support .gitignore file to ignore files and directories by default
+    * Use `--skip-gitignore` option to enable `.gitignore` file
 
 Also See `--help` for more options.
 

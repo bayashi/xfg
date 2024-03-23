@@ -108,12 +108,15 @@ func (x *xfg) Search() error {
 		return err
 	}
 
-	// read .gitignore file in start directory to search or home directory
-	// There would be no .gitignore file, then `gitignore` variable will be `nil`.
-	gitignore, _ := ignore.CompileIgnoreFile(filepath.Join(sPath, GIT_IGNOE_FILE_NAME))
-	if gitignore == nil {
-		if homeDir, err := os.UserHomeDir(); err == nil {
-			gitignore, _ = ignore.CompileIgnoreFile(filepath.Join(homeDir, GIT_IGNOE_FILE_NAME))
+	var gitignore *ignore.GitIgnore
+	if !x.options.skipGitIgnore {
+		// read .gitignore file in start directory to search or home directory
+		// There would be no .gitignore file, then `gitignore` variable will be `nil`.
+		gitignore, _ = ignore.CompileIgnoreFile(filepath.Join(sPath, GIT_IGNOE_FILE_NAME))
+		if gitignore == nil {
+			if homeDir, err := os.UserHomeDir(); err == nil {
+				gitignore, _ = ignore.CompileIgnoreFile(filepath.Join(homeDir, GIT_IGNOE_FILE_NAME))
+			}
 		}
 	}
 
