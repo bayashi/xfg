@@ -132,15 +132,17 @@ func (x *xfg) Search() error {
 			}
 		}
 
-		if fInfo.IsDir() && fInfo.Name() == ".git" {
-			return filepath.SkipDir // not search for .git directory
-		} else if !fInfo.IsDir() && (fInfo.Name() == ".gitkeep" || strings.HasSuffix(fInfo.Name(), ".min.js")) {
-			return nil // not pick .gitkeep file
-		} else if !x.options.hidden && strings.HasPrefix(fInfo.Name(), ".") {
-			return nil // skip dot-file
+		if !x.options.searchAll {
+			if fInfo.IsDir() && fInfo.Name() == ".git" {
+				return filepath.SkipDir // not search for .git directory
+			} else if !fInfo.IsDir() && (fInfo.Name() == ".gitkeep" || strings.HasSuffix(fInfo.Name(), ".min.js")) {
+				return nil // not pick .gitkeep file
+			} else if !x.options.hidden && strings.HasPrefix(fInfo.Name(), ".") {
+				return nil // skip dot-file
+			}
 		}
 
-		if gitignore != nil && gitignore.MatchesPath(fPath) {
+		if !x.options.searchAll && gitignore != nil && gitignore.MatchesPath(fPath) {
 			return nil // skip a file by .gitignore
 		}
 
