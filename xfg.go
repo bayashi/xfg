@@ -113,6 +113,10 @@ func (x *xfg) Search() error {
 
 		if fInfo.IsDir() && fInfo.Name() == ".git" {
 			return filepath.SkipDir
+		} else if !fInfo.IsDir() && fInfo.Name() == ".gitkeep" {
+			return nil
+		} else if !x.options.hidden && strings.HasPrefix(fInfo.Name(), ".") {
+			return nil
 		}
 
 		if fInfo.IsDir() {
@@ -120,8 +124,6 @@ func (x *xfg) Search() error {
 				return nil // not pick up
 			}
 			fPath = fPath + string(filepath.Separator)
-		} else if fInfo.Name() == ".gitkeep" {
-			return nil // skip
 		}
 
 		if !strings.Contains(fPath, x.options.searchPath) {

@@ -179,6 +179,34 @@ func TestRunner_OK(t *testing.T) {
                 testdata/service-d/
 			`),
 		},
+		"not pick .gitkeep even with --hidden option": {
+			opt: &options{
+				searchPath: "service-d",
+				hidden: true,
+			},
+			expect: here.Doc(`
+                testdata/service-d/
+			`),
+		},
+		"not pick dotfile by default": {
+			opt: &options{
+				searchPath: "service-e",
+				hidden: false, // default false
+			},
+			expect: here.Doc(`
+                testdata/service-e/
+			`),
+		},
+		"pick dotfile with --hidden option": {
+			opt: &options{
+				searchPath: "service-e",
+				hidden: true,
+			},
+			expect: here.Doc(`
+                testdata/service-e/
+                testdata/service-e/.config
+			`),
+		},
 	} {
 		t.Run(tname, func(t *testing.T) {
 			var o bytes.Buffer
