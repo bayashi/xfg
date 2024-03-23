@@ -66,6 +66,7 @@ service-b/main.go
 
 * Not follow symbolic links
 * Files and directories whose names start with a dot are ignored
+* Support .gitignore file to ignore files and directories
 
 Also See `--help` for more options.
 
