@@ -217,7 +217,7 @@ func TestRunner_OK(t *testing.T) {
 		},
 		"pick up ignorez dir with --skip-gitignore option": {
 			opt: &options{
-				searchPath: "service-f",
+				searchPath:    "service-f",
 				skipGitIgnore: true,
 			},
 			expect: here.Doc(`
