@@ -65,7 +65,9 @@ service-b/main.go
 ## Notes
 
 * Not follow symbolic links
-* `.git` directory is ignored
+* Files and directories whose names start with a dot are ignored
+
+Also See `--help` for more options.
 
 ## Installation
 
