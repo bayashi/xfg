@@ -233,6 +233,26 @@ func TestRunner_OK(t *testing.T) {
                 testdata/service-g/
 			`),
 		},
+		"ignore option": {
+			opt: &options{
+				searchPath: "service-a",
+				ignore:     []string{"a.dat", "b"},
+			},
+			expect: here.Doc(`
+                testdata/service-a/
+                testdata/service-a/main.go
+			`),
+		},
+		"ignore anyway even with --hidden option": {
+			opt: &options{
+				searchPath: "service-e",
+				hidden:     true,
+				ignore:     []string{".config"},
+			},
+			expect: here.Doc(`
+                testdata/service-e/
+			`),
+		},
 	} {
 		t.Run(tname, func(t *testing.T) {
 			var o bytes.Buffer

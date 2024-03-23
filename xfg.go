@@ -126,6 +126,12 @@ func (x *xfg) Search() error {
 			return fmt.Errorf("something went wrong within path `%s` at `%s`: %w", sPath, fPath, err)
 		}
 
+		for _, i := range x.options.ignore {
+			if i != "" && strings.Contains(fPath, i) {
+				return nil // skip
+			}
+		}
+
 		if fInfo.IsDir() && fInfo.Name() == ".git" {
 			return filepath.SkipDir // not search for .git directory
 		} else if !fInfo.IsDir() && (fInfo.Name() == ".gitkeep" || strings.HasSuffix(fInfo.Name(), ".min.js")) {

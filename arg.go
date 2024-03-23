@@ -24,6 +24,8 @@ type options struct {
 	groupSeparator string
 	indent         string
 
+	ignore []string
+
 	relax            bool
 	noColor          bool
 	abs              bool
@@ -48,6 +50,7 @@ func (cli *runner) parseArgs() *options {
 	flag.StringVarP(&o.searchStart, "start", "s", ".", "A location to start searching")
 	flag.StringVarP(&o.groupSeparator, "group-separator", "", "--", "When -C is in use, print this string instead of `--` between groups of lines")
 	flag.StringVarP(&o.indent, "indent", "", "  ", "Indent string for the top of each line")
+	flag.StringArrayVarP(&o.ignore, "ignore", "", []string{}, "Ignore stuff even with `--search-all`")
 	flag.BoolVarP(&o.noColor, "no-color", "", false, "disable colors for matched words")
 	flag.BoolVarP(&o.relax, "relax", "", false, "Insert blank space between contents for relaxing view")
 	flag.BoolVarP(&o.abs, "abs", "", false, "Show absolute paths")
