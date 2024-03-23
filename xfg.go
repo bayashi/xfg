@@ -9,6 +9,7 @@ import (
 	"strings"
 
 	"github.com/fatih/color"
+	ignore "github.com/sabhiram/go-gitignore"
 )
 
 type line struct {
@@ -99,10 +100,21 @@ func (x *xfg) showContent(writer *bufio.Writer, contents []line) error {
 	return nil
 }
 
+const GIT_IGNOE_FILE_NAME = ".gitignore"
+
 func (x *xfg) Search() error {
 	sPath, err := validateStartPath(x.options.searchStart)
 	if err != nil {
 		return err
+	}
+
+	// read .gitignore file in start directory to search or home directory
+	// There would be no .gitignore file, then `gitignore` variable will be `nil`.
+	gitignore, _ := ignore.CompileIgnoreFile(filepath.Join(sPath, GIT_IGNOE_FILE_NAME))
+	if gitignore == nil {
+		if homeDir, err := os.UserHomeDir(); err == nil {
+			gitignore, _ = ignore.CompileIgnoreFile(filepath.Join(homeDir, GIT_IGNOE_FILE_NAME))
+		}
 	}
 
 	var paths []path
@@ -112,11 +124,15 @@ func (x *xfg) Search() error {
 		}
 
 		if fInfo.IsDir() && fInfo.Name() == ".git" {
-			return filepath.SkipDir
+			return filepath.SkipDir // not search for .git directory
 		} else if !fInfo.IsDir() && fInfo.Name() == ".gitkeep" {
-			return nil
+			return nil // not pick .gitkeep file
 		} else if !x.options.hidden && strings.HasPrefix(fInfo.Name(), ".") {
-			return nil
+			return nil // skip dot-file
+		}
+
+		if gitignore != nil && gitignore.MatchesPath(fPath) {
+			return nil // skip a file by .gitignore
 		}
 
 		if fInfo.IsDir() {

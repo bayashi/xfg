@@ -207,6 +207,14 @@ func TestRunner_OK(t *testing.T) {
                 testdata/service-e/.config
 			`),
 		},
+		"not pick up ignorez dir due to .gitignore": {
+			opt: &options{
+				searchPath: "service-f",
+			},
+			expect: here.Doc(`
+                testdata/service-f/
+			`),
+		},
 	} {
 		t.Run(tname, func(t *testing.T) {
 			var o bytes.Buffer
