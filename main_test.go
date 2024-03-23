@@ -182,7 +182,7 @@ func TestRunner_OK(t *testing.T) {
 		"not pick .gitkeep even with --hidden option": {
 			opt: &options{
 				searchPath: "service-d",
-				hidden: true,
+				hidden:     true,
 			},
 			expect: here.Doc(`
                 testdata/service-d/
@@ -191,7 +191,7 @@ func TestRunner_OK(t *testing.T) {
 		"not pick dotfile by default": {
 			opt: &options{
 				searchPath: "service-e",
-				hidden: false, // default false
+				hidden:     false, // default false
 			},
 			expect: here.Doc(`
                 testdata/service-e/
@@ -200,7 +200,7 @@ func TestRunner_OK(t *testing.T) {
 		"pick dotfile with --hidden option": {
 			opt: &options{
 				searchPath: "service-e",
-				hidden: true,
+				hidden:     true,
 			},
 			expect: here.Doc(`
                 testdata/service-e/
