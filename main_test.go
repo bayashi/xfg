@@ -233,6 +233,56 @@ func TestRunner_OK(t *testing.T) {
                 testdata/service-g/
 			`),
 		},
+		"ignore option": {
+			opt: &options{
+				searchPath: "service-a",
+				ignore:     []string{"a.dat", "b"},
+			},
+			expect: here.Doc(`
+                testdata/service-a/
+                testdata/service-a/main.go
+			`),
+		},
+		"ignore anyway even with --hidden option": {
+			opt: &options{
+				searchPath: "service-e",
+				hidden:     true,
+				ignore:     []string{".config"},
+			},
+			expect: here.Doc(`
+                testdata/service-e/
+			`),
+		},
+		"ignore anyway even with --search-all option": {
+			opt: &options{
+				searchPath: "service-e",
+				searchAll:  true,
+				ignore:     []string{".config"},
+			},
+			expect: here.Doc(`
+                testdata/service-e/
+			`),
+		},
+		"pick *min.js with --search-all option": {
+			opt: &options{
+				searchPath: "service-g",
+				searchAll:  true,
+			},
+			expect: here.Doc(`
+                testdata/service-g/
+                testdata/service-g/service-g.min.js
+			`),
+		},
+		"pick up ignorez dir with --search-all option": {
+			opt: &options{
+				searchPath: "service-f",
+				searchAll:  true,
+			},
+			expect: here.Doc(`
+                testdata/service-f/
+                testdata/service-f/ignorez/
+			`),
+		},
 	} {
 		t.Run(tname, func(t *testing.T) {
 			var o bytes.Buffer
