@@ -1,6 +1,4 @@
-# xfg: Cross find and grep tool
-
-Do `find` paths by a keyword, and also search for contents like a `grep`.
+# xfg
 
 <a href="https://github.com/bayashi/xfg/actions" title="xfg CI"><img src="https://github.com/bayashi/xfg/workflows/main/badge.svg" alt="xfg CI"></a>
 <a href="https://goreportcard.com/report/github.com/bayashi/xfg" title="xfg report card" target="_blank"><img src="https://goreportcard.com/badge/github.com/bayashi/xfg" alt="xfg report card"></a>
@@ -8,7 +6,7 @@ Do `find` paths by a keyword, and also search for contents like a `grep`.
 
 ## Features
 
-* Find paths first, then grep contents
+* Find paths and search for contents
 
 ## Usage of `xfg` command
 
