@@ -225,6 +225,14 @@ func TestRunner_OK(t *testing.T) {
                 testdata/service-f/ignorez/
 			`),
 		},
+		"ignore *min.js by default": {
+			opt: &options{
+				searchPath: "service-g",
+			},
+			expect: here.Doc(`
+                testdata/service-g/
+			`),
+		},
 	} {
 		t.Run(tname, func(t *testing.T) {
 			var o bytes.Buffer
