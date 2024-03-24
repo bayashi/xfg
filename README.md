@@ -4,9 +4,7 @@
 <a href="https://goreportcard.com/report/github.com/bayashi/xfg" title="xfg report card" target="_blank"><img src="https://goreportcard.com/badge/github.com/bayashi/xfg" alt="xfg report card"></a>
 <a href="https://pkg.go.dev/github.com/bayashi/xfg" title="Go xfg package reference" target="_blank"><img src="https://pkg.go.dev/badge/github.com/bayashi/xfg.svg" alt="Go Reference: xfg"></a>
 
-## Features
-
-* Find paths and search for contents
+Find paths anyway, then search for contents also
 
 ## Usage of `xfg` command
 
