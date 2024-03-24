@@ -331,7 +331,7 @@ func (x *xfg) grepFile(scanner *bufio.Scanner, fPath string) ([]line, error) {
 					aline--
 					matchedContents = append(matchedContents, line{lc: lc, content: l})
 				} else {
-					// lotate blines
+					// rotate blines
 					// join "2nd to last elements of `blines`" and "current `line`"
 					blines = append(blines[1:], line{lc: lc, content: l})
 				}
