@@ -179,7 +179,7 @@ func (x *xfg) postMatch(fPath string, fInfo fs.FileInfo) (err error) {
 	}
 
 	if x.options.searchGrep != "" && isRegularFile(fInfo) {
-		matchedPath.contents, err = x.grep(fPath)
+		matchedPath.contents, err = x.grepPath(fPath)
 		if err != nil {
 			return fmt.Errorf("error during grep: %w", err)
 		}
@@ -245,7 +245,7 @@ func (x *xfg) compileGitIgnore(sPath string) *ignore.GitIgnore {
 	return gitignore
 }
 
-func (x *xfg) grep(fPath string) ([]line, error) {
+func (x *xfg) grepPath(fPath string) ([]line, error) {
 	fh, err := os.Open(fPath)
 	if err != nil {
 		return nil, fmt.Errorf("could not open file `%s`: %w", fPath, err)
