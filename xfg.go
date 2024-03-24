@@ -168,12 +168,17 @@ func (x *xfg) walker(wa *walkerArg) error {
 		fPath = absPath
 	}
 
+	x.postMatch(fPath, fInfo)
+
+	return nil
+}
+
+func (x *xfg) postMatch(fPath string, fInfo fs.FileInfo) (err error) {
 	matchedPath := path{
 		info: fInfo,
 	}
 
 	if x.options.searchGrep != "" && isRegularFile(fInfo) {
-		var err error
 		matchedPath.contents, err = x.grep(fPath)
 		if err != nil {
 			return fmt.Errorf("error during grep: %w", err)
