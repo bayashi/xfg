@@ -58,6 +58,31 @@ type walkerArg struct {
 	gitignore *ignore.GitIgnore
 }
 
+func (x *xfg) Search() error {
+	if err := validateStartPath(x.options.searchStart); err != nil {
+		return err
+	}
+
+	gitignore := x.compileGitIgnore(x.options.searchStart)
+
+	walkErr := filepath.Walk(x.options.searchStart, func(fPath string, fInfo os.FileInfo, err error) error {
+		if err != nil {
+			return fmt.Errorf("something went wrong within path `%s` at `%s`: %w", x.options.searchStart, fPath, err)
+		}
+
+		return x.walker(&walkerArg{
+			path:      fPath,
+			info:      fInfo,
+			gitignore: gitignore,
+		})
+	})
+	if walkErr != nil {
+		return fmt.Errorf("failed to walk: %w", walkErr)
+	}
+
+	return nil
+}
+
 func (x *xfg) walker(wa *walkerArg) error {
 	fPath, fInfo := wa.path, wa.info
 
@@ -150,31 +175,6 @@ func (x *xfg) postMatch(fPath string, fInfo fs.FileInfo) (err error) {
 	}
 
 	x.result = append(x.result, matchedPath)
-
-	return nil
-}
-
-func (x *xfg) Search() error {
-	if err := validateStartPath(x.options.searchStart); err != nil {
-		return err
-	}
-
-	gitignore := x.compileGitIgnore(x.options.searchStart)
-
-	walkErr := filepath.Walk(x.options.searchStart, func(fPath string, fInfo os.FileInfo, err error) error {
-		if err != nil {
-			return fmt.Errorf("something went wrong within path `%s` at `%s`: %w", x.options.searchStart, fPath, err)
-		}
-
-		return x.walker(&walkerArg{
-			path:      fPath,
-			info:      fInfo,
-			gitignore: gitignore,
-		})
-	})
-	if walkErr != nil {
-		return fmt.Errorf("failed to walk: %w", walkErr)
-	}
 
 	return nil
 }
