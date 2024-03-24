@@ -101,6 +101,16 @@ func (x *xfg) showContent(writer *bufio.Writer, contents []line) error {
 	return nil
 }
 
+func (x *xfg) isIgnore(fPath string) bool {
+	for _, i := range x.options.ignore {
+		if i != "" && strings.Contains(fPath, i) {
+			return true // skip
+		}
+	}
+
+	return false
+}
+
 func (x *xfg) isSkip(fPath string, fInfo fs.FileInfo, gitignore *ignore.GitIgnore) bool {
 	if !x.options.searchAll {
 		if !fInfo.IsDir() && (fInfo.Name() == ".gitkeep" || strings.HasSuffix(fInfo.Name(), ".min.js")) {
@@ -136,10 +146,8 @@ type walkerArg struct {
 func (x *xfg) walker(wa *walkerArg) error {
 	fPath, fInfo := wa.path, wa.info
 
-	for _, i := range x.options.ignore {
-		if i != "" && strings.Contains(fPath, i) {
-			return nil // skip
-		}
+	if x.isIgnore(fPath) {
+		return nil // skip by --ignore option
 	}
 
 	if !x.options.searchAll {
