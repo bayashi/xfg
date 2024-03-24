@@ -4,6 +4,7 @@ import (
 	"bufio"
 	"fmt"
 	"io"
+	"io/fs"
 	"os"
 	"path/filepath"
 	"strings"
@@ -100,6 +101,80 @@ func (x *xfg) showContent(writer *bufio.Writer, contents []line) error {
 	return nil
 }
 
+type walkerArg struct {
+	path string
+	info fs.FileInfo
+	gitignore *ignore.GitIgnore
+}
+
+func (x *xfg) walker(wa *walkerArg) error {
+	fPath, fInfo := wa.path, wa.info
+
+	for _, i := range x.options.ignore {
+		if i != "" && strings.Contains(fPath, i) {
+			return nil // skip
+		}
+	}
+
+	if !x.options.searchAll {
+		if fInfo.IsDir() && fInfo.Name() == ".git" {
+			return filepath.SkipDir // not search for .git directory
+		} else if !fInfo.IsDir() && (fInfo.Name() == ".gitkeep" || strings.HasSuffix(fInfo.Name(), ".min.js")) {
+			return nil // not pick .gitkeep file
+		} else if !x.options.hidden && strings.HasPrefix(fInfo.Name(), ".") {
+			return nil // skip dot-file
+		}
+	}
+
+	if !x.options.searchAll && wa.gitignore != nil && wa.gitignore.MatchesPath(fPath) {
+		return nil // skip a file by .gitignore
+	}
+
+	if fInfo.IsDir() {
+		if x.options.onlyMatch {
+			return nil // not pick up
+		}
+		fPath = fPath + string(filepath.Separator)
+	}
+
+	if !strings.Contains(fPath, x.options.searchPath) {
+		return nil
+	}
+
+	if x.options.abs {
+		absPath, err := filepath.Abs(fPath)
+		if err != nil {
+			return fmt.Errorf("failed to get absolute path from `%s`: %w", fPath, err)
+		}
+		fPath = absPath
+	}
+
+	matchedPath := path{
+		info: fInfo,
+	}
+
+	if x.options.searchGrep != "" && isRegularFile(fInfo) {
+		var err error
+		matchedPath.contents, err = x.grep(fPath)
+		if err != nil {
+			return fmt.Errorf("error during grep: %w", err)
+		}
+		if x.options.onlyMatch && len(matchedPath.contents) == 0 {
+			return nil // not pick up
+		}
+	}
+
+	if x.options.noColor {
+		matchedPath.path = fPath
+	} else {
+		matchedPath.path = strings.ReplaceAll(fPath, x.options.searchPath, x.pathHighlighter)
+	}
+
+	x.result = append(x.result, matchedPath)
+
+	return nil
+}
+
 const GIT_IGNOE_FILE_NAME = ".gitignore"
 
 func (x *xfg) Search() error {
@@ -121,80 +196,20 @@ func (x *xfg) Search() error {
 		}
 	}
 
-	var paths []path
 	walkErr := filepath.Walk(sPath, func(fPath string, fInfo os.FileInfo, err error) error {
 		if err != nil {
 			return fmt.Errorf("something went wrong within path `%s` at `%s`: %w", sPath, fPath, err)
 		}
 
-		for _, i := range x.options.ignore {
-			if i != "" && strings.Contains(fPath, i) {
-				return nil // skip
-			}
-		}
-
-		if !x.options.searchAll {
-			if fInfo.IsDir() && fInfo.Name() == ".git" {
-				return filepath.SkipDir // not search for .git directory
-			} else if !fInfo.IsDir() && (fInfo.Name() == ".gitkeep" || strings.HasSuffix(fInfo.Name(), ".min.js")) {
-				return nil // not pick .gitkeep file
-			} else if !x.options.hidden && strings.HasPrefix(fInfo.Name(), ".") {
-				return nil // skip dot-file
-			}
-		}
-
-		if !x.options.searchAll && gitignore != nil && gitignore.MatchesPath(fPath) {
-			return nil // skip a file by .gitignore
-		}
-
-		if fInfo.IsDir() {
-			if x.options.onlyMatch {
-				return nil // not pick up
-			}
-			fPath = fPath + string(filepath.Separator)
-		}
-
-		if !strings.Contains(fPath, x.options.searchPath) {
-			return nil
-		}
-
-		if x.options.abs {
-			absPath, err := filepath.Abs(fPath)
-			if err != nil {
-				return fmt.Errorf("failed to get absolute path from `%s`: %w", fPath, err)
-			}
-			fPath = absPath
-		}
-
-		matchedPath := path{
+		return x.walker(&walkerArg{
+			path: fPath,
 			info: fInfo,
-		}
-
-		if x.options.searchGrep != "" && isRegularFile(fInfo) {
-			matchedPath.contents, err = x.grep(fPath)
-			if err != nil {
-				return fmt.Errorf("error during grep: %w", err)
-			}
-			if x.options.onlyMatch && len(matchedPath.contents) == 0 {
-				return nil // not pick up
-			}
-		}
-
-		if x.options.noColor {
-			matchedPath.path = fPath
-		} else {
-			matchedPath.path = strings.ReplaceAll(fPath, x.options.searchPath, x.pathHighlighter)
-		}
-
-		paths = append(paths, matchedPath)
-
-		return nil
+			gitignore: gitignore,
+		})
 	})
 	if walkErr != nil {
 		return fmt.Errorf("failed to walk: %w", walkErr)
 	}
-
-	x.result = paths
 
 	return nil
 }
