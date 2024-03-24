@@ -275,7 +275,7 @@ func (x *xfg) grepFile(scanner *bufio.Scanner, fPath string) ([]line, error) {
 
 func (x *xfg) processContentLine(gf *grepFile) {
 	if strings.Contains(gf.l, x.options.searchGrep) {
-		if gf.withContextLines {
+		if !x.options.showMatchCount && gf.withContextLines {
 			for _, bl := range gf.blines {
 				if bl.lc == 0 {
 					continue // skip
@@ -285,17 +285,19 @@ func (x *xfg) processContentLine(gf *grepFile) {
 			gf.blines = make([]line, x.options.contextLines)
 		}
 
-		if !x.options.noColor {
+		if x.options.showMatchCount {
+			gf.l = ""
+		} else if !x.options.noColor {
 			gf.l = strings.ReplaceAll(gf.l, x.options.searchGrep, x.grepHighlighter)
 		}
 
 		gf.matchedContents = append(gf.matchedContents, line{lc: gf.lc, content: gf.l, matched: true})
 
-		if gf.withContextLines {
+		if !x.options.showMatchCount && gf.withContextLines {
 			gf.aline = x.options.contextLines // start countdown for `aline`
 		}
 	} else {
-		if gf.withContextLines {
+		if !x.options.showMatchCount && gf.withContextLines {
 			if gf.aline > 0 {
 				gf.aline--
 				gf.matchedContents = append(gf.matchedContents, line{lc: gf.lc, content: gf.l})
@@ -331,16 +333,26 @@ func (x *xfg) Show(w io.Writer) error {
 	}
 	writer := bufio.NewWriter(w)
 	for _, p := range x.result {
-		if _, err := fmt.Fprintf(writer, "%s\n", p.path); err != nil {
+		if _, err := fmt.Fprintf(writer, "%s", p.path); err != nil {
+			return err
+		}
+		if x.options.showMatchCount && !p.info.IsDir() {
+			if _, err := fmt.Fprintf(writer, ":%d", len(p.contents)); err != nil {
+				return err
+			}
+		}
+		if _, err := fmt.Fprint(writer, "\n"); err != nil {
 			return err
 		}
 
-		if len(p.contents) > 0 {
-			x.showContent(writer, p.contents)
-		}
-		if x.options.relax && len(p.contents) > 0 {
-			if _, err := fmt.Fprint(writer, "\n"); err != nil {
-				return err
+		if !x.options.showMatchCount {
+			if len(p.contents) > 0 {
+				x.showContent(writer, p.contents)
+			}
+			if x.options.relax && len(p.contents) > 0 {
+				if _, err := fmt.Fprint(writer, "\n"); err != nil {
+					return err
+				}
 			}
 		}
 

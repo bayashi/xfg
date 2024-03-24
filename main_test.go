@@ -321,6 +321,17 @@ func TestRunner_OK(t *testing.T) {
                   5: 	hello()
 			`),
 		},
+		"service-h show count": {
+			opt: &options{
+				searchPath:     "service-h",
+				searchGrep:     "h",
+				showMatchCount: true,
+			},
+			expect: here.Doc(`
+                testdata/service-h/
+                testdata/service-h/main.go:5
+			`),
+		},
 	} {
 		t.Run(tname, func(t *testing.T) {
 			var o bytes.Buffer
