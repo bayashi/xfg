@@ -263,7 +263,7 @@ func (x *xfg) grepFile(scanner *bufio.Scanner, fPath string) ([]line, error) {
 			return nil, fmt.Errorf("could not scan file `%s` line %d: %w", fPath, gf.lc, err)
 		}
 
-		x.processContent(gf)
+		x.processContentLine(gf)
 
 		if x.options.maxMatchCount != 0 && int(x.options.maxMatchCount) <= len(gf.matchedContents) {
 			break
@@ -273,7 +273,7 @@ func (x *xfg) grepFile(scanner *bufio.Scanner, fPath string) ([]line, error) {
 	return gf.matchedContents, nil
 }
 
-func (x *xfg) processContent(gf *grepFile) {
+func (x *xfg) processContentLine(gf *grepFile) {
 	if strings.Contains(gf.l, x.options.searchGrep) {
 		if gf.withContextLines {
 			for _, bl := range gf.blines {
