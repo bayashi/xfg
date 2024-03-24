@@ -100,14 +100,6 @@ func (x *xfg) walker(wa *walkerArg) error {
 		return nil // skip
 	}
 
-	if x.options.abs {
-		absPath, err := filepath.Abs(fPath)
-		if err != nil {
-			return fmt.Errorf("failed to get absolute path from `%s`: %w", fPath, err)
-		}
-		fPath = absPath
-	}
-
 	x.postMatch(fPath, fInfo)
 
 	return nil
@@ -162,6 +154,14 @@ func (x *xfg) postMatch(fPath string, fInfo fs.FileInfo) (err error) {
 		if x.options.onlyMatch && len(matchedPath.contents) == 0 {
 			return nil // not pick up
 		}
+	}
+
+	if x.options.abs {
+		absPath, err := filepath.Abs(fPath)
+		if err != nil {
+			return fmt.Errorf("failed to get absolute path from `%s`: %w", fPath, err)
+		}
+		fPath = absPath
 	}
 
 	if x.options.noColor {
