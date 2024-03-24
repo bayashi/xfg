@@ -134,7 +134,6 @@ func (x *xfg) walker(wa *walkerArg) error {
 		if x.options.onlyMatch {
 			return nil // not pick up
 		}
-		fPath = fPath + string(filepath.Separator)
 	}
 
 	if !strings.Contains(fPath, x.options.searchPath) {
@@ -168,6 +167,10 @@ func (x *xfg) walker(wa *walkerArg) error {
 		matchedPath.path = fPath
 	} else {
 		matchedPath.path = strings.ReplaceAll(fPath, x.options.searchPath, x.pathHighlighter)
+	}
+
+	if fInfo.IsDir() {
+		matchedPath.path = matchedPath.path + string(filepath.Separator)
 	}
 
 	x.result = append(x.result, matchedPath)
