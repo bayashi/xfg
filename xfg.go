@@ -4,6 +4,7 @@ import (
 	"bufio"
 	"fmt"
 	"io"
+	"io/fs"
 	"os"
 	"path/filepath"
 	"strings"
@@ -100,14 +101,135 @@ func (x *xfg) showContent(writer *bufio.Writer, contents []line) error {
 	return nil
 }
 
-const GIT_IGNOE_FILE_NAME = ".gitignore"
+type walkerArg struct {
+	path      string
+	info      fs.FileInfo
+	gitignore *ignore.GitIgnore
+}
+
+func (x *xfg) walker(wa *walkerArg) error {
+	fPath, fInfo := wa.path, wa.info
+
+	if x.isIgnore(fPath) {
+		return nil // skip by --ignore option
+	}
+
+	if !x.options.searchAll {
+		if fInfo.IsDir() && fInfo.Name() == ".git" {
+			return filepath.SkipDir // not search for .git directory
+		}
+	}
+
+	if x.isSkip(fPath, fInfo, wa.gitignore) {
+		return nil // skip
+	}
+
+	if x.options.abs {
+		absPath, err := filepath.Abs(fPath)
+		if err != nil {
+			return fmt.Errorf("failed to get absolute path from `%s`: %w", fPath, err)
+		}
+		fPath = absPath
+	}
+
+	x.postMatch(fPath, fInfo)
+
+	return nil
+}
+
+func (x *xfg) isIgnore(fPath string) bool {
+	for _, i := range x.options.ignore {
+		if i != "" && strings.Contains(fPath, i) {
+			return true // skip
+		}
+	}
+
+	return false
+}
+
+func (x *xfg) isSkip(fPath string, fInfo fs.FileInfo, gitignore *ignore.GitIgnore) bool {
+	if !x.options.searchAll {
+		if !fInfo.IsDir() && (fInfo.Name() == ".gitkeep" || strings.HasSuffix(fInfo.Name(), ".min.js")) {
+			return true // not pick .gitkeep file
+		} else if !x.options.hidden && strings.HasPrefix(fInfo.Name(), ".") {
+			return true // skip dot-file
+		}
+	}
+
+	if !x.options.searchAll && gitignore != nil && gitignore.MatchesPath(fPath) {
+		return true // skip a file by .gitignore
+	}
+
+	if fInfo.IsDir() {
+		if x.options.onlyMatch {
+			return true // not pick up
+		}
+	}
+
+	if !strings.Contains(fPath, x.options.searchPath) {
+		return true // not match
+	}
+
+	return false
+}
+
+func (x *xfg) postMatch(fPath string, fInfo fs.FileInfo) (err error) {
+	matchedPath := path{
+		info: fInfo,
+	}
+
+	if x.options.searchGrep != "" && isRegularFile(fInfo) {
+		matchedPath.contents, err = x.grep(fPath)
+		if err != nil {
+			return fmt.Errorf("error during grep: %w", err)
+		}
+		if x.options.onlyMatch && len(matchedPath.contents) == 0 {
+			return nil // not pick up
+		}
+	}
+
+	if x.options.noColor {
+		matchedPath.path = fPath
+	} else {
+		matchedPath.path = strings.ReplaceAll(fPath, x.options.searchPath, x.pathHighlighter)
+	}
+
+	if fInfo.IsDir() {
+		matchedPath.path = matchedPath.path + string(filepath.Separator)
+	}
+
+	x.result = append(x.result, matchedPath)
+
+	return nil
+}
 
 func (x *xfg) Search() error {
-	sPath, err := validateStartPath(x.options.searchStart)
-	if err != nil {
+	if err := validateStartPath(x.options.searchStart); err != nil {
 		return err
 	}
 
+	gitignore := x.compileGitIgnore(x.options.searchStart)
+
+	walkErr := filepath.Walk(x.options.searchStart, func(fPath string, fInfo os.FileInfo, err error) error {
+		if err != nil {
+			return fmt.Errorf("something went wrong within path `%s` at `%s`: %w", x.options.searchStart, fPath, err)
+		}
+
+		return x.walker(&walkerArg{
+			path:      fPath,
+			info:      fInfo,
+			gitignore: gitignore,
+		})
+	})
+	if walkErr != nil {
+		return fmt.Errorf("failed to walk: %w", walkErr)
+	}
+
+	return nil
+}
+
+func (x *xfg) compileGitIgnore(sPath string) *ignore.GitIgnore {
+	const GIT_IGNOE_FILE_NAME = ".gitignore"
 	var gitignore *ignore.GitIgnore
 	if !x.options.skipGitIgnore {
 		// read .gitignore file in start directory to search or home directory
@@ -120,82 +242,7 @@ func (x *xfg) Search() error {
 		}
 	}
 
-	var paths []path
-	walkErr := filepath.Walk(sPath, func(fPath string, fInfo os.FileInfo, err error) error {
-		if err != nil {
-			return fmt.Errorf("something went wrong within path `%s` at `%s`: %w", sPath, fPath, err)
-		}
-
-		for _, i := range x.options.ignore {
-			if i != "" && strings.Contains(fPath, i) {
-				return nil // skip
-			}
-		}
-
-		if !x.options.searchAll {
-			if fInfo.IsDir() && fInfo.Name() == ".git" {
-				return filepath.SkipDir // not search for .git directory
-			} else if !fInfo.IsDir() && (fInfo.Name() == ".gitkeep" || strings.HasSuffix(fInfo.Name(), ".min.js")) {
-				return nil // not pick .gitkeep file
-			} else if !x.options.hidden && strings.HasPrefix(fInfo.Name(), ".") {
-				return nil // skip dot-file
-			}
-		}
-
-		if !x.options.searchAll && gitignore != nil && gitignore.MatchesPath(fPath) {
-			return nil // skip a file by .gitignore
-		}
-
-		if fInfo.IsDir() {
-			if x.options.onlyMatch {
-				return nil // not pick up
-			}
-			fPath = fPath + string(filepath.Separator)
-		}
-
-		if !strings.Contains(fPath, x.options.searchPath) {
-			return nil
-		}
-
-		if x.options.abs {
-			absPath, err := filepath.Abs(fPath)
-			if err != nil {
-				return fmt.Errorf("failed to get absolute path from `%s`: %w", fPath, err)
-			}
-			fPath = absPath
-		}
-
-		matchedPath := path{
-			info: fInfo,
-		}
-
-		if x.options.searchGrep != "" && isRegularFile(fInfo) {
-			matchedPath.contents, err = x.grep(fPath)
-			if err != nil {
-				return fmt.Errorf("error during grep: %w", err)
-			}
-			if x.options.onlyMatch && len(matchedPath.contents) == 0 {
-				return nil // not pick up
-			}
-		}
-
-		if x.options.noColor {
-			matchedPath.path = fPath
-		} else {
-			matchedPath.path = strings.ReplaceAll(fPath, x.options.searchPath, x.pathHighlighter)
-		}
-
-		paths = append(paths, matchedPath)
-
-		return nil
-	})
-	if walkErr != nil {
-		return fmt.Errorf("failed to walk: %w", walkErr)
-	}
-
-	x.result = paths
-
-	return nil
+	return gitignore
 }
 
 func (x *xfg) grep(fPath string) ([]line, error) {
@@ -299,15 +346,15 @@ func isRegularFile(fInfo os.FileInfo) bool {
 	return fInfo.Size() > 0 && fInfo.Mode().Type() == 0
 }
 
-func validateStartPath(startPath string) (string, error) {
+func validateStartPath(startPath string) error {
 	d, err := os.Stat(startPath)
 	if err != nil {
-		return "", fmt.Errorf("path `%s` is wrong: %w", startPath, err)
+		return fmt.Errorf("path `%s` is wrong: %w", startPath, err)
 	}
 
 	if !d.IsDir() {
-		return "", fmt.Errorf("path `%s` should point to a directory", startPath)
+		return fmt.Errorf("path `%s` should point to a directory", startPath)
 	}
 
-	return startPath, nil
+	return nil
 }
