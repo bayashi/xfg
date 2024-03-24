@@ -264,6 +264,10 @@ func (x *xfg) grepFile(scanner *bufio.Scanner, fPath string) ([]line, error) {
 		}
 
 		x.processContent(gf)
+
+		if x.options.maxMatchCount != 0 && int(x.options.maxMatchCount) <= len(gf.matchedContents) {
+			break;
+		}
 	}
 
 	return gf.matchedContents, nil
