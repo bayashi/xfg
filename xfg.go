@@ -100,7 +100,7 @@ func (x *xfg) walker(wa *walkerArg) error {
 		return nil // skip
 	}
 
-	x.onMatch(fPath, fInfo)
+	x.onMatchPath(fPath, fInfo)
 
 	return nil
 }
@@ -141,7 +141,7 @@ func (x *xfg) isSkip(fPath string, fInfo fs.FileInfo, gitignore *ignore.GitIgnor
 	return false
 }
 
-func (x *xfg) onMatch(fPath string, fInfo fs.FileInfo) (err error) {
+func (x *xfg) onMatchPath(fPath string, fInfo fs.FileInfo) (err error) {
 	matchedPath := path{
 		info: fInfo,
 	}
