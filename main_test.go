@@ -50,6 +50,7 @@ func TestRunner_OK(t *testing.T) {
                   1: package b
 
                 testdata/service-c/main.go
+                testdata/service-h/main.go
 			`),
 		},
 		"service-b grep bar with C1": {
@@ -281,6 +282,43 @@ func TestRunner_OK(t *testing.T) {
 			expect: here.Doc(`
                 testdata/service-f/
                 testdata/service-f/ignorez/
+			`),
+		},
+		"service-h": {
+			opt: &options{
+				searchPath:     "service-h",
+				searchGrep:     "h",
+				groupSeparator: "--",
+				indent:         "  ",
+			},
+			expect: here.Doc(`
+                testdata/service-h/
+                testdata/service-h/main.go
+                  1: package h
+                  --
+                  4: 	hi()
+                  5: 	hello()
+                  --
+                  8: func hi() {
+                  --
+                  11: func hello() {
+			`),
+		},
+		"service-h with maxMatchCount": {
+			opt: &options{
+				searchPath:     "service-h",
+				searchGrep:     "h",
+				groupSeparator: "--",
+				indent:         "  ",
+				maxMatchCount:  3,
+			},
+			expect: here.Doc(`
+                testdata/service-h/
+                testdata/service-h/main.go
+                  1: package h
+                  --
+                  4: 	hi()
+                  5: 	hello()
 			`),
 		},
 	} {

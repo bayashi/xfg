@@ -36,7 +36,8 @@ type options struct {
 	skipGitIgnore    bool
 	searchAll        bool
 
-	contextLines uint32
+	contextLines  uint32
+	maxMatchCount uint32
 }
 
 func (cli *runner) parseArgs() *options {
@@ -51,6 +52,7 @@ func (cli *runner) parseArgs() *options {
 	flag.StringVarP(&o.searchStart, "start", "s", ".", "A location to start searching")
 
 	flag.Uint32VarP(&o.contextLines, "context", "C", 0, "Show several lines before and after the matched one")
+	flag.Uint32VarP(&o.maxMatchCount, "max-count", "m", 0, "Stop reading a file after NUM matching lines")
 
 	flag.StringArrayVarP(&o.ignore, "ignore", "", []string{}, "Ignore stuff even with '--search-all'")
 	flag.BoolVarP(&o.hidden, "hidden", "", false, "Search hidden files")
