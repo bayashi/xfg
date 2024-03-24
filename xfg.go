@@ -240,20 +240,20 @@ func (x *xfg) isBinary(fh *os.File) (bool, error) {
 }
 
 type grepFile struct {
-	lc                 int32  // line count
-	l                  string // line text
-	blines             []line // slice for before lines
-	aline              uint32 // the count for after lines
-	existsContentLines bool
+	lc               int32  // line count
+	l                string // line text
+	blines           []line // slice for before lines
+	aline            uint32 // the count for after lines
+	withContextLines bool
 
 	matchedContents []line // result
 }
 
 func (x *xfg) grepFile(scanner *bufio.Scanner, fPath string) ([]line, error) {
 	gf := &grepFile{
-		lc:                 0,
-		blines:             make([]line, x.options.contextLines),
-		existsContentLines: x.options.contextLines > 0,
+		lc:               0,
+		blines:           make([]line, x.options.contextLines),
+		withContextLines: x.options.contextLines > 0,
 	}
 
 	for scanner.Scan() {
@@ -275,7 +275,7 @@ func (x *xfg) grepFile(scanner *bufio.Scanner, fPath string) ([]line, error) {
 
 func (x *xfg) processContent(gf *grepFile) {
 	if strings.Contains(gf.l, x.options.searchGrep) {
-		if gf.existsContentLines {
+		if gf.withContextLines {
 			for _, bl := range gf.blines {
 				if bl.lc == 0 {
 					continue // skip
@@ -291,11 +291,11 @@ func (x *xfg) processContent(gf *grepFile) {
 
 		gf.matchedContents = append(gf.matchedContents, line{lc: gf.lc, content: gf.l, matched: true})
 
-		if gf.existsContentLines {
+		if gf.withContextLines {
 			gf.aline = x.options.contextLines // start countdown for `aline`
 		}
 	} else {
-		if gf.existsContentLines {
+		if gf.withContextLines {
 			if gf.aline > 0 {
 				gf.aline--
 				gf.matchedContents = append(gf.matchedContents, line{lc: gf.lc, content: gf.l})
