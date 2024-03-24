@@ -101,9 +101,35 @@ func (x *xfg) showContent(writer *bufio.Writer, contents []line) error {
 	return nil
 }
 
+func (x *xfg) isSkip(fPath string, fInfo fs.FileInfo, gitignore *ignore.GitIgnore) bool {
+	if !x.options.searchAll {
+		if !fInfo.IsDir() && (fInfo.Name() == ".gitkeep" || strings.HasSuffix(fInfo.Name(), ".min.js")) {
+			return true // not pick .gitkeep file
+		} else if !x.options.hidden && strings.HasPrefix(fInfo.Name(), ".") {
+			return true // skip dot-file
+		}
+	}
+
+	if !x.options.searchAll && gitignore != nil && gitignore.MatchesPath(fPath) {
+		return true // skip a file by .gitignore
+	}
+
+	if fInfo.IsDir() {
+		if x.options.onlyMatch {
+			return true // not pick up
+		}
+	}
+
+	if !strings.Contains(fPath, x.options.searchPath) {
+		return true // not match
+	}
+
+	return false
+}
+
 type walkerArg struct {
-	path string
-	info fs.FileInfo
+	path      string
+	info      fs.FileInfo
 	gitignore *ignore.GitIgnore
 }
 
@@ -119,25 +145,11 @@ func (x *xfg) walker(wa *walkerArg) error {
 	if !x.options.searchAll {
 		if fInfo.IsDir() && fInfo.Name() == ".git" {
 			return filepath.SkipDir // not search for .git directory
-		} else if !fInfo.IsDir() && (fInfo.Name() == ".gitkeep" || strings.HasSuffix(fInfo.Name(), ".min.js")) {
-			return nil // not pick .gitkeep file
-		} else if !x.options.hidden && strings.HasPrefix(fInfo.Name(), ".") {
-			return nil // skip dot-file
 		}
 	}
 
-	if !x.options.searchAll && wa.gitignore != nil && wa.gitignore.MatchesPath(fPath) {
-		return nil // skip a file by .gitignore
-	}
-
-	if fInfo.IsDir() {
-		if x.options.onlyMatch {
-			return nil // not pick up
-		}
-	}
-
-	if !strings.Contains(fPath, x.options.searchPath) {
-		return nil
+	if x.isSkip(fPath, fInfo, wa.gitignore) {
+		return nil // skip
 	}
 
 	if x.options.abs {
@@ -205,8 +217,8 @@ func (x *xfg) Search() error {
 		}
 
 		return x.walker(&walkerArg{
-			path: fPath,
-			info: fInfo,
+			path:      fPath,
+			info:      fInfo,
 			gitignore: gitignore,
 		})
 	})
