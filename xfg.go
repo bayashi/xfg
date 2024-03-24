@@ -103,10 +103,11 @@ func (x *xfg) showContent(writer *bufio.Writer, contents []line) error {
 const GIT_IGNOE_FILE_NAME = ".gitignore"
 
 func (x *xfg) Search() error {
-	sPath, err := validateStartPath(x.options.searchStart)
-	if err != nil {
+	if err := validateStartPath(x.options.searchStart); err != nil {
 		return err
 	}
+
+	sPath := x.options.searchStart
 
 	var gitignore *ignore.GitIgnore
 	if !x.options.skipGitIgnore {
@@ -299,15 +300,15 @@ func isRegularFile(fInfo os.FileInfo) bool {
 	return fInfo.Size() > 0 && fInfo.Mode().Type() == 0
 }
 
-func validateStartPath(startPath string) (string, error) {
+func validateStartPath(startPath string) error {
 	d, err := os.Stat(startPath)
 	if err != nil {
-		return "", fmt.Errorf("path `%s` is wrong: %w", startPath, err)
+		return fmt.Errorf("path `%s` is wrong: %w", startPath, err)
 	}
 
 	if !d.IsDir() {
-		return "", fmt.Errorf("path `%s` should point to a directory", startPath)
+		return fmt.Errorf("path `%s` should point to a directory", startPath)
 	}
 
-	return startPath, nil
+	return nil
 }
