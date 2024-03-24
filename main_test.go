@@ -286,8 +286,8 @@ func TestRunner_OK(t *testing.T) {
 		},
 		"service-h": {
 			opt: &options{
-				searchPath: "service-h",
-				searchGrep:  "h",
+				searchPath:     "service-h",
+				searchGrep:     "h",
 				groupSeparator: "--",
 				indent:         "  ",
 			},
@@ -296,32 +296,29 @@ func TestRunner_OK(t *testing.T) {
                 testdata/service-h/main.go
                   1: package h
                   --
-                  4: 	// hi
-                  5: 	hi()
-                  6: 	hello()
+                  4: 	hi()
+                  5: 	hello()
                   --
-                  9: func hi() {
-                  10: 	// hi
+                  8: func hi() {
                   --
-                  13: func hello() {
-                  14: 	// hello
+                  11: func hello() {
 			`),
 		},
 		"service-h with maxMatchCount": {
 			opt: &options{
-				searchPath: "service-h",
-				searchGrep:  "h",
+				searchPath:     "service-h",
+				searchGrep:     "h",
 				groupSeparator: "--",
 				indent:         "  ",
-				maxMatchCount: 3,
+				maxMatchCount:  3,
 			},
 			expect: here.Doc(`
                 testdata/service-h/
                 testdata/service-h/main.go
                   1: package h
                   --
-                  4: 	// hi
-                  5: 	hi()
+                  4: 	hi()
+                  5: 	hello()
 			`),
 		},
 	} {
