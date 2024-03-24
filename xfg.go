@@ -179,7 +179,7 @@ func (x *xfg) postMatch(fPath string, fInfo fs.FileInfo) (err error) {
 	}
 
 	if x.options.searchGrep != "" && isRegularFile(fInfo) {
-		matchedPath.contents, err = x.grep(fPath)
+		matchedPath.contents, err = x.grepPath(fPath)
 		if err != nil {
 			return fmt.Errorf("error during grep: %w", err)
 		}
@@ -245,7 +245,7 @@ func (x *xfg) compileGitIgnore(sPath string) *ignore.GitIgnore {
 	return gitignore
 }
 
-func (x *xfg) grep(fPath string) ([]line, error) {
+func (x *xfg) grepPath(fPath string) ([]line, error) {
 	fh, err := os.Open(fPath)
 	if err != nil {
 		return nil, fmt.Errorf("could not open file `%s`: %w", fPath, err)
@@ -288,58 +288,69 @@ func (x *xfg) isBinary(fh *os.File) (bool, error) {
 	return false, nil
 }
 
+type grepFile struct {
+	lc                 int32  // line count
+	l                  string // line text
+	blines             []line // slice for before lines
+	aline              uint32 // the count for after lines
+	existsContentLines bool
+
+	matchedContents []line // result
+}
+
 func (x *xfg) grepFile(scanner *bufio.Scanner, fPath string) ([]line, error) {
-	var (
-		lc              int32 = 0 // line count
-		matchedContents []line
-
-		blines = make([]line, x.options.contextLines) // slice for before lines
-		aline  uint32                                 // the count for after lines
-
-		optC = x.options.contextLines > 0
-	)
+	gf := &grepFile{
+		lc:                 0,
+		blines:             make([]line, x.options.contextLines),
+		existsContentLines: x.options.contextLines > 0,
+	}
 
 	for scanner.Scan() {
-		lc++
-		l := scanner.Text()
+		gf.lc++
+		gf.l = scanner.Text()
 		if err := scanner.Err(); err != nil {
-			return nil, fmt.Errorf("could not scan file `%s` line %d: %w", fPath, lc, err)
+			return nil, fmt.Errorf("could not scan file `%s` line %d: %w", fPath, gf.lc, err)
 		}
-		if strings.Contains(l, x.options.searchGrep) {
-			if optC {
-				for _, bl := range blines {
-					if bl.lc == 0 {
-						continue // skip
-					}
-					matchedContents = append(matchedContents, bl)
+
+		x.processContent(gf)
+	}
+
+	return gf.matchedContents, nil
+}
+
+func (x *xfg) processContent(gf *grepFile) {
+	if strings.Contains(gf.l, x.options.searchGrep) {
+		if gf.existsContentLines {
+			for _, bl := range gf.blines {
+				if bl.lc == 0 {
+					continue // skip
 				}
-				blines = make([]line, x.options.contextLines)
+				gf.matchedContents = append(gf.matchedContents, bl)
 			}
+			gf.blines = make([]line, x.options.contextLines)
+		}
 
-			if !x.options.noColor {
-				l = strings.ReplaceAll(l, x.options.searchGrep, x.grepHighlighter)
-			}
+		if !x.options.noColor {
+			gf.l = strings.ReplaceAll(gf.l, x.options.searchGrep, x.grepHighlighter)
+		}
 
-			matchedContents = append(matchedContents, line{lc: lc, content: l, matched: true})
+		gf.matchedContents = append(gf.matchedContents, line{lc: gf.lc, content: gf.l, matched: true})
 
-			if optC {
-				aline = x.options.contextLines // start countdown for `aline`
-			}
-		} else {
-			if optC {
-				if aline > 0 {
-					aline--
-					matchedContents = append(matchedContents, line{lc: lc, content: l})
-				} else {
-					// rotate blines
-					// join "2nd to last elements of `blines`" and "current `line`"
-					blines = append(blines[1:], line{lc: lc, content: l})
-				}
+		if gf.existsContentLines {
+			gf.aline = x.options.contextLines // start countdown for `aline`
+		}
+	} else {
+		if gf.existsContentLines {
+			if gf.aline > 0 {
+				gf.aline--
+				gf.matchedContents = append(gf.matchedContents, line{lc: gf.lc, content: gf.l})
+			} else {
+				// rotate blines
+				// join "2nd to last elements of `blines`" and "current `line`"
+				gf.blines = append(gf.blines[1:], line{lc: gf.lc, content: gf.l})
 			}
 		}
 	}
-
-	return matchedContents, nil
 }
 
 func isRegularFile(fInfo os.FileInfo) bool {
