@@ -203,30 +203,16 @@ func (x *xfg) postMatch(fPath string, fInfo fs.FileInfo) (err error) {
 	return nil
 }
 
-const GIT_IGNOE_FILE_NAME = ".gitignore"
-
 func (x *xfg) Search() error {
 	if err := validateStartPath(x.options.searchStart); err != nil {
 		return err
 	}
 
-	sPath := x.options.searchStart
+	gitignore := x.compileGitIgnore(x.options.searchStart)
 
-	var gitignore *ignore.GitIgnore
-	if !x.options.skipGitIgnore {
-		// read .gitignore file in start directory to search or home directory
-		// There would be no .gitignore file, then `gitignore` variable will be `nil`.
-		gitignore, _ = ignore.CompileIgnoreFile(filepath.Join(sPath, GIT_IGNOE_FILE_NAME))
-		if gitignore == nil {
-			if homeDir, err := os.UserHomeDir(); err == nil {
-				gitignore, _ = ignore.CompileIgnoreFile(filepath.Join(homeDir, GIT_IGNOE_FILE_NAME))
-			}
-		}
-	}
-
-	walkErr := filepath.Walk(sPath, func(fPath string, fInfo os.FileInfo, err error) error {
+	walkErr := filepath.Walk(x.options.searchStart, func(fPath string, fInfo os.FileInfo, err error) error {
 		if err != nil {
-			return fmt.Errorf("something went wrong within path `%s` at `%s`: %w", sPath, fPath, err)
+			return fmt.Errorf("something went wrong within path `%s` at `%s`: %w", x.options.searchStart, fPath, err)
 		}
 
 		return x.walker(&walkerArg{
@@ -240,6 +226,23 @@ func (x *xfg) Search() error {
 	}
 
 	return nil
+}
+
+func (x *xfg) compileGitIgnore(sPath string) *ignore.GitIgnore {
+	const GIT_IGNOE_FILE_NAME = ".gitignore"
+	var gitignore *ignore.GitIgnore
+	if !x.options.skipGitIgnore {
+		// read .gitignore file in start directory to search or home directory
+		// There would be no .gitignore file, then `gitignore` variable will be `nil`.
+		gitignore, _ = ignore.CompileIgnoreFile(filepath.Join(sPath, GIT_IGNOE_FILE_NAME))
+		if gitignore == nil {
+			if homeDir, err := os.UserHomeDir(); err == nil {
+				gitignore, _ = ignore.CompileIgnoreFile(filepath.Join(homeDir, GIT_IGNOE_FILE_NAME))
+			}
+		}
+	}
+
+	return gitignore
 }
 
 func (x *xfg) grep(fPath string) ([]line, error) {
