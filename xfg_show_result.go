@@ -32,7 +32,7 @@ func (x *xfg) showResult(w io.Writer) error {
 
 		if !x.options.showMatchCount {
 			if len(p.contents) > 0 {
-				x.showContent(&out, p.contents)
+				x.buildContentOutput(&out, p.contents)
 			}
 			if x.options.relax && len(p.contents) > 0 {
 				out = out + "\n"
@@ -46,7 +46,7 @@ func (x *xfg) showResult(w io.Writer) error {
 	return nil
 }
 
-func (x *xfg) showContent(out *string, contents []line) error {
+func (x *xfg) buildContentOutput(out *string, contents []line) error {
 	var blc int32 = 0
 	for _, line := range contents {
 		if blc != 0 && line.lc-blc > 1 {
