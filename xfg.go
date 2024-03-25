@@ -3,7 +3,6 @@ package main
 import (
 	"bufio"
 	"fmt"
-	"io"
 	"io/fs"
 	"os"
 	"path/filepath"
@@ -36,7 +35,7 @@ type xfg struct {
 	result []path
 }
 
-func NewX(o *options, pathHighlightColor *color.Color, grepHighlightColor *color.Color) *xfg {
+func newX(o *options, pathHighlightColor *color.Color, grepHighlightColor *color.Color) *xfg {
 	x := &xfg{
 		options: o,
 	}
@@ -58,12 +57,15 @@ type walkerArg struct {
 	gitignore *ignore.GitIgnore
 }
 
-func (x *xfg) Search() error {
+func (x *xfg) search() error {
 	if err := validateStartPath(x.options.searchStart); err != nil {
 		return err
 	}
 
-	gitignore := x.compileGitIgnore(x.options.searchStart)
+	var gitignore *ignore.GitIgnore
+	if !x.options.skipGitIgnore {
+		gitignore = compileGitIgnore(x.options.searchStart)
+	}
 
 	walkErr := filepath.Walk(x.options.searchStart, func(fPath string, fInfo os.FileInfo, err error) error {
 		if err != nil {
@@ -86,7 +88,7 @@ func (x *xfg) Search() error {
 func (x *xfg) walker(wa *walkerArg) error {
 	fPath, fInfo := wa.path, wa.info
 
-	if x.isIgnore(fPath) {
+	if x.isIgnorePath(fPath) {
 		return nil // skip by --ignore option
 	}
 
@@ -96,7 +98,7 @@ func (x *xfg) walker(wa *walkerArg) error {
 		}
 	}
 
-	if x.isSkip(fPath, fInfo, wa.gitignore) {
+	if x.canSkip(fPath, fInfo, wa.gitignore) {
 		return nil // skip
 	}
 
@@ -105,7 +107,7 @@ func (x *xfg) walker(wa *walkerArg) error {
 	return nil
 }
 
-func (x *xfg) isIgnore(fPath string) bool {
+func (x *xfg) isIgnorePath(fPath string) bool {
 	for _, i := range x.options.ignore {
 		if i != "" && strings.Contains(fPath, i) {
 			return true // skip
@@ -115,7 +117,7 @@ func (x *xfg) isIgnore(fPath string) bool {
 	return false
 }
 
-func (x *xfg) isSkip(fPath string, fInfo fs.FileInfo, gitignore *ignore.GitIgnore) bool {
+func (x *xfg) canSkip(fPath string, fInfo fs.FileInfo, gitignore *ignore.GitIgnore) bool {
 	if !x.options.searchAll {
 		if !fInfo.IsDir() && (fInfo.Name() == ".gitkeep" || strings.HasSuffix(fInfo.Name(), ".min.js")) {
 			return true // not pick .gitkeep file
@@ -147,7 +149,7 @@ func (x *xfg) onMatchPath(fPath string, fInfo fs.FileInfo) (err error) {
 	}
 
 	if x.options.searchGrep != "" && isRegularFile(fInfo) {
-		matchedPath.contents, err = x.grepPath(fPath)
+		matchedPath.contents, err = x.checkFile(fPath)
 		if err != nil {
 			return fmt.Errorf("error during grep: %w", err)
 		}
@@ -179,31 +181,14 @@ func (x *xfg) onMatchPath(fPath string, fInfo fs.FileInfo) (err error) {
 	return nil
 }
 
-func (x *xfg) compileGitIgnore(sPath string) *ignore.GitIgnore {
-	const GIT_IGNOE_FILE_NAME = ".gitignore"
-	var gitignore *ignore.GitIgnore
-	if !x.options.skipGitIgnore {
-		// read .gitignore file in start directory to search or home directory
-		// There would be no .gitignore file, then `gitignore` variable will be `nil`.
-		gitignore, _ = ignore.CompileIgnoreFile(filepath.Join(sPath, GIT_IGNOE_FILE_NAME))
-		if gitignore == nil {
-			if homeDir, err := os.UserHomeDir(); err == nil {
-				gitignore, _ = ignore.CompileIgnoreFile(filepath.Join(homeDir, GIT_IGNOE_FILE_NAME))
-			}
-		}
-	}
-
-	return gitignore
-}
-
-func (x *xfg) grepPath(fPath string) ([]line, error) {
+func (x *xfg) checkFile(fPath string) ([]line, error) {
 	fh, err := os.Open(fPath)
 	if err != nil {
 		return nil, fmt.Errorf("could not open file `%s`: %w", fPath, err)
 	}
 	defer fh.Close()
 
-	isBinary, err := x.isBinary(fh)
+	isBinary, err := isBinaryFile(fh)
 	if err != nil {
 		return nil, fmt.Errorf("error during isBinary file `%s`: %w", fPath, err)
 	}
@@ -215,7 +200,7 @@ func (x *xfg) grepPath(fPath string) ([]line, error) {
 		return nil, fmt.Errorf("could not seek `%s`: %w", fPath, err)
 	}
 
-	matchedContents, err := x.grepFile(bufio.NewScanner(fh), fPath)
+	matchedContents, err := x.scanFile(bufio.NewScanner(fh), fPath)
 	if err != nil {
 		return nil, fmt.Errorf("could not grepFile `%s`: %w", fPath, err)
 	}
@@ -223,23 +208,7 @@ func (x *xfg) grepPath(fPath string) ([]line, error) {
 	return matchedContents, nil
 }
 
-func (x *xfg) isBinary(fh *os.File) (bool, error) {
-	dat := make([]byte, 8000)
-	n, err := fh.Read(dat)
-	if err != nil {
-		return false, fmt.Errorf("could not read fh: %w", err)
-	}
-
-	for _, c := range dat[:n] {
-		if c == 0x00 {
-			return true, nil
-		}
-	}
-
-	return false, nil
-}
-
-type grepFile struct {
+type scanFile struct {
 	lc               int32  // line count
 	l                string // line text
 	blines           []line // slice for before lines
@@ -249,8 +218,8 @@ type grepFile struct {
 	matchedContents []line // result
 }
 
-func (x *xfg) grepFile(scanner *bufio.Scanner, fPath string) ([]line, error) {
-	gf := &grepFile{
+func (x *xfg) scanFile(scanner *bufio.Scanner, fPath string) ([]line, error) {
+	gf := &scanFile{
 		lc:               0,
 		blines:           make([]line, x.options.contextLines),
 		withContextLines: x.options.contextLines > 0,
@@ -273,7 +242,7 @@ func (x *xfg) grepFile(scanner *bufio.Scanner, fPath string) ([]line, error) {
 	return gf.matchedContents, nil
 }
 
-func (x *xfg) processContentLine(gf *grepFile) {
+func (x *xfg) processContentLine(gf *scanFile) {
 	if strings.Contains(gf.l, x.options.searchGrep) {
 		if !x.options.showMatchCount && gf.withContextLines {
 			for _, bl := range gf.blines {
@@ -308,78 +277,4 @@ func (x *xfg) processContentLine(gf *grepFile) {
 			}
 		}
 	}
-}
-
-func isRegularFile(fInfo os.FileInfo) bool {
-	return fInfo.Size() > 0 && fInfo.Mode().Type() == 0
-}
-
-func validateStartPath(startPath string) error {
-	d, err := os.Stat(startPath)
-	if err != nil {
-		return fmt.Errorf("path `%s` is wrong: %w", startPath, err)
-	}
-
-	if !d.IsDir() {
-		return fmt.Errorf("path `%s` should point to a directory", startPath)
-	}
-
-	return nil
-}
-
-func output(writer *bufio.Writer, out string) error {
-	if _, err := fmt.Fprint(writer, out); err != nil {
-		return err
-	}
-	if err := writer.Flush(); err != nil {
-		return err
-	}
-
-	return nil
-}
-
-func (x *xfg) Show(w io.Writer) error {
-	if x.options.noIndent {
-		x.options.indent = ""
-	}
-
-	writer := bufio.NewWriter(w)
-	for _, p := range x.result {
-		out := p.path
-		if x.options.showMatchCount && !p.info.IsDir() {
-			out = out + fmt.Sprintf(":%d", len(p.contents))
-		}
-		out = out + "\n"
-
-		if !x.options.showMatchCount {
-			if len(p.contents) > 0 {
-				x.showContent(&out, p.contents)
-			}
-			if x.options.relax && len(p.contents) > 0 {
-				out = out + "\n"
-			}
-		}
-		if err := output(writer, out); err != nil {
-			return err
-		}
-	}
-
-	return nil
-}
-
-func (x *xfg) showContent(out *string, contents []line) error {
-	var blc int32 = 0
-	for _, line := range contents {
-		if blc != 0 && line.lc-blc > 1 {
-			*out = *out + x.options.indent + x.options.groupSeparator + "\n"
-		}
-		lc := fmt.Sprintf("%d", line.lc)
-		if !x.options.noColor && line.matched {
-			lc = x.grepHighlitColor.Sprint(lc)
-		}
-		*out = *out + fmt.Sprintf("%s%s: %s\n", x.options.indent, lc, line.content)
-		blc = line.lc
-	}
-
-	return nil
 }

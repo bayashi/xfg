@@ -36,13 +36,13 @@ func (cli *runner) xfg(o *options) error {
 		grepColor = color.New(color.FgHiRed)
 	)
 
-	x := NewX(o, pathColor, grepColor)
+	x := newX(o, pathColor, grepColor)
 
-	if err := x.Search(); err != nil {
+	if err := x.search(); err != nil {
 		return fmt.Errorf("error during Search %w", err)
 	}
 
-	if err := x.Show(cli.out); err != nil {
+	if err := x.showResult(cli.out); err != nil {
 		return fmt.Errorf("error during Show %w", err)
 	}
 
