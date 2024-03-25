@@ -12,9 +12,9 @@ import (
 const (
 	errNeedToSetPath = "Err: You should specify a directory path `--path`"
 
-	defaultIndent = " "
+	defaultGroupSeparator = "--"
+	defaultIndent         = " "
 )
-
 
 var (
 	version     = ""
@@ -73,7 +73,7 @@ func (cli *runner) parseArgs() *options {
 	flag.BoolVarP(&o.noGroupSeparator, "no-group-separator", "", false, "When '-C' is in use, do not print a separator between groups of lines")
 	flag.BoolVarP(&o.noIndent, "no-indent", "", false, "Do not print an indent string")
 
-	flag.StringVarP(&o.groupSeparator, "group-separator", "", "--", "When '-C' is in use, print this string instead of '--' between groups of lines")
+	flag.StringVarP(&o.groupSeparator, "group-separator", "", defaultGroupSeparator, "When '-C' is in use, print this string instead of '--' between groups of lines")
 	flag.StringVarP(&o.indent, "indent", "", defaultIndent, "Indent string for the top of each line")
 
 	flag.BoolVarP(&flagHelp, "help", "h", false, "Show help (This message) and exit")
