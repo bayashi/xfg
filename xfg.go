@@ -278,4 +278,3 @@ func (x *xfg) processContentLine(gf *scanFile) {
 		}
 	}
 }
-
