@@ -36,7 +36,7 @@ type xfg struct {
 	result []path
 }
 
-func NewX(o *options, pathHighlightColor *color.Color, grepHighlightColor *color.Color) *xfg {
+func newX(o *options, pathHighlightColor *color.Color, grepHighlightColor *color.Color) *xfg {
 	x := &xfg{
 		options: o,
 	}
@@ -58,7 +58,7 @@ type walkerArg struct {
 	gitignore *ignore.GitIgnore
 }
 
-func (x *xfg) Search() error {
+func (x *xfg) search() error {
 	if err := validateStartPath(x.options.searchStart); err != nil {
 		return err
 	}
@@ -86,7 +86,7 @@ func (x *xfg) Search() error {
 func (x *xfg) walker(wa *walkerArg) error {
 	fPath, fInfo := wa.path, wa.info
 
-	if x.isIgnore(fPath) {
+	if x.isIgnorePath(fPath) {
 		return nil // skip by --ignore option
 	}
 
@@ -96,7 +96,7 @@ func (x *xfg) walker(wa *walkerArg) error {
 		}
 	}
 
-	if x.isSkip(fPath, fInfo, wa.gitignore) {
+	if x.canSkip(fPath, fInfo, wa.gitignore) {
 		return nil // skip
 	}
 
@@ -105,7 +105,7 @@ func (x *xfg) walker(wa *walkerArg) error {
 	return nil
 }
 
-func (x *xfg) isIgnore(fPath string) bool {
+func (x *xfg) isIgnorePath(fPath string) bool {
 	for _, i := range x.options.ignore {
 		if i != "" && strings.Contains(fPath, i) {
 			return true // skip
@@ -115,7 +115,7 @@ func (x *xfg) isIgnore(fPath string) bool {
 	return false
 }
 
-func (x *xfg) isSkip(fPath string, fInfo fs.FileInfo, gitignore *ignore.GitIgnore) bool {
+func (x *xfg) canSkip(fPath string, fInfo fs.FileInfo, gitignore *ignore.GitIgnore) bool {
 	if !x.options.searchAll {
 		if !fInfo.IsDir() && (fInfo.Name() == ".gitkeep" || strings.HasSuffix(fInfo.Name(), ".min.js")) {
 			return true // not pick .gitkeep file
@@ -147,7 +147,7 @@ func (x *xfg) onMatchPath(fPath string, fInfo fs.FileInfo) (err error) {
 	}
 
 	if x.options.searchGrep != "" && isRegularFile(fInfo) {
-		matchedPath.contents, err = x.grepPath(fPath)
+		matchedPath.contents, err = x.checkFile(fPath)
 		if err != nil {
 			return fmt.Errorf("error during grep: %w", err)
 		}
@@ -196,14 +196,14 @@ func (x *xfg) compileGitIgnore(sPath string) *ignore.GitIgnore {
 	return gitignore
 }
 
-func (x *xfg) grepPath(fPath string) ([]line, error) {
+func (x *xfg) checkFile(fPath string) ([]line, error) {
 	fh, err := os.Open(fPath)
 	if err != nil {
 		return nil, fmt.Errorf("could not open file `%s`: %w", fPath, err)
 	}
 	defer fh.Close()
 
-	isBinary, err := x.isBinary(fh)
+	isBinary, err := x.isBinaryFile(fh)
 	if err != nil {
 		return nil, fmt.Errorf("error during isBinary file `%s`: %w", fPath, err)
 	}
@@ -215,7 +215,7 @@ func (x *xfg) grepPath(fPath string) ([]line, error) {
 		return nil, fmt.Errorf("could not seek `%s`: %w", fPath, err)
 	}
 
-	matchedContents, err := x.grepFile(bufio.NewScanner(fh), fPath)
+	matchedContents, err := x.scanFile(bufio.NewScanner(fh), fPath)
 	if err != nil {
 		return nil, fmt.Errorf("could not grepFile `%s`: %w", fPath, err)
 	}
@@ -223,7 +223,7 @@ func (x *xfg) grepPath(fPath string) ([]line, error) {
 	return matchedContents, nil
 }
 
-func (x *xfg) isBinary(fh *os.File) (bool, error) {
+func (x *xfg) isBinaryFile(fh *os.File) (bool, error) {
 	dat := make([]byte, 8000)
 	n, err := fh.Read(dat)
 	if err != nil {
@@ -239,7 +239,7 @@ func (x *xfg) isBinary(fh *os.File) (bool, error) {
 	return false, nil
 }
 
-type grepFile struct {
+type scanFile struct {
 	lc               int32  // line count
 	l                string // line text
 	blines           []line // slice for before lines
@@ -249,8 +249,8 @@ type grepFile struct {
 	matchedContents []line // result
 }
 
-func (x *xfg) grepFile(scanner *bufio.Scanner, fPath string) ([]line, error) {
-	gf := &grepFile{
+func (x *xfg) scanFile(scanner *bufio.Scanner, fPath string) ([]line, error) {
+	gf := &scanFile{
 		lc:               0,
 		blines:           make([]line, x.options.contextLines),
 		withContextLines: x.options.contextLines > 0,
@@ -273,7 +273,7 @@ func (x *xfg) grepFile(scanner *bufio.Scanner, fPath string) ([]line, error) {
 	return gf.matchedContents, nil
 }
 
-func (x *xfg) processContentLine(gf *grepFile) {
+func (x *xfg) processContentLine(gf *scanFile) {
 	if strings.Contains(gf.l, x.options.searchGrep) {
 		if !x.options.showMatchCount && gf.withContextLines {
 			for _, bl := range gf.blines {
@@ -338,7 +338,7 @@ func output(writer *bufio.Writer, out string) error {
 	return nil
 }
 
-func (x *xfg) Show(w io.Writer) error {
+func (x *xfg) showResult(w io.Writer) error {
 	if x.options.noIndent {
 		x.options.indent = ""
 	}
