@@ -3,7 +3,6 @@ package main
 import (
 	"bufio"
 	"fmt"
-	"io"
 	"io/fs"
 	"os"
 	"path/filepath"
@@ -63,7 +62,10 @@ func (x *xfg) search() error {
 		return err
 	}
 
-	gitignore := x.compileGitIgnore(x.options.searchStart)
+	var gitignore *ignore.GitIgnore
+	if !x.options.skipGitIgnore {
+		gitignore = compileGitIgnore(x.options.searchStart)
+	}
 
 	walkErr := filepath.Walk(x.options.searchStart, func(fPath string, fInfo os.FileInfo, err error) error {
 		if err != nil {
@@ -179,23 +181,6 @@ func (x *xfg) onMatchPath(fPath string, fInfo fs.FileInfo) (err error) {
 	return nil
 }
 
-func (x *xfg) compileGitIgnore(sPath string) *ignore.GitIgnore {
-	const GIT_IGNOE_FILE_NAME = ".gitignore"
-	var gitignore *ignore.GitIgnore
-	if !x.options.skipGitIgnore {
-		// read .gitignore file in start directory to search or home directory
-		// There would be no .gitignore file, then `gitignore` variable will be `nil`.
-		gitignore, _ = ignore.CompileIgnoreFile(filepath.Join(sPath, GIT_IGNOE_FILE_NAME))
-		if gitignore == nil {
-			if homeDir, err := os.UserHomeDir(); err == nil {
-				gitignore, _ = ignore.CompileIgnoreFile(filepath.Join(homeDir, GIT_IGNOE_FILE_NAME))
-			}
-		}
-	}
-
-	return gitignore
-}
-
 func (x *xfg) checkFile(fPath string) ([]line, error) {
 	fh, err := os.Open(fPath)
 	if err != nil {
@@ -203,7 +188,7 @@ func (x *xfg) checkFile(fPath string) ([]line, error) {
 	}
 	defer fh.Close()
 
-	isBinary, err := x.isBinaryFile(fh)
+	isBinary, err := isBinaryFile(fh)
 	if err != nil {
 		return nil, fmt.Errorf("error during isBinary file `%s`: %w", fPath, err)
 	}
@@ -221,22 +206,6 @@ func (x *xfg) checkFile(fPath string) ([]line, error) {
 	}
 
 	return matchedContents, nil
-}
-
-func (x *xfg) isBinaryFile(fh *os.File) (bool, error) {
-	dat := make([]byte, 8000)
-	n, err := fh.Read(dat)
-	if err != nil {
-		return false, fmt.Errorf("could not read fh: %w", err)
-	}
-
-	for _, c := range dat[:n] {
-		if c == 0x00 {
-			return true, nil
-		}
-	}
-
-	return false, nil
 }
 
 type scanFile struct {
@@ -310,76 +279,3 @@ func (x *xfg) processContentLine(gf *scanFile) {
 	}
 }
 
-func isRegularFile(fInfo os.FileInfo) bool {
-	return fInfo.Size() > 0 && fInfo.Mode().Type() == 0
-}
-
-func validateStartPath(startPath string) error {
-	d, err := os.Stat(startPath)
-	if err != nil {
-		return fmt.Errorf("path `%s` is wrong: %w", startPath, err)
-	}
-
-	if !d.IsDir() {
-		return fmt.Errorf("path `%s` should point to a directory", startPath)
-	}
-
-	return nil
-}
-
-func output(writer *bufio.Writer, out string) error {
-	if _, err := fmt.Fprint(writer, out); err != nil {
-		return err
-	}
-	if err := writer.Flush(); err != nil {
-		return err
-	}
-
-	return nil
-}
-
-func (x *xfg) showResult(w io.Writer) error {
-	if x.options.noIndent {
-		x.options.indent = ""
-	}
-
-	writer := bufio.NewWriter(w)
-	for _, p := range x.result {
-		out := p.path
-		if x.options.showMatchCount && !p.info.IsDir() {
-			out = out + fmt.Sprintf(":%d", len(p.contents))
-		}
-		out = out + "\n"
-
-		if !x.options.showMatchCount {
-			if len(p.contents) > 0 {
-				x.showContent(&out, p.contents)
-			}
-			if x.options.relax && len(p.contents) > 0 {
-				out = out + "\n"
-			}
-		}
-		if err := output(writer, out); err != nil {
-			return err
-		}
-	}
-
-	return nil
-}
-
-func (x *xfg) showContent(out *string, contents []line) error {
-	var blc int32 = 0
-	for _, line := range contents {
-		if blc != 0 && line.lc-blc > 1 {
-			*out = *out + x.options.indent + x.options.groupSeparator + "\n"
-		}
-		lc := fmt.Sprintf("%d", line.lc)
-		if !x.options.noColor && line.matched {
-			lc = x.grepHighlitColor.Sprint(lc)
-		}
-		*out = *out + fmt.Sprintf("%s%s: %s\n", x.options.indent, lc, line.content)
-		blc = line.lc
-	}
-
-	return nil
-}
