@@ -327,8 +327,7 @@ func validateStartPath(startPath string) error {
 	return nil
 }
 
-func output(w io.Writer, out string) error {
-	writer := bufio.NewWriter(w)
+func output(writer *bufio.Writer, out string) error {
 	if _, err := fmt.Fprint(writer, out); err != nil {
 		return err
 	}
@@ -344,6 +343,7 @@ func (x *xfg) Show(w io.Writer) error {
 		x.options.indent = ""
 	}
 
+	writer := bufio.NewWriter(w)
 	for _, p := range x.result {
 		out := p.path
 		if x.options.showMatchCount && !p.info.IsDir() {
@@ -359,7 +359,7 @@ func (x *xfg) Show(w io.Writer) error {
 				out = out + "\n"
 			}
 		}
-		if err := output(w, out); err != nil {
+		if err := output(writer, out); err != nil {
 			return err
 		}
 	}
