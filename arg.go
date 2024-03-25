@@ -9,7 +9,12 @@ import (
 	flag "github.com/spf13/pflag"
 )
 
-const errNeedToSetPath = "Err: You should specify a directory path `--path`"
+const (
+	errNeedToSetPath = "Err: You should specify a directory path `--path`"
+
+	defaultIndent = " "
+)
+
 
 var (
 	version     = ""
@@ -69,7 +74,7 @@ func (cli *runner) parseArgs() *options {
 	flag.BoolVarP(&o.noIndent, "no-indent", "", false, "Do not print an indent string")
 
 	flag.StringVarP(&o.groupSeparator, "group-separator", "", "--", "When '-C' is in use, print this string instead of '--' between groups of lines")
-	flag.StringVarP(&o.indent, "indent", "", "  ", "Indent string for the top of each line")
+	flag.StringVarP(&o.indent, "indent", "", defaultIndent, "Indent string for the top of each line")
 
 	flag.BoolVarP(&flagHelp, "help", "h", false, "Show help (This message) and exit")
 	flag.BoolVarP(&flagVersion, "version", "v", false, "Show version and build command info and exit")
