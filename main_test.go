@@ -18,7 +18,6 @@ func TestRunner_OK(t *testing.T) {
 		"service-b": {
 			opt: &options{
 				searchPath: "service-b",
-				indent:     "  ",
 			},
 			expect: here.Doc(`
                 testdata/service-b/
@@ -29,25 +28,25 @@ func TestRunner_OK(t *testing.T) {
 			opt: &options{
 				searchPath: "service-b",
 				searchGrep: "func",
-				indent:     "  ",
+				indent:     defaultIndent,
 			},
 			expect: here.Doc(`
                 testdata/service-b/
                 testdata/service-b/main.go
-                  3: func main() {
+                 3: func main() {
 			`),
 		},
 		"service grep relax": {
 			opt: &options{
 				searchPath: "main",
 				searchGrep: "package b",
-				indent:     "  ",
+				indent:     defaultIndent,
 				relax:      true,
 			},
 			expect: here.Doc(`
                 testdata/service-a/main.go
                 testdata/service-b/main.go
-                  1: package b
+                 1: package b
 
                 testdata/service-c/main.go
                 testdata/service-h/main.go
@@ -57,99 +56,99 @@ func TestRunner_OK(t *testing.T) {
 			opt: &options{
 				searchPath:   "service-b",
 				searchGrep:   "main",
-				indent:       "  ",
+				indent:       defaultIndent,
 				contextLines: 1,
 			},
 			expect: here.Doc(`
 				testdata/service-b/
 				testdata/service-b/main.go
-				  2: 
-				  3: func main() {
-				  4: 	bar := 34
+				 2: 
+				 3: func main() {
+				 4: 	bar := 34
 			`),
 		},
 		"service-b grep bar with C2": {
 			opt: &options{
 				searchPath:   "service-b",
 				searchGrep:   "main",
-				indent:       "  ",
+				indent:       defaultIndent,
 				contextLines: 2,
 			},
 			expect: here.Doc(`
 				testdata/service-b/
 				testdata/service-b/main.go
-				  1: package b
-				  2: 
-				  3: func main() {
-				  4: 	bar := 34
-				  5: }
+				 1: package b
+				 2: 
+				 3: func main() {
+				 4: 	bar := 34
+				 5: }
 			`),
 		},
 		"service-c grep 56 with C2. Match 2 consecutive lines": {
 			opt: &options{
 				searchPath:   "service-c",
 				searchGrep:   "56",
-				indent:       "  ",
+				indent:       defaultIndent,
 				contextLines: 2,
 			},
 			expect: here.Doc(`
 				testdata/service-c/
 				testdata/service-c/main.go
-				  2: 
-				  3: func main() {
-				  4: 	baz := 56
-				  5: 	bag := 56
-				  6: 
-				  7: 	foo()
+				 2: 
+				 3: func main() {
+				 4: 	baz := 56
+				 5: 	bag := 56
+				 6: 
+				 7: 	foo()
 			`),
 		},
 		"service-b grep onlyMatch": {
 			opt: &options{
 				searchPath: "service-b",
 				searchGrep: "func",
-				indent:     "  ",
+				indent:     defaultIndent,
 				onlyMatch:  true,
 			},
 			expect: here.Doc(`
                 testdata/service-b/main.go
-                  3: func main() {
+                 3: func main() {
 			`),
 		},
 		"service-b grep foo": {
 			opt: &options{
 				searchPath: "service-a",
 				searchGrep: "foo",
-				indent:     "  ",
+				indent:     defaultIndent,
 			},
 			expect: here.Doc(`
                 testdata/service-a/
                 testdata/service-a/a.dat
                 testdata/service-a/b
                 testdata/service-a/main.go
-                  4: 	foo := 12
+                 4: 	foo := 12
 			`),
 		},
 		"service-c grep foo": {
 			opt: &options{
 				searchPath:     "service-c",
 				searchGrep:     "foo",
-				groupSeparator: "--",
-				indent:         "  ",
+				groupSeparator: defaultGroupSeparator,
+				indent:         defaultIndent,
 			},
 			expect: here.Doc(`
                 testdata/service-c/
                 testdata/service-c/main.go
-                  7: 	foo()
-                  --
-                  10: func foo() {
+                 7: 	foo()
+                 --
+                 10: func foo() {
 			`),
 		},
 		"service-c grep foo noIndent": {
 			opt: &options{
 				searchPath:     "service-c",
 				searchGrep:     "foo",
-				groupSeparator: "--",
-				indent:         "  ",
+				groupSeparator: defaultGroupSeparator,
+				indent:         defaultIndent,
 				noIndent:       true,
 			},
 			expect: here.Doc(`
@@ -288,37 +287,37 @@ func TestRunner_OK(t *testing.T) {
 			opt: &options{
 				searchPath:     "service-h",
 				searchGrep:     "h",
-				groupSeparator: "--",
-				indent:         "  ",
+				groupSeparator: defaultGroupSeparator,
+				indent:         defaultIndent,
 			},
 			expect: here.Doc(`
                 testdata/service-h/
                 testdata/service-h/main.go
-                  1: package h
-                  --
-                  4: 	hi()
-                  5: 	hello()
-                  --
-                  8: func hi() {
-                  --
-                  11: func hello() {
+                 1: package h
+                 --
+                 4: 	hi()
+                 5: 	hello()
+                 --
+                 8: func hi() {
+                 --
+                 11: func hello() {
 			`),
 		},
 		"service-h with maxMatchCount": {
 			opt: &options{
 				searchPath:     "service-h",
 				searchGrep:     "h",
-				groupSeparator: "--",
-				indent:         "  ",
+				groupSeparator: defaultGroupSeparator,
+				indent:         defaultIndent,
 				maxMatchCount:  3,
 			},
 			expect: here.Doc(`
                 testdata/service-h/
                 testdata/service-h/main.go
-                  1: package h
-                  --
-                  4: 	hi()
-                  5: 	hello()
+                 1: package h
+                 --
+                 4: 	hi()
+                 5: 	hello()
 			`),
 		},
 		"service-h show count": {
