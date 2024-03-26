@@ -132,7 +132,6 @@ func TestRunner_OK(t *testing.T) {
 			opt: &options{
 				searchPath:     "service-c",
 				searchGrep:     "foo",
-				groupSeparator: defaultGroupSeparator,
 				indent:         defaultIndent,
 			},
 			expect: here.Doc(`
@@ -146,7 +145,6 @@ func TestRunner_OK(t *testing.T) {
 			opt: &options{
 				searchPath:     "service-c",
 				searchGrep:     "foo",
-				groupSeparator: defaultGroupSeparator,
 				indent:         defaultIndent,
 				noIndent:       true,
 			},
@@ -285,7 +283,6 @@ func TestRunner_OK(t *testing.T) {
 			opt: &options{
 				searchPath:     "service-h",
 				searchGrep:     "h",
-				groupSeparator: defaultGroupSeparator,
 				indent:         defaultIndent,
 			},
 			expect: here.Doc(`
@@ -302,7 +299,6 @@ func TestRunner_OK(t *testing.T) {
 			opt: &options{
 				searchPath:     "service-h",
 				searchGrep:     "h",
-				groupSeparator: defaultGroupSeparator,
 				indent:         defaultIndent,
 				maxMatchCount:  3,
 			},
@@ -340,6 +336,26 @@ func TestRunner_OK(t *testing.T) {
                  3: func main() {
                  4: 	baz := 56
                  --
+                 9: 
+                 10: func foo() {
+                 11: 	println("Result")
+			`),
+		},
+		"service-c with contextLines groupSeparator": {
+			opt: &options{
+				searchPath:     "service-c",
+				searchGrep:     "func",
+				groupSeparator: "====",
+				indent:         defaultIndent,
+				contextLines:  1,
+			},
+			expect: here.Doc(`
+                testdata/service-c/
+                testdata/service-c/main.go
+                 2: 
+                 3: func main() {
+                 4: 	baz := 56
+                 ====
                  9: 
                  10: func foo() {
                  11: 	println("Result")
