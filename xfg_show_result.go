@@ -49,7 +49,7 @@ func (x *xfg) showResult(w io.Writer) error {
 func (x *xfg) buildContentOutput(out *string, contents []line) error {
 	var blc int32 = 0
 	for _, line := range contents {
-		if blc != 0 && line.lc-blc > 1 {
+		if x.needToShowGroupSeparator(blc, line.lc) {
 			*out = *out + x.options.indent + x.options.groupSeparator + "\n"
 		}
 		lc := fmt.Sprintf("%d", line.lc)
@@ -61,4 +61,8 @@ func (x *xfg) buildContentOutput(out *string, contents []line) error {
 	}
 
 	return nil
+}
+
+func (x *xfg) needToShowGroupSeparator(blc int32, lc int32) bool {
+	return x.options.contextLines > 0 && blc != 0 && lc-blc > 1
 }

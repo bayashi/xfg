@@ -130,32 +130,28 @@ func TestRunner_OK(t *testing.T) {
 		},
 		"service-c grep foo": {
 			opt: &options{
-				searchPath:     "service-c",
-				searchGrep:     "foo",
-				groupSeparator: defaultGroupSeparator,
-				indent:         defaultIndent,
+				searchPath: "service-c",
+				searchGrep: "foo",
+				indent:     defaultIndent,
 			},
 			expect: here.Doc(`
                 testdata/service-c/
                 testdata/service-c/main.go
                  7: 	foo()
-                 --
                  10: func foo() {
 			`),
 		},
 		"service-c grep foo noIndent": {
 			opt: &options{
-				searchPath:     "service-c",
-				searchGrep:     "foo",
-				groupSeparator: defaultGroupSeparator,
-				indent:         defaultIndent,
-				noIndent:       true,
+				searchPath: "service-c",
+				searchGrep: "foo",
+				indent:     defaultIndent,
+				noIndent:   true,
 			},
 			expect: here.Doc(`
                 testdata/service-c/
                 testdata/service-c/main.go
                 7: 	foo()
-                --
                 10: func foo() {
 			`),
 		},
@@ -285,37 +281,31 @@ func TestRunner_OK(t *testing.T) {
 		},
 		"service-h": {
 			opt: &options{
-				searchPath:     "service-h",
-				searchGrep:     "h",
-				groupSeparator: defaultGroupSeparator,
-				indent:         defaultIndent,
+				searchPath: "service-h",
+				searchGrep: "h",
+				indent:     defaultIndent,
 			},
 			expect: here.Doc(`
                 testdata/service-h/
                 testdata/service-h/main.go
                  1: package h
-                 --
                  4: 	hi()
                  5: 	hello()
-                 --
                  8: func hi() {
-                 --
                  11: func hello() {
 			`),
 		},
 		"service-h with maxMatchCount": {
 			opt: &options{
-				searchPath:     "service-h",
-				searchGrep:     "h",
-				groupSeparator: defaultGroupSeparator,
-				indent:         defaultIndent,
-				maxMatchCount:  3,
+				searchPath:    "service-h",
+				searchGrep:    "h",
+				indent:        defaultIndent,
+				maxMatchCount: 3,
 			},
 			expect: here.Doc(`
                 testdata/service-h/
                 testdata/service-h/main.go
                  1: package h
-                 --
                  4: 	hi()
                  5: 	hello()
 			`),
@@ -329,6 +319,46 @@ func TestRunner_OK(t *testing.T) {
 			expect: here.Doc(`
                 testdata/service-h/
                 testdata/service-h/main.go:5
+			`),
+		},
+		"service-c with contextLines": {
+			opt: &options{
+				searchPath:     "service-c",
+				searchGrep:     "func",
+				groupSeparator: defaultGroupSeparator,
+				indent:         defaultIndent,
+				contextLines:   1,
+			},
+			expect: here.Doc(`
+                testdata/service-c/
+                testdata/service-c/main.go
+                 2: 
+                 3: func main() {
+                 4: 	baz := 56
+                 --
+                 9: 
+                 10: func foo() {
+                 11: 	println("Result")
+			`),
+		},
+		"service-c with contextLines groupSeparator": {
+			opt: &options{
+				searchPath:     "service-c",
+				searchGrep:     "func",
+				groupSeparator: "====",
+				indent:         defaultIndent,
+				contextLines:   1,
+			},
+			expect: here.Doc(`
+                testdata/service-c/
+                testdata/service-c/main.go
+                 2: 
+                 3: func main() {
+                 4: 	baz := 56
+                 ====
+                 9: 
+                 10: func foo() {
+                 11: 	println("Result")
 			`),
 		},
 	} {
@@ -347,7 +377,7 @@ func TestRunner_OK(t *testing.T) {
 				tt.expect = strings.ReplaceAll(tt.expect, "/", "\\")
 			}
 
-			a.Got(o.String()).Expect(tt.expect).X().Same(t)
+			a.Got(o.String()).Expect(tt.expect).X().Debug("options", tt.opt).Same(t)
 		})
 	}
 }
