@@ -130,9 +130,9 @@ func TestRunner_OK(t *testing.T) {
 		},
 		"service-c grep foo": {
 			opt: &options{
-				searchPath:     "service-c",
-				searchGrep:     "foo",
-				indent:         defaultIndent,
+				searchPath: "service-c",
+				searchGrep: "foo",
+				indent:     defaultIndent,
 			},
 			expect: here.Doc(`
                 testdata/service-c/
@@ -143,10 +143,10 @@ func TestRunner_OK(t *testing.T) {
 		},
 		"service-c grep foo noIndent": {
 			opt: &options{
-				searchPath:     "service-c",
-				searchGrep:     "foo",
-				indent:         defaultIndent,
-				noIndent:       true,
+				searchPath: "service-c",
+				searchGrep: "foo",
+				indent:     defaultIndent,
+				noIndent:   true,
 			},
 			expect: here.Doc(`
                 testdata/service-c/
@@ -281,9 +281,9 @@ func TestRunner_OK(t *testing.T) {
 		},
 		"service-h": {
 			opt: &options{
-				searchPath:     "service-h",
-				searchGrep:     "h",
-				indent:         defaultIndent,
+				searchPath: "service-h",
+				searchGrep: "h",
+				indent:     defaultIndent,
 			},
 			expect: here.Doc(`
                 testdata/service-h/
@@ -297,10 +297,10 @@ func TestRunner_OK(t *testing.T) {
 		},
 		"service-h with maxMatchCount": {
 			opt: &options{
-				searchPath:     "service-h",
-				searchGrep:     "h",
-				indent:         defaultIndent,
-				maxMatchCount:  3,
+				searchPath:    "service-h",
+				searchGrep:    "h",
+				indent:        defaultIndent,
+				maxMatchCount: 3,
 			},
 			expect: here.Doc(`
                 testdata/service-h/
@@ -327,7 +327,7 @@ func TestRunner_OK(t *testing.T) {
 				searchGrep:     "func",
 				groupSeparator: defaultGroupSeparator,
 				indent:         defaultIndent,
-				contextLines:  1,
+				contextLines:   1,
 			},
 			expect: here.Doc(`
                 testdata/service-c/
@@ -347,7 +347,7 @@ func TestRunner_OK(t *testing.T) {
 				searchGrep:     "func",
 				groupSeparator: "====",
 				indent:         defaultIndent,
-				contextLines:  1,
+				contextLines:   1,
 			},
 			expect: here.Doc(`
                 testdata/service-c/
