@@ -6,6 +6,7 @@ import (
 	"io/fs"
 	"os"
 	"path/filepath"
+	"regexp"
 	"strings"
 
 	"github.com/fatih/color"
@@ -31,6 +32,10 @@ type xfg struct {
 	pathHighlighter  string
 	grepHighlitColor *color.Color
 	grepHighlighter  string
+
+	searchPathRe *regexp.Regexp
+	searchGrepRe *regexp.Regexp
+	ignoreRe     []*regexp.Regexp
 
 	result []path
 }
@@ -65,6 +70,30 @@ func (x *xfg) search() error {
 	var gitignore *ignore.GitIgnore
 	if !x.options.skipGitIgnore {
 		gitignore = compileGitIgnore(x.options.searchStart)
+	}
+
+	if x.options.ignoreCase {
+		searchPathRe, err := regexp.Compile("(?i)(" + regexp.QuoteMeta(x.options.searchPath) + ")")
+		if err != nil {
+			return err
+		}
+		x.searchPathRe = searchPathRe
+		if x.options.searchGrep != "" {
+			searchGrepRe, err := regexp.Compile("(?i)(" + regexp.QuoteMeta(x.options.searchGrep) + ")")
+			if err != nil {
+				return err
+			}
+			x.searchGrepRe = searchGrepRe
+		}
+		if len(x.options.ignore) > 0 {
+			for _, i := range x.options.ignore {
+				ignoreRe, err := regexp.Compile(`(?i)` + regexp.QuoteMeta(i))
+				if err != nil {
+					return err
+				}
+				x.ignoreRe = append(x.ignoreRe, ignoreRe)
+			}
+		}
 	}
 
 	walkErr := filepath.Walk(x.options.searchStart, func(fPath string, fInfo os.FileInfo, err error) error {
@@ -108,9 +137,17 @@ func (x *xfg) walker(wa *walkerArg) error {
 }
 
 func (x *xfg) isIgnorePath(fPath string) bool {
-	for _, i := range x.options.ignore {
-		if i != "" && strings.Contains(fPath, i) {
-			return true // skip
+	if x.options.ignoreCase {
+		for _, re := range x.ignoreRe {
+			if isMatchRegexp(fPath, re) {
+				return true // skip
+			}
+		}
+	} else {
+		for _, i := range x.options.ignore {
+			if isMatch(fPath, i) {
+				return true // skip
+			}
 		}
 	}
 
@@ -136,11 +173,11 @@ func (x *xfg) canSkip(fPath string, fInfo fs.FileInfo, gitignore *ignore.GitIgno
 		}
 	}
 
-	if !strings.Contains(fPath, x.options.searchPath) {
-		return true // not match
+	if x.options.ignoreCase {
+		return !isMatchRegexp(fPath, x.searchPathRe)
+	} else {
+		return !isMatch(fPath, x.options.searchPath)
 	}
-
-	return false
 }
 
 func (x *xfg) onMatchPath(fPath string, fInfo fs.FileInfo) (err error) {
@@ -169,7 +206,11 @@ func (x *xfg) onMatchPath(fPath string, fInfo fs.FileInfo) (err error) {
 	if x.options.noColor {
 		matchedPath.path = fPath
 	} else {
-		matchedPath.path = strings.ReplaceAll(fPath, x.options.searchPath, x.pathHighlighter)
+		if x.options.ignoreCase {
+			matchedPath.path = x.searchPathRe.ReplaceAllString(fPath, x.pathHighlitColor.Sprintf("$1"))
+		} else {
+			matchedPath.path = strings.ReplaceAll(fPath, x.options.searchPath, x.pathHighlighter)
+		}
 	}
 
 	if fInfo.IsDir() {
@@ -242,8 +283,16 @@ func (x *xfg) scanFile(scanner *bufio.Scanner, fPath string) ([]line, error) {
 	return gf.matchedContents, nil
 }
 
+func (x *xfg) isMatchLine(line string) bool {
+	if x.options.ignoreCase {
+		return isMatchRegexp(line, x.searchGrepRe)
+	} else {
+		return isMatch(line, x.options.searchGrep)
+	}
+}
+
 func (x *xfg) processContentLine(gf *scanFile) {
-	if strings.Contains(gf.l, x.options.searchGrep) {
+	if x.isMatchLine(gf.l) {
 		if !x.options.showMatchCount && gf.withContextLines {
 			for _, bl := range gf.blines {
 				if bl.lc == 0 {
@@ -257,7 +306,11 @@ func (x *xfg) processContentLine(gf *scanFile) {
 		if x.options.showMatchCount {
 			gf.l = ""
 		} else if !x.options.noColor {
-			gf.l = strings.ReplaceAll(gf.l, x.options.searchGrep, x.grepHighlighter)
+			if x.options.ignoreCase {
+				gf.l = x.searchGrepRe.ReplaceAllString(gf.l, x.grepHighlitColor.Sprintf("$1"))
+			} else {
+				gf.l = strings.ReplaceAll(gf.l, x.options.searchGrep, x.grepHighlighter)
+			}
 		}
 
 		gf.matchedContents = append(gf.matchedContents, line{lc: gf.lc, content: gf.l, matched: true})

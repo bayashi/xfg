@@ -4,6 +4,8 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"regexp"
+	"strings"
 
 	ignore "github.com/sabhiram/go-gitignore"
 )
@@ -53,4 +55,20 @@ func validateStartPath(startPath string) error {
 	}
 
 	return nil
+}
+
+func isMatch(target string, included string) bool {
+	if target == "" || included == "" {
+		return false
+	}
+
+	return strings.Contains(target, included)
+}
+
+func isMatchRegexp(target string, re *regexp.Regexp) bool {
+	if target == "" || re == nil {
+		return false
+	}
+
+	return re.MatchString(target)
 }
