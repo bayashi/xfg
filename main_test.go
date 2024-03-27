@@ -361,6 +361,19 @@ func TestRunner_OK(t *testing.T) {
                  11: 	println("Result")
 			`),
 		},
+		"service-b ignore case to match": {
+			opt: &options{
+				searchPath: "Service-B",
+				searchGrep: "FunC",
+				indent:     defaultIndent,
+				ignoreCase: true,
+			},
+			expect: here.Doc(`
+                testdata/service-b/
+                testdata/service-b/main.go
+                 3: func main() {
+			`),
+		},
 	} {
 		t.Run(tname, func(t *testing.T) {
 			var o bytes.Buffer
