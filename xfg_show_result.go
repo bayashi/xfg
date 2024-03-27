@@ -54,7 +54,7 @@ func (x *xfg) buildContentOutput(out *string, contents []line) error {
 		}
 		lc := fmt.Sprintf("%d", line.lc)
 		if !x.options.noColor && line.matched {
-			lc = x.grepHighlitColor.Sprint(lc)
+			lc = x.grepHighlightColor.Sprint(lc)
 		}
 		*out = *out + fmt.Sprintf("%s%s: %s\n", x.options.indent, lc, line.content)
 		blc = line.lc

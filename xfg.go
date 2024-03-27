@@ -9,6 +9,7 @@ import (
 	"regexp"
 	"strings"
 
+	"github.com/bayashi/colorpalette"
 	"github.com/fatih/color"
 	ignore "github.com/sabhiram/go-gitignore"
 )
@@ -28,10 +29,10 @@ type path struct {
 type xfg struct {
 	options *options
 
-	pathHighlitColor *color.Color
-	pathHighlighter  string
-	grepHighlitColor *color.Color
-	grepHighlighter  string
+	pathHighlightColor *color.Color
+	pathHighlighter    string
+	grepHighlightColor *color.Color
+	grepHighlighter    string
 
 	searchPathRe *regexp.Regexp
 	searchGrepRe *regexp.Regexp
@@ -40,18 +41,24 @@ type xfg struct {
 	result []path
 }
 
-func newX(o *options, pathHighlightColor *color.Color, grepHighlightColor *color.Color) *xfg {
+func newX(o *options) *xfg {
 	x := &xfg{
 		options: o,
 	}
-	if pathHighlightColor != nil {
-		x.pathHighlitColor = pathHighlightColor
-		x.pathHighlighter = pathHighlightColor.Sprintf(x.options.searchPath)
+
+	if o.colorPath != "" && colorpalette.Exists(o.colorPath) {
+		x.pathHighlightColor = colorpalette.Get(o.colorPath)
+	} else {
+		x.pathHighlightColor = colorpalette.Get("cyan")
 	}
-	if grepHighlightColor != nil {
-		x.grepHighlitColor = grepHighlightColor
-		x.grepHighlighter = grepHighlightColor.Sprintf(x.options.searchGrep)
+	x.pathHighlighter = x.pathHighlightColor.Sprintf(x.options.searchPath)
+
+	if o.colorContent != "" && colorpalette.Exists(o.colorContent) {
+		x.grepHighlightColor = colorpalette.Get(o.colorContent)
+	} else {
+		x.grepHighlightColor = colorpalette.Get("red")
 	}
+	x.grepHighlighter = x.grepHighlightColor.Sprintf(x.options.searchGrep)
 
 	return x
 }
@@ -207,7 +214,7 @@ func (x *xfg) onMatchPath(fPath string, fInfo fs.FileInfo) (err error) {
 		matchedPath.path = fPath
 	} else {
 		if x.options.ignoreCase {
-			matchedPath.path = x.searchPathRe.ReplaceAllString(fPath, x.pathHighlitColor.Sprintf("$1"))
+			matchedPath.path = x.searchPathRe.ReplaceAllString(fPath, x.pathHighlightColor.Sprintf("$1"))
 		} else {
 			matchedPath.path = strings.ReplaceAll(fPath, x.options.searchPath, x.pathHighlighter)
 		}
@@ -307,7 +314,7 @@ func (x *xfg) processContentLine(gf *scanFile) {
 			gf.l = ""
 		} else if !x.options.noColor {
 			if x.options.ignoreCase {
-				gf.l = x.searchGrepRe.ReplaceAllString(gf.l, x.grepHighlitColor.Sprintf("$1"))
+				gf.l = x.searchGrepRe.ReplaceAllString(gf.l, x.grepHighlightColor.Sprintf("$1"))
 			} else {
 				gf.l = strings.ReplaceAll(gf.l, x.options.searchGrep, x.grepHighlighter)
 			}
