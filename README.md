@@ -75,7 +75,33 @@ service-b/main.go
 * Pick up all files and directories with `--search-all` option
     * You can ignore specific files and directories with `--ignore` option
 
-Also See `--help` for more options.
+## Options
+
+```
+  -p, --path stringArray         A string to find paths
+  -g, --grep stringArray         A string to search for contents
+  -s, --start string             A location to start searching (default ".")
+  -C, --context uint32           Show several lines before and after the matched one
+  -m, --max-count uint32         Stop reading a file after NUM matching lines
+      --ignore stringArray       Ignore path to pick up even with '--search-all'
+      --hidden                   Enable to search hidden files
+      --skip-git-ignore          Search files and directories even if a path matches a line of .gitignore
+      --search-all               Search all files and directories except specific ignoring files and directories
+  -i, --ignore-case              Ignore case distinctions to search. Also affects keywords of ignore option
+      --no-color                 Disable colors for an output
+      --relax                    Insert blank space between contents for relaxing view
+      --abs                      Show absolute paths
+  -c, --count                    Show a count of matching lines instead of contents
+  -o, --only-match               Show paths only matched contents
+      --no-group-separator       Do not print a separator between groups of lines
+      --no-indent                Do not print an indent string
+      --group-separator string   Print this string instead of '--' between groups of lines (default "--")
+      --indent string            Indent string for the top of each line (default " ")
+      --color-path string        Color name to highlight keywords in a path (default "cyan")
+      --color-content string     Color name to highlight keywords in a content line (default "red")
+  -h, --help                     Show help (This message) and exit
+  -v, --version                  Show version and build command info and exit
+```
 
 ## Installation
 
