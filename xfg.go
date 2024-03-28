@@ -41,11 +41,8 @@ type xfg struct {
 	result []path
 }
 
-func newX(o *options) *xfg {
-	x := &xfg{
-		options: o,
-	}
-
+func (x *xfg) setHighlighter() {
+	o := x.options
 	if o.colorPath != "" && colorpalette.Exists(o.colorPath) {
 		x.pathHighlightColor = colorpalette.Get(o.colorPath)
 	} else {
@@ -63,6 +60,14 @@ func newX(o *options) *xfg {
 	for _, sg := range o.searchGrep {
 		x.grepHighlighter = append(x.grepHighlighter, x.grepHighlightColor.Sprintf(sg))
 	}
+}
+
+func newX(o *options) *xfg {
+	x := &xfg{
+		options: o,
+	}
+
+	x.setHighlighter()
 
 	return x
 }
