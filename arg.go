@@ -22,8 +22,8 @@ var (
 )
 
 type options struct {
-	searchPath  string
-	searchGrep  string
+	searchPath  []string
+	searchGrep  []string
 	searchStart string
 
 	groupSeparator string
@@ -56,8 +56,8 @@ func (cli *runner) parseArgs() *options {
 
 	var flagHelp bool
 	var flagVersion bool
-	flag.StringVarP(&o.searchPath, "path", "p", "", "A string to find paths")
-	flag.StringVarP(&o.searchGrep, "grep", "g", "", "A string to search for contents")
+	flag.StringArrayVarP(&o.searchPath, "path", "p", []string{}, "A string to find paths")
+	flag.StringArrayVarP(&o.searchGrep, "grep", "g", []string{}, "A string to search for contents")
 	flag.StringVarP(&o.searchStart, "start", "s", ".", "A location to start searching")
 
 	flag.Uint32VarP(&o.contextLines, "context", "C", 0, "Show several lines before and after the matched one")
@@ -103,22 +103,14 @@ func (cli *runner) parseArgs() *options {
 }
 
 func (o *options) targetPathFromArgs(cli *runner) {
-	if o.searchPath != "" {
-		return
-	}
-
 	if len(flag.Args()) == 0 {
 		cli.putHelp(errNeedToSetPath)
 	}
 
-	o.searchPath = flag.Args()[0]
-
-	if o.searchPath == "" {
-		cli.putHelp(errNeedToSetPath)
-	}
+	o.searchPath[len(o.searchPath)] = flag.Args()[0]
 
 	if len(flag.Args()) == 2 {
-		o.searchGrep = flag.Args()[1]
+		o.searchGrep[len(o.searchGrep)] = flag.Args()[1]
 	}
 }
 

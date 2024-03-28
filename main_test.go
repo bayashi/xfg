@@ -17,7 +17,7 @@ func TestRunner_OK(t *testing.T) {
 	}{
 		"service-b": {
 			opt: &options{
-				searchPath: "service-b",
+				searchPath: []string{"service-b"},
 			},
 			expect: here.Doc(`
                 testdata/service-b/
@@ -26,8 +26,8 @@ func TestRunner_OK(t *testing.T) {
 		},
 		"service-b grep": {
 			opt: &options{
-				searchPath: "service-b",
-				searchGrep: "func",
+				searchPath: []string{"service-b"},
+				searchGrep: []string{"func"},
 				indent:     defaultIndent,
 			},
 			expect: here.Doc(`
@@ -38,8 +38,8 @@ func TestRunner_OK(t *testing.T) {
 		},
 		"service grep relax": {
 			opt: &options{
-				searchPath: "main",
-				searchGrep: "package b",
+				searchPath: []string{"main"},
+				searchGrep: []string{"package b"},
 				indent:     defaultIndent,
 				relax:      true,
 			},
@@ -54,8 +54,8 @@ func TestRunner_OK(t *testing.T) {
 		},
 		"service-b grep bar with C1": {
 			opt: &options{
-				searchPath:   "service-b",
-				searchGrep:   "main",
+				searchPath:   []string{"service-b"},
+				searchGrep:   []string{"main"},
 				indent:       defaultIndent,
 				contextLines: 1,
 			},
@@ -69,8 +69,8 @@ func TestRunner_OK(t *testing.T) {
 		},
 		"service-b grep bar with C2": {
 			opt: &options{
-				searchPath:   "service-b",
-				searchGrep:   "main",
+				searchPath:   []string{"service-b"},
+				searchGrep:   []string{"main"},
 				indent:       defaultIndent,
 				contextLines: 2,
 			},
@@ -86,8 +86,8 @@ func TestRunner_OK(t *testing.T) {
 		},
 		"service-c grep 56 with C2. Match 2 consecutive lines": {
 			opt: &options{
-				searchPath:   "service-c",
-				searchGrep:   "56",
+				searchPath:   []string{"service-c"},
+				searchGrep:   []string{"56"},
 				indent:       defaultIndent,
 				contextLines: 2,
 			},
@@ -104,8 +104,8 @@ func TestRunner_OK(t *testing.T) {
 		},
 		"service-b grep onlyMatch": {
 			opt: &options{
-				searchPath: "service-b",
-				searchGrep: "func",
+				searchPath: []string{"service-b"},
+				searchGrep: []string{"func"},
 				indent:     defaultIndent,
 				onlyMatch:  true,
 			},
@@ -116,8 +116,8 @@ func TestRunner_OK(t *testing.T) {
 		},
 		"service-b grep foo": {
 			opt: &options{
-				searchPath: "service-a",
-				searchGrep: "foo",
+				searchPath: []string{"service-a"},
+				searchGrep: []string{"foo"},
 				indent:     defaultIndent,
 			},
 			expect: here.Doc(`
@@ -130,8 +130,8 @@ func TestRunner_OK(t *testing.T) {
 		},
 		"service-c grep foo": {
 			opt: &options{
-				searchPath: "service-c",
-				searchGrep: "foo",
+				searchPath: []string{"service-c"},
+				searchGrep: []string{"foo"},
 				indent:     defaultIndent,
 			},
 			expect: here.Doc(`
@@ -143,8 +143,8 @@ func TestRunner_OK(t *testing.T) {
 		},
 		"service-c grep foo noIndent": {
 			opt: &options{
-				searchPath: "service-c",
-				searchGrep: "foo",
+				searchPath: []string{"service-c"},
+				searchGrep: []string{"foo"},
 				indent:     defaultIndent,
 				noIndent:   true,
 			},
@@ -157,8 +157,8 @@ func TestRunner_OK(t *testing.T) {
 		},
 		"service-b grep custom indent string": {
 			opt: &options{
-				searchPath: "service-b",
-				searchGrep: "func",
+				searchPath: []string{"service-b"},
+				searchGrep: []string{"func"},
 				indent:     "	",
 			},
 			expect: here.Doc(`
@@ -169,7 +169,7 @@ func TestRunner_OK(t *testing.T) {
 		},
 		"service-d ignore .gitkeep": {
 			opt: &options{
-				searchPath: "service-d",
+				searchPath: []string{"service-d"},
 			},
 			expect: here.Doc(`
                 testdata/service-d/
@@ -177,7 +177,7 @@ func TestRunner_OK(t *testing.T) {
 		},
 		"not pick .gitkeep even with --hidden option": {
 			opt: &options{
-				searchPath: "service-d",
+				searchPath: []string{"service-d"},
 				hidden:     true,
 			},
 			expect: here.Doc(`
@@ -186,7 +186,7 @@ func TestRunner_OK(t *testing.T) {
 		},
 		"not pick dotfile by default": {
 			opt: &options{
-				searchPath: "service-e",
+				searchPath: []string{"service-e"},
 				hidden:     false, // default false
 			},
 			expect: here.Doc(`
@@ -195,7 +195,7 @@ func TestRunner_OK(t *testing.T) {
 		},
 		"pick dotfile with --hidden option": {
 			opt: &options{
-				searchPath: "service-e",
+				searchPath: []string{"service-e"},
 				hidden:     true,
 			},
 			expect: here.Doc(`
@@ -205,7 +205,7 @@ func TestRunner_OK(t *testing.T) {
 		},
 		"not pick up ignorez dir due to .gitignore": {
 			opt: &options{
-				searchPath: "service-f",
+				searchPath: []string{"service-f"},
 			},
 			expect: here.Doc(`
                 testdata/service-f/
@@ -213,7 +213,7 @@ func TestRunner_OK(t *testing.T) {
 		},
 		"pick up ignorez dir with --skip-gitignore option": {
 			opt: &options{
-				searchPath:    "service-f",
+				searchPath:    []string{"service-f"},
 				skipGitIgnore: true,
 			},
 			expect: here.Doc(`
@@ -223,7 +223,7 @@ func TestRunner_OK(t *testing.T) {
 		},
 		"ignore *min.js by default": {
 			opt: &options{
-				searchPath: "service-g",
+				searchPath: []string{"service-g"},
 			},
 			expect: here.Doc(`
                 testdata/service-g/
@@ -231,7 +231,7 @@ func TestRunner_OK(t *testing.T) {
 		},
 		"ignore option": {
 			opt: &options{
-				searchPath: "service-a",
+				searchPath: []string{"service-a"},
 				ignore:     []string{"a.dat", "b"},
 			},
 			expect: here.Doc(`
@@ -241,7 +241,7 @@ func TestRunner_OK(t *testing.T) {
 		},
 		"ignore anyway even with --hidden option": {
 			opt: &options{
-				searchPath: "service-e",
+				searchPath: []string{"service-e"},
 				hidden:     true,
 				ignore:     []string{".config"},
 			},
@@ -251,7 +251,7 @@ func TestRunner_OK(t *testing.T) {
 		},
 		"ignore anyway even with --search-all option": {
 			opt: &options{
-				searchPath: "service-e",
+				searchPath: []string{"service-e"},
 				searchAll:  true,
 				ignore:     []string{".config"},
 			},
@@ -261,7 +261,7 @@ func TestRunner_OK(t *testing.T) {
 		},
 		"pick *min.js with --search-all option": {
 			opt: &options{
-				searchPath: "service-g",
+				searchPath: []string{"service-g"},
 				searchAll:  true,
 			},
 			expect: here.Doc(`
@@ -271,7 +271,7 @@ func TestRunner_OK(t *testing.T) {
 		},
 		"pick up ignorez dir with --search-all option": {
 			opt: &options{
-				searchPath: "service-f",
+				searchPath: []string{"service-f"},
 				searchAll:  true,
 			},
 			expect: here.Doc(`
@@ -281,8 +281,8 @@ func TestRunner_OK(t *testing.T) {
 		},
 		"service-h": {
 			opt: &options{
-				searchPath: "service-h",
-				searchGrep: "h",
+				searchPath: []string{"service-h"},
+				searchGrep: []string{"h"},
 				indent:     defaultIndent,
 			},
 			expect: here.Doc(`
@@ -297,8 +297,8 @@ func TestRunner_OK(t *testing.T) {
 		},
 		"service-h with maxMatchCount": {
 			opt: &options{
-				searchPath:    "service-h",
-				searchGrep:    "h",
+				searchPath:    []string{"service-h"},
+				searchGrep:    []string{"h"},
 				indent:        defaultIndent,
 				maxMatchCount: 3,
 			},
@@ -312,8 +312,8 @@ func TestRunner_OK(t *testing.T) {
 		},
 		"service-h show count": {
 			opt: &options{
-				searchPath:     "service-h",
-				searchGrep:     "h",
+				searchPath:     []string{"service-h"},
+				searchGrep:     []string{"h"},
 				showMatchCount: true,
 			},
 			expect: here.Doc(`
@@ -323,8 +323,8 @@ func TestRunner_OK(t *testing.T) {
 		},
 		"service-c with contextLines": {
 			opt: &options{
-				searchPath:     "service-c",
-				searchGrep:     "func",
+				searchPath:     []string{"service-c"},
+				searchGrep:     []string{"func"},
 				groupSeparator: defaultGroupSeparator,
 				indent:         defaultIndent,
 				contextLines:   1,
@@ -343,8 +343,8 @@ func TestRunner_OK(t *testing.T) {
 		},
 		"service-c with contextLines groupSeparator": {
 			opt: &options{
-				searchPath:     "service-c",
-				searchGrep:     "func",
+				searchPath:     []string{"service-c"},
+				searchGrep:     []string{"func"},
 				groupSeparator: "====",
 				indent:         defaultIndent,
 				contextLines:   1,
@@ -363,8 +363,8 @@ func TestRunner_OK(t *testing.T) {
 		},
 		"service-b ignore case to match": {
 			opt: &options{
-				searchPath: "Service-B",
-				searchGrep: "FunC",
+				searchPath: []string{"Service-B"},
+				searchGrep: []string{"FunC"},
 				indent:     defaultIndent,
 				ignoreCase: true,
 			},
