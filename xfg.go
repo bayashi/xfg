@@ -158,13 +158,13 @@ func (x *xfg) isIgnorePath(fPath string) bool {
 	if x.options.ignoreCase {
 		for _, re := range x.ignoreRe {
 			if isMatchRegexp(fPath, re) {
-				return true // skip
+				return true // ignore
 			}
 		}
 	} else {
 		for _, i := range x.options.ignore {
 			if isMatch(fPath, i) {
-				return true // skip
+				return true // ignore
 			}
 		}
 	}
