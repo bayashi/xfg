@@ -4,8 +4,6 @@ import (
 	"fmt"
 	"io"
 	"os"
-
-	"github.com/fatih/color"
 )
 
 type runner struct {
@@ -31,12 +29,7 @@ func (cli *runner) run() {
 }
 
 func (cli *runner) xfg(o *options) error {
-	var (
-		pathColor = color.New(color.FgHiCyan)
-		grepColor = color.New(color.FgHiRed)
-	)
-
-	x := newX(o, pathColor, grepColor)
+	x := newX(o)
 
 	if err := x.search(); err != nil {
 		return fmt.Errorf("error during Search %w", err)

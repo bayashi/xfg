@@ -28,6 +28,8 @@ type options struct {
 
 	groupSeparator string
 	indent         string
+	colorPath      string
+	colorContent   string
 
 	ignore []string
 
@@ -77,6 +79,8 @@ func (cli *runner) parseArgs() *options {
 
 	flag.StringVarP(&o.groupSeparator, "group-separator", "", defaultGroupSeparator, "Print this string instead of '--' between groups of lines")
 	flag.StringVarP(&o.indent, "indent", "", defaultIndent, "Indent string for the top of each line")
+	flag.StringVarP(&o.colorPath, "color-path", "", "cyan", "Color name to highlight keywords in a path")
+	flag.StringVarP(&o.colorContent, "color-content", "", "red", "Color name to highlight keywords in a content line")
 
 	flag.BoolVarP(&flagHelp, "help", "h", false, "Show help (This message) and exit")
 	flag.BoolVarP(&flagVersion, "version", "v", false, "Show version and build command info and exit")

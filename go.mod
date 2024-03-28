@@ -13,6 +13,7 @@ require (
 require (
 	github.com/MakeNowJust/heredoc/v2 v2.0.1
 	github.com/bayashi/actually v0.25.0
+	github.com/bayashi/colorpalette v0.0.2
 	github.com/fatih/color v1.16.0
 	github.com/mattn/go-colorable v0.1.13 // indirect
 	github.com/mattn/go-isatty v0.0.20 // indirect
