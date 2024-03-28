@@ -37,15 +37,13 @@ type xfg struct {
 	searchPathRe []*regexp.Regexp
 	searchGrepRe []*regexp.Regexp
 	ignoreRe     []*regexp.Regexp
+	gitignore    *ignore.GitIgnore
 
 	result []path
 }
 
-func newX(o *options) *xfg {
-	x := &xfg{
-		options: o,
-	}
-
+func (x *xfg) setHighlighter() {
+	o := x.options
 	if o.colorPath != "" && colorpalette.Exists(o.colorPath) {
 		x.pathHighlightColor = colorpalette.Get(o.colorPath)
 	} else {
@@ -63,24 +61,25 @@ func newX(o *options) *xfg {
 	for _, sg := range o.searchGrep {
 		x.grepHighlighter = append(x.grepHighlighter, x.grepHighlightColor.Sprintf(sg))
 	}
+}
+
+func newX(o *options) *xfg {
+	x := &xfg{
+		options: o,
+	}
+
+	x.setHighlighter()
 
 	return x
 }
 
-type walkerArg struct {
-	path      string
-	info      fs.FileInfo
-	gitignore *ignore.GitIgnore
-}
-
-func (x *xfg) search() error {
+func (x *xfg) preSearch() error {
 	if err := validateStartPath(x.options.searchStart); err != nil {
 		return err
 	}
 
-	var gitignore *ignore.GitIgnore
 	if !x.options.skipGitIgnore {
-		gitignore = compileGitIgnore(x.options.searchStart)
+		x.gitignore = compileGitIgnore(x.options.searchStart)
 	}
 
 	if x.options.ignoreCase {
@@ -113,16 +112,20 @@ func (x *xfg) search() error {
 		}
 	}
 
+	return nil
+}
+
+func (x *xfg) search() error {
+	if err := x.preSearch(); err != nil {
+		return fmt.Errorf("error in preSearch: %w", err)
+	}
+
 	walkErr := filepath.Walk(x.options.searchStart, func(fPath string, fInfo os.FileInfo, err error) error {
 		if err != nil {
 			return fmt.Errorf("something went wrong within path `%s` at `%s`: %w", x.options.searchStart, fPath, err)
 		}
 
-		return x.walker(&walkerArg{
-			path:      fPath,
-			info:      fInfo,
-			gitignore: gitignore,
-		})
+		return x.walker(fPath, fInfo)
 	})
 	if walkErr != nil {
 		return fmt.Errorf("failed to walk: %w", walkErr)
@@ -131,9 +134,7 @@ func (x *xfg) search() error {
 	return nil
 }
 
-func (x *xfg) walker(wa *walkerArg) error {
-	fPath, fInfo := wa.path, wa.info
-
+func (x *xfg) walker(fPath string, fInfo os.FileInfo) error {
 	if x.isIgnorePath(fPath) {
 		return nil // skip by --ignore option
 	}
@@ -144,7 +145,7 @@ func (x *xfg) walker(wa *walkerArg) error {
 		}
 	}
 
-	if x.canSkip(fPath, fInfo, wa.gitignore) {
+	if x.canSkip(fPath, fInfo) {
 		return nil // skip
 	}
 
@@ -157,13 +158,13 @@ func (x *xfg) isIgnorePath(fPath string) bool {
 	if x.options.ignoreCase {
 		for _, re := range x.ignoreRe {
 			if isMatchRegexp(fPath, re) {
-				return true // skip
+				return true // ignore
 			}
 		}
 	} else {
 		for _, i := range x.options.ignore {
 			if isMatch(fPath, i) {
-				return true // skip
+				return true // ignore
 			}
 		}
 	}
@@ -171,7 +172,7 @@ func (x *xfg) isIgnorePath(fPath string) bool {
 	return false
 }
 
-func (x *xfg) canSkip(fPath string, fInfo fs.FileInfo, gitignore *ignore.GitIgnore) bool {
+func (x *xfg) canSkip(fPath string, fInfo fs.FileInfo) bool {
 	if !x.options.searchAll {
 		if !fInfo.IsDir() && (fInfo.Name() == ".gitkeep" || strings.HasSuffix(fInfo.Name(), ".min.js")) {
 			return true // not pick .gitkeep file
@@ -180,7 +181,7 @@ func (x *xfg) canSkip(fPath string, fInfo fs.FileInfo, gitignore *ignore.GitIgno
 		}
 	}
 
-	if !x.options.searchAll && gitignore != nil && gitignore.MatchesPath(fPath) {
+	if !x.options.searchAll && x.gitignore != nil && x.gitignore.MatchesPath(fPath) {
 		return true // skip a file by .gitignore
 	}
 
