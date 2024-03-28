@@ -381,6 +381,7 @@ func TestRunner_OK(t *testing.T) {
 				out: &o,
 			}
 
+			tt.opt.noColor = true
 			tt.opt.searchStart = "./testdata"
 
 			cli.xfg(tt.opt)
