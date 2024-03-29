@@ -107,10 +107,10 @@ func (o *options) targetPathFromArgs(cli *runner) {
 		cli.putHelp(errNeedToSetPath)
 	}
 
-	o.searchPath[len(o.searchPath)] = flag.Args()[0]
+	o.searchPath = append(o.searchPath, flag.Args()[0])
 
 	if len(flag.Args()) == 2 {
-		o.searchGrep[len(o.searchGrep)] = flag.Args()[1]
+		o.searchGrep = append(o.searchGrep, flag.Args()[1])
 	}
 }
 
