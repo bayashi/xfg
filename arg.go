@@ -97,20 +97,22 @@ func (cli *runner) parseArgs() *options {
 		os.Exit(exitOK)
 	}
 
-	o.targetPathFromArgs(cli)
+	if len(o.searchPath) == 0 && len(flag.Args()) == 0 {
+		cli.putHelp(errNeedToSetPath)
+	}
+
+	o.targetPathFromArgs()
 
 	return o
 }
 
-func (o *options) targetPathFromArgs(cli *runner) {
-	if len(flag.Args()) == 0 {
-		cli.putHelp(errNeedToSetPath)
+func (o *options) targetPathFromArgs() {
+	if len(flag.Args()) > 0 && flag.Args()[0] != "" {
+		o.searchPath = append(o.searchPath, flag.Args()[0])
 	}
 
-	o.searchPath[len(o.searchPath)] = flag.Args()[0]
-
-	if len(flag.Args()) == 2 {
-		o.searchGrep[len(o.searchGrep)] = flag.Args()[1]
+	if len(flag.Args()) == 2 && flag.Args()[1] != "" {
+		o.searchGrep = append(o.searchGrep, flag.Args()[1])
 	}
 }
 
