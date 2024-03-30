@@ -125,7 +125,7 @@ func TestArgsVersion(t *testing.T) {
 func TestArgs(t *testing.T) {
 	for tname, tt := range map[string]struct {
 		args   []string
-		expect func(o *options)()
+		expect func(o *options)
 	}{
 		"only path arg": {
 			args: []string{"foo"},
