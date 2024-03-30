@@ -10,6 +10,20 @@ import (
 	a "github.com/bayashi/actually"
 )
 
+func TestRun_OK(t *testing.T) {
+	var outOutput bytes.Buffer
+	cli := &runner{
+		out: &outOutput,
+	}
+	resetFlag()
+	stubExit()
+	os.Args = []string{fakeCmd, "#NotMatch:47704cd-fe9cf87_29706c1@8ab965d!"}
+	cli.run()
+	a.Got(stubCalled).False(t)
+	a.Got(stubCode).Expect(exitOK).Same(t)
+	a.Got(outOutput.String()).Expect("").Same(t)
+}
+
 func TestRunner_OK(t *testing.T) {
 	for tname, tt := range map[string]struct {
 		opt    *options
