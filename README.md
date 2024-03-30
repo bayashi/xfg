@@ -63,6 +63,7 @@ service-b/main.go
 ## Notes
 
 * Not follow symbolic links
+* Skip binary files
 
 ### Ignore rules
 
