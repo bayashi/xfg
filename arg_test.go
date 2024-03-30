@@ -15,7 +15,7 @@ var (
 	stubCode   int
 )
 
-func stub() {
+func stubExit() {
 	stubCalled = false
 	stubCode = 0
 
@@ -65,7 +65,7 @@ func TestArgsNoArgs(t *testing.T) {
 	}
 
 	resetFlag()
-	stub()
+	stubExit()
 	os.Args = []string{fakeCmd}
 	o := cli.parseArgs()
 
@@ -87,7 +87,7 @@ func TestArgsHelp(t *testing.T) {
 	}
 
 	resetFlag()
-	stub()
+	stubExit()
 	os.Args = []string{fakeCmd, "--help"}
 	o := cli.parseArgs()
 
@@ -109,7 +109,7 @@ func TestArgsVersion(t *testing.T) {
 	}
 
 	resetFlag()
-	stub()
+	stubExit()
 	os.Args = []string{fakeCmd, "--version"}
 	o := cli.parseArgs()
 
@@ -169,7 +169,7 @@ func TestArgs(t *testing.T) {
 	} {
 		t.Run(tname, func(t *testing.T) {
 			resetFlag()
-			stub()
+			stubExit()
 			os.Args = append([]string{fakeCmd}, tt.args...)
 			cli := &runner{}
 
