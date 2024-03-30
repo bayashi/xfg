@@ -2,7 +2,10 @@ module github.com/bayashi/xfg
 
 go 1.21.7
 
-require github.com/spf13/pflag v1.0.5
+require (
+	github.com/spf13/pflag v1.0.5
+	golang.org/x/term v0.18.0
+)
 
 require (
 	github.com/bayashi/witness v0.0.18 // indirect
@@ -18,5 +21,5 @@ require (
 	github.com/mattn/go-colorable v0.1.13 // indirect
 	github.com/mattn/go-isatty v0.0.20 // indirect
 	github.com/sabhiram/go-gitignore v0.0.0-20210923224102-525f6e181f06
-	golang.org/x/sys v0.14.0 // indirect
+	golang.org/x/sys v0.18.0 // indirect
 )

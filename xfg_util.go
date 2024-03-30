@@ -8,6 +8,7 @@ import (
 	"strings"
 
 	ignore "github.com/sabhiram/go-gitignore"
+	"golang.org/x/term"
 )
 
 func compileGitIgnore(sPath string) *ignore.GitIgnore {
@@ -71,4 +72,13 @@ func isMatchRegexp(target string, re *regexp.Regexp) bool {
 	}
 
 	return re.MatchString(target)
+}
+
+func getTermWindowRows(fd int) (int, error) {
+	_, rows, err := term.GetSize(fd)
+	if err != nil {
+		return 0, err
+	}
+
+	return rows, nil
 }

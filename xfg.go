@@ -39,7 +39,8 @@ type xfg struct {
 	ignoreRe     []*regexp.Regexp
 	gitignore    *ignore.GitIgnore
 
-	result []path
+	result      []path
+	resultLines int
 }
 
 func (x *xfg) setHighlighter() {
@@ -247,6 +248,7 @@ func (x *xfg) onMatchPath(fPath string, fInfo fs.FileInfo) (err error) {
 	}
 
 	x.result = append(x.result, matchedPath)
+	x.resultLines = x.resultLines + len(matchedPath.contents) + 1
 
 	return nil
 }
