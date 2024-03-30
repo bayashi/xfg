@@ -15,7 +15,7 @@ const noMatchKeyword = "#NotMatch:4770&4cd-fe9cf87_29706c1@8ab965d!$% ;-P"
 func TestMain_OK(t *testing.T) {
 	resetFlag()
 	stubExit()
-	os.Args = []string{fakeCmd, noMatchKeyword}
+	os.Args = []string{fakeCmd, noMatchKeyword, "--no-pager"}
 	main()
 	a.Got(stubCalled).True(t)
 	a.Got(stubCode).Expect(exitOK).Same(t)
@@ -28,7 +28,7 @@ func TestRun_OK(t *testing.T) {
 	}
 	resetFlag()
 	stubExit()
-	os.Args = []string{fakeCmd, noMatchKeyword}
+	os.Args = []string{fakeCmd, noMatchKeyword, "--no-pager"}
 	cli.run()
 	a.Got(stubCalled).False(t)
 	a.Got(stubCode).Expect(exitOK).Same(t)
@@ -442,6 +442,7 @@ func TestXfg_OK(t *testing.T) {
 				out: &o,
 			}
 
+			tt.opt.noPager = true
 			tt.opt.noColor = true
 			tt.opt.searchStart = "./testdata"
 

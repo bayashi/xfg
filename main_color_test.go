@@ -79,6 +79,7 @@ func TestHighlight(t *testing.T) {
 				out: &o,
 			}
 
+			tt.opt.noPager = true
 			tt.opt.searchStart = "./testdata"
 
 			cli.xfg(tt.opt)

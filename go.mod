@@ -8,6 +8,7 @@ require (
 	github.com/bayashi/witness v0.0.18 // indirect
 	github.com/davecgh/go-spew v1.1.1 // indirect
 	github.com/pmezard/go-difflib v1.0.0 // indirect
+	golang.org/x/term v0.18.0 // indirect
 )
 
 require (
@@ -18,5 +19,6 @@ require (
 	github.com/mattn/go-colorable v0.1.13 // indirect
 	github.com/mattn/go-isatty v0.0.20 // indirect
 	github.com/sabhiram/go-gitignore v0.0.0-20210923224102-525f6e181f06
-	golang.org/x/sys v0.14.0 // indirect
+	golang.org/x/crypto v0.21.0
+	golang.org/x/sys v0.18.0 // indirect
 )

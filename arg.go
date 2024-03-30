@@ -51,6 +51,7 @@ type options struct {
 	hidden           bool
 	skipGitIgnore    bool
 	searchAll        bool
+	noPager          bool
 
 	contextLines uint32
 
@@ -98,6 +99,7 @@ func (cli *runner) parseArgs() *options {
 	flag.BoolVarP(&o.onlyMatchContent, "only-match", "o", false, "Show paths only matched contents")
 	flag.BoolVarP(&o.noGroupSeparator, "no-group-separator", "", false, "Do not print a separator between groups of lines")
 	flag.BoolVarP(&o.noIndent, "no-indent", "", false, "Do not print an indent string")
+	flag.BoolVarP(&o.noPager, "no-pager", "", false, "Do not invoke with the Pager")
 
 	flag.StringVarP(&o.groupSeparator, "group-separator", "", defaultGroupSeparator, "Print this string instead of '--' between groups of lines")
 	flag.StringVarP(&o.indent, "indent", "", defaultIndent, "Indent string for the top of each line")
