@@ -185,10 +185,8 @@ func (x *xfg) canSkip(fPath string, fInfo fs.FileInfo) bool {
 		return true // skip a file by .gitignore
 	}
 
-	if fInfo.IsDir() {
-		if x.options.onlyMatch {
-			return true // not pick up
-		}
+	if fInfo.IsDir() && x.options.onlyMatchContent {
+		return true // not pick up
 	}
 
 	if x.options.ignoreCase {
@@ -218,7 +216,7 @@ func (x *xfg) onMatchPath(fPath string, fInfo fs.FileInfo) (err error) {
 		if err != nil {
 			return fmt.Errorf("error during grep: %w", err)
 		}
-		if x.options.onlyMatch && len(matchedPath.contents) == 0 {
+		if x.options.onlyMatchContent && len(matchedPath.contents) == 0 {
 			return nil // not pick up
 		}
 	}

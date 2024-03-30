@@ -38,7 +38,7 @@ func defaultOptions() *options {
 		noColor:          false,
 		abs:              false,
 		showMatchCount:   false,
-		onlyMatch:        false,
+		onlyMatchContent: false,
 		noGroupSeparator: false,
 		noIndent:         false,
 		hidden:           false,
