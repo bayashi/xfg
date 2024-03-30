@@ -1,6 +1,11 @@
 package main
 
-import flag "github.com/spf13/pflag"
+import (
+	"os"
+	"strings"
+
+	flag "github.com/spf13/pflag"
+)
 
 const fakeCmd = "fake-command"
 
@@ -47,4 +52,13 @@ func defaultOptions() *options {
 		contextLines:     0,
 		maxMatchCount:    0,
 	}
+}
+
+func windowsBK(src string) string {
+	if os.Getenv("RUNNER_OS") == "Windows" {
+		// BK: override path delimiter for Windows
+		src = strings.ReplaceAll(src, "/", "\\")
+	}
+
+	return src
 }
