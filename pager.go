@@ -29,7 +29,7 @@ func (cli *runner) pager(noPager bool, result int) (func(), error) {
 	if err != nil {
 		return nil, err
 	}
-	if rows - 1 > result {
+	if rows-1 > result {
 		return nil, nil // No need pager. Don't think about gourp separators
 	}
 
