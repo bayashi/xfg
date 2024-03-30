@@ -2,8 +2,6 @@ package main
 
 import (
 	"bytes"
-	"os"
-	"strings"
 	"testing"
 
 	a "github.com/bayashi/actually"
@@ -85,10 +83,7 @@ func TestHighlight(t *testing.T) {
 
 			cli.xfg(tt.opt)
 
-			if os.Getenv("RUNNER_OS") == "Windows" {
-				// BK: override path delimiter for Windows
-				tt.expect = strings.ReplaceAll(tt.expect, "/", "\\")
-			}
+			tt.expect = windowsBK(tt.expect)
 
 			a.Got(o.String()).Expect(tt.expect).X().Debug("options", tt.opt).Same(t)
 		})
