@@ -79,11 +79,16 @@ func (x *xfg) needToShowGroupSeparator(blc int32, lc int32) bool {
 func (cli *runner) outputForNonTTY(x *xfg) error {
 	writer := bufio.NewWriter(cli.out)
 	for _, p := range x.result {
-		out := p.path
-		if x.options.showMatchCount && !p.info.IsDir() {
-			out = out + fmt.Sprintf(":%d", len(p.contents))
+		out := ""
+		if p.info.IsDir() {
+			out = fmt.Sprintf("%s\n", p.path)
+		} else {
+			for _, l := range p.contents {
+				if l.matched {
+					out = out + fmt.Sprintf("%s:%d:%s\n", p.path, l.lc, l.content)
+				}
+			}
 		}
-		out = out + "\n"
 
 		if err := output(writer, out); err != nil {
 			return err

@@ -470,7 +470,7 @@ func TestNonTTY(t *testing.T) {
 	// no color, no pager
 	expect := here.Doc(`
 	    testdata/service-b/
-	    testdata/service-b/main.go
+	    testdata/service-b/main.go:3:func main() {
 	`)
 
 	expect = windowsBK(expect)
