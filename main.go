@@ -6,6 +6,10 @@ import (
 	"os"
 )
 
+var funcExit = func(code int) {
+	os.Exit(code)
+}
+
 type runner struct {
 	out io.Writer
 	err io.Writer
@@ -17,14 +21,14 @@ func main() {
 		err: os.Stderr,
 	}
 	cli.run()
-	os.Exit(exitOK)
+	funcExit(exitOK)
 }
 
 func (cli *runner) run() {
 	err := cli.xfg(cli.parseArgs())
 	if err != nil {
 		cli.putErr(fmt.Sprintf("Err: %s", err))
-		os.Exit(exitErr)
+		funcExit(exitErr)
 	}
 }
 

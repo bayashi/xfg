@@ -54,6 +54,9 @@ func (cli *runner) parseArgs() *options {
 
 	o := &options{}
 
+	flag.CommandLine.SetOutput(cli.err)
+	flag.CommandLine.SortFlags = false
+
 	var flagHelp bool
 	var flagVersion bool
 	flag.StringArrayVarP(&o.searchPath, "path", "p", []string{}, "A string to find paths")
@@ -85,19 +88,14 @@ func (cli *runner) parseArgs() *options {
 	flag.BoolVarP(&flagHelp, "help", "h", false, "Show help (This message) and exit")
 	flag.BoolVarP(&flagVersion, "version", "v", false, "Show version and build command info and exit")
 
-	flag.CommandLine.SortFlags = false
 	flag.Parse()
 
 	if noArgs || flagHelp {
 		cli.putHelp(fmt.Sprintf("Version %s", getVersion()))
-	}
-
-	if flagVersion {
+	} else if flagVersion {
 		cli.putErr(versionDetails())
-		os.Exit(exitOK)
-	}
-
-	if len(o.searchPath) == 0 && len(flag.Args()) == 0 {
+		funcExit(exitOK)
+	} else if len(o.searchPath) == 0 && len(flag.Args()) == 0 {
 		cli.putHelp(errNeedToSetPath)
 	}
 

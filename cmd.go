@@ -2,7 +2,6 @@ package main
 
 import (
 	"fmt"
-	"os"
 
 	flag "github.com/spf13/pflag"
 )
@@ -29,5 +28,5 @@ func (cli *runner) putHelp(message string) {
 	cli.putUsage()
 	cli.putErr("Options:")
 	flag.PrintDefaults()
-	os.Exit(exitOK)
+	funcExit(exitOK)
 }
