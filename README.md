@@ -105,6 +105,21 @@ service-b/main.go
 
 ## Installation
 
+### Mac
+
+```sh
+brew tap bayashi/tap
+brew install bayashi/tap/xfg
+```
+
+### Binary install
+
+Download binary from here: https://github.com/bayashi/xfg/releases
+
+### Go manual
+
+If you have golang environment:
+
 ```cmd
 go install github.com/bayashi/xfg@latest
 ```

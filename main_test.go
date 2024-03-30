@@ -35,7 +35,7 @@ func TestRun_OK(t *testing.T) {
 	a.Got(outOutput.String()).Expect("").Same(t)
 }
 
-func TestRunner_OK(t *testing.T) {
+func TestXfg_OK(t *testing.T) {
 	for tname, tt := range map[string]struct {
 		opt    *options
 		expect string
