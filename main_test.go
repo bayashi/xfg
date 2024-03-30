@@ -399,6 +399,42 @@ func TestXfg_OK(t *testing.T) {
                  3: func main() {
 			`),
 		},
+		"service-c with afterContextLines": {
+			opt: &options{
+				searchPath:        []string{"service-c"},
+				searchGrep:        []string{"func"},
+				groupSeparator:    defaultGroupSeparator,
+				indent:            defaultIndent,
+				afterContextLines: 1,
+			},
+			expect: here.Doc(`
+                testdata/service-c/
+                testdata/service-c/main.go
+                 3: func main() {
+                 4: 	baz := 56
+                 --
+                 10: func foo() {
+                 11: 	println("Result")
+			`),
+		},
+		"service-c with beforeContextLines": {
+			opt: &options{
+				searchPath:         []string{"service-c"},
+				searchGrep:         []string{"func"},
+				groupSeparator:     defaultGroupSeparator,
+				indent:             defaultIndent,
+				beforeContextLines: 1,
+			},
+			expect: here.Doc(`
+                testdata/service-c/
+                testdata/service-c/main.go
+                 2: 
+                 3: func main() {
+                 --
+                 9: 
+                 10: func foo() {
+			`),
+		},
 	} {
 		t.Run(tname, func(t *testing.T) {
 			var o bytes.Buffer

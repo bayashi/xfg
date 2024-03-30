@@ -64,5 +64,5 @@ func (x *xfg) buildContentOutput(out *string, contents []line) error {
 }
 
 func (x *xfg) needToShowGroupSeparator(blc int32, lc int32) bool {
-	return x.options.contextLines > 0 && blc != 0 && lc-blc > 1
+	return (x.options.withAfterContextLines || x.options.withBeforeContextLines) && blc != 0 && lc-blc > 1
 }
