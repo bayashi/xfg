@@ -4,6 +4,8 @@ import (
 	"fmt"
 	"io"
 	"os"
+
+	"github.com/mattn/go-isatty"
 )
 
 var funcExit = func(code int) {
@@ -11,14 +13,18 @@ var funcExit = func(code int) {
 }
 
 type runner struct {
-	out io.Writer
-	err io.Writer
+	out   io.Writer
+	err   io.Writer
+	isTTY bool
 }
 
 func main() {
+	stdout := os.Stdout
+	fd := stdout.Fd()
 	cli := &runner{
-		out: os.Stdout,
-		err: os.Stderr,
+		out:   stdout,
+		err:   os.Stderr,
+		isTTY: isatty.IsTerminal(fd) || isatty.IsCygwinTerminal(fd),
 	}
 	cli.run()
 	funcExit(exitOK)
@@ -48,7 +54,7 @@ func (cli *runner) xfg(o *options) error {
 		defer closer()
 	}
 
-	if err := x.showResult(cli.out); err != nil {
+	if err := cli.showResult(x); err != nil {
 		return fmt.Errorf("error during Show %w", err)
 	}
 

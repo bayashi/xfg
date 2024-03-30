@@ -2,6 +2,7 @@ package main
 
 import (
 	"bytes"
+	"fmt"
 	"os"
 	"strings"
 	"testing"
@@ -440,6 +441,7 @@ func TestXfg_OK(t *testing.T) {
 			var o bytes.Buffer
 			cli := &runner{
 				out: &o,
+				isTTY: true,
 			}
 
 			tt.opt.noPager = true
@@ -456,4 +458,36 @@ func TestXfg_OK(t *testing.T) {
 			a.Got(o.String()).Expect(tt.expect).X().Debug("options", tt.opt).Same(t)
 		})
 	}
+}
+
+func TestNonTTY(t *testing.T) {
+	var o bytes.Buffer
+	cli := &runner{
+		out:   &o,
+		isTTY: false,
+	}
+
+	opt := &options{
+		searchPath:  []string{"service-b"},
+		searchGrep:  []string{"func"},
+		noPager:     true,
+		noColor:     true,
+		searchStart: "./testdata",
+	}
+
+	cli.xfg(opt)
+
+	expect := here.Doc(`
+	    testdata/service-b/
+	    testdata/service-b/main.go
+	`)
+
+	if os.Getenv("RUNNER_OS") == "Windows" {
+		// BK: override path delimiter for Windows
+		expect = strings.ReplaceAll(expect, "/", "\\")
+	}
+
+	fmt.Printf("%#v\n", o.String())
+
+	a.Got(o.String()).Expect(expect).X().Debug("options", opt).Same(t)
 }
