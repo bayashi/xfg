@@ -2,7 +2,6 @@ package main
 
 import (
 	"bytes"
-	"fmt"
 	"os"
 	"strings"
 	"testing"
@@ -461,22 +460,18 @@ func TestXfg_OK(t *testing.T) {
 }
 
 func TestNonTTY(t *testing.T) {
+	resetFlag()
+	stubExit()
+	os.Args = []string{fakeCmd, "service-b", "func", "-s", "./testdata"}
 	var o bytes.Buffer
 	cli := &runner{
 		out:   &o,
 		isTTY: false,
 	}
 
-	opt := &options{
-		searchPath:  []string{"service-b"},
-		searchGrep:  []string{"func"},
-		noPager:     true,
-		noColor:     true,
-		searchStart: "./testdata",
-	}
+	cli.run()
 
-	cli.xfg(opt)
-
+	// no color, no pager
 	expect := here.Doc(`
 	    testdata/service-b/
 	    testdata/service-b/main.go
@@ -487,7 +482,5 @@ func TestNonTTY(t *testing.T) {
 		expect = strings.ReplaceAll(expect, "/", "\\")
 	}
 
-	fmt.Printf("%#v\n", o.String())
-
-	a.Got(o.String()).Expect(expect).X().Debug("options", opt).Same(t)
+	a.Got(o.String()).Expect(expect).X().Same(t)
 }
