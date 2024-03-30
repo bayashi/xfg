@@ -25,7 +25,7 @@ func (cli *runner) pager(noPager bool, result int) (func(), error) {
 		return nil, nil
 	}
 
-	rows, err := getTermWindowRows(syscall.Stdout)
+	rows, err := getTermWindowRows(int(syscall.Stdout))
 	if err != nil {
 		return nil, err
 	}
