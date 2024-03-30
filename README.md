@@ -81,6 +81,8 @@ service-b/main.go
   -p, --path stringArray         A string to find paths
   -g, --grep stringArray         A string to search for contents
   -s, --start string             A location to start searching (default ".")
+  -A, --after-context uint32     Show several lines after the matched one. Override context option
+  -B, --before-context uint32    Show several lines before the matched one. Override context option
   -C, --context uint32           Show several lines before and after the matched one
   -m, --max-count uint32         Stop reading a file after NUM matching lines
       --ignore stringArray       Ignore path to pick up even with '--search-all'
@@ -95,6 +97,7 @@ service-b/main.go
   -o, --only-match               Show paths only matched contents
       --no-group-separator       Do not print a separator between groups of lines
       --no-indent                Do not print an indent string
+      --no-pager                 Do not invoke with the Pager
       --group-separator string   Print this string instead of '--' between groups of lines (default "--")
       --indent string            Indent string for the top of each line (default " ")
       --color-path string        Color name to highlight keywords in a path (default "cyan")
