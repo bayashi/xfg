@@ -177,7 +177,7 @@ func (x *xfg) canSkip(fPath string, fInfo fs.FileInfo) bool {
 		if !fInfo.IsDir() && (fInfo.Name() == ".gitkeep" || strings.HasSuffix(fInfo.Name(), ".min.js")) {
 			return true // not pick .gitkeep file
 		} else if !x.options.hidden && strings.HasPrefix(fInfo.Name(), ".") {
-			return true // skip dot-file
+			return true // skip dot-file/dir
 		}
 	}
 
