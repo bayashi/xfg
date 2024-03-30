@@ -10,7 +10,7 @@ import (
 	a "github.com/bayashi/actually"
 )
 
-func TestRunner_OK(t *testing.T) {
+func TestXfg_OK(t *testing.T) {
 	for tname, tt := range map[string]struct {
 		opt    *options
 		expect string
