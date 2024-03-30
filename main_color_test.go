@@ -76,7 +76,8 @@ func TestHighlight(t *testing.T) {
 		t.Run(tname, func(t *testing.T) {
 			var o bytes.Buffer
 			cli := &runner{
-				out: &o,
+				out:   &o,
+				isTTY: true,
 			}
 
 			tt.opt.noPager = true
