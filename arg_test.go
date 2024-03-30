@@ -7,55 +7,7 @@ import (
 	"testing"
 
 	a "github.com/bayashi/actually"
-	flag "github.com/spf13/pflag"
 )
-
-var (
-	stubCalled bool
-	stubCode   int
-)
-
-func stubExit() {
-	stubCalled = false
-	stubCode = 0
-
-	funcExit = func(code int) {
-		stubCalled = true
-		stubCode = code
-	}
-}
-
-const fakeCmd = "fake-command"
-
-func defaultOptions() *options {
-	return &options{
-		searchPath:       []string{},
-		searchGrep:       []string{},
-		searchStart:      ".",
-		groupSeparator:   "--",
-		indent:           " ",
-		colorPath:        "cyan",
-		colorContent:     "red",
-		ignore:           []string{},
-		ignoreCase:       false,
-		relax:            false,
-		noColor:          false,
-		abs:              false,
-		showMatchCount:   false,
-		onlyMatch:        false,
-		noGroupSeparator: false,
-		noIndent:         false,
-		hidden:           false,
-		skipGitIgnore:    false,
-		searchAll:        false,
-		contextLines:     0,
-		maxMatchCount:    0,
-	}
-}
-
-func resetFlag() {
-	flag.CommandLine = flag.NewFlagSet(fakeCmd, 1)
-}
 
 // No args, then put help message
 func TestArgsNoArgs(t *testing.T) {
