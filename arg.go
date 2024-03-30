@@ -45,7 +45,7 @@ type options struct {
 	noColor          bool
 	abs              bool
 	showMatchCount   bool
-	onlyMatch        bool
+	onlyMatchContent bool
 	noGroupSeparator bool
 	noIndent         bool
 	hidden           bool
@@ -83,7 +83,7 @@ func (cli *runner) parseArgs() *options {
 	flag.BoolVarP(&o.relax, "relax", "", false, "Insert blank space between contents for relaxing view")
 	flag.BoolVarP(&o.abs, "abs", "", false, "Show absolute paths")
 	flag.BoolVarP(&o.showMatchCount, "count", "c", false, "Show a count of matching lines instead of contents")
-	flag.BoolVarP(&o.onlyMatch, "only-match", "o", false, "Show paths only matched contents")
+	flag.BoolVarP(&o.onlyMatchContent, "only-match", "o", false, "Show paths only matched contents")
 	flag.BoolVarP(&o.noGroupSeparator, "no-group-separator", "", false, "Do not print a separator between groups of lines")
 	flag.BoolVarP(&o.noIndent, "no-indent", "", false, "Do not print an indent string")
 

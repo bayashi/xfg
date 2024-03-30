@@ -129,10 +129,10 @@ func TestXfg_OK(t *testing.T) {
 		},
 		"service-b grep onlyMatch": {
 			opt: &options{
-				searchPath: []string{"service-b"},
-				searchGrep: []string{"func"},
-				indent:     defaultIndent,
-				onlyMatch:  true,
+				searchPath:       []string{"service-b"},
+				searchGrep:       []string{"func"},
+				indent:           defaultIndent,
+				onlyMatchContent: true,
 			},
 			expect: here.Doc(`
                 testdata/service-b/main.go
