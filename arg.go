@@ -52,8 +52,18 @@ type options struct {
 	skipGitIgnore    bool
 	searchAll        bool
 
-	contextLines  uint32
+	contextLines uint32
+
+	afterContextLines  uint32
+	beforeContextLines uint32
+
 	maxMatchCount uint32
+
+	// runtime options
+	actualAfterContextLines  uint32
+	actualBeforeContextLines uint32
+	withAfterContextLines    bool
+	withBeforeContextLines   bool
 }
 
 func (cli *runner) parseArgs() *options {
@@ -70,6 +80,8 @@ func (cli *runner) parseArgs() *options {
 	flag.StringArrayVarP(&o.searchGrep, "grep", "g", []string{}, "A string to search for contents")
 	flag.StringVarP(&o.searchStart, "start", "s", ".", "A location to start searching")
 
+	flag.Uint32VarP(&o.afterContextLines, "after-context", "A", 0, "Show several lines after the matched one. Override context option")
+	flag.Uint32VarP(&o.beforeContextLines, "before-context", "B", 0, "Show several lines before the matched one. Override context option")
 	flag.Uint32VarP(&o.contextLines, "context", "C", 0, "Show several lines before and after the matched one")
 	flag.Uint32VarP(&o.maxMatchCount, "max-count", "m", 0, "Stop reading a file after NUM matching lines")
 
@@ -119,6 +131,24 @@ func (o *options) targetPathFromArgs() {
 	if len(flag.Args()) == 2 && flag.Args()[1] != "" {
 		o.searchGrep = append(o.searchGrep, flag.Args()[1])
 	}
+}
+
+func (o *options) prepareContextLines() {
+	if o.afterContextLines > 0 {
+		o.actualAfterContextLines = o.afterContextLines
+	} else if o.contextLines > 0 {
+		o.actualAfterContextLines = o.contextLines
+	}
+
+	o.withAfterContextLines = o.contextLines > 0 || o.afterContextLines > 0
+
+	if o.beforeContextLines > 0 {
+		o.actualBeforeContextLines = o.beforeContextLines
+	} else if o.contextLines > 0 {
+		o.actualBeforeContextLines = o.contextLines
+	}
+
+	o.withBeforeContextLines = o.contextLines > 0 || o.beforeContextLines > 0
 }
 
 func versionDetails() string {

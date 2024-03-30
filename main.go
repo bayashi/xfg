@@ -33,6 +33,7 @@ func (cli *runner) run() {
 }
 
 func (cli *runner) xfg(o *options) error {
+	o.prepareContextLines()
 	x := newX(o)
 
 	if err := x.search(); err != nil {

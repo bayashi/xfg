@@ -279,20 +279,18 @@ func (x *xfg) checkFile(fPath string) ([]line, error) {
 }
 
 type scanFile struct {
-	lc               int32  // line count
-	l                string // line text
-	blines           []line // slice for before lines
-	aline            uint32 // the count for after lines
-	withContextLines bool
+	lc     int32  // line count
+	l      string // line text
+	blines []line // slice for before lines
+	aline  uint32 // the count for after lines
 
 	matchedContents []line // result
 }
 
 func (x *xfg) scanFile(scanner *bufio.Scanner, fPath string) ([]line, error) {
 	gf := &scanFile{
-		lc:               0,
-		blines:           make([]line, x.options.contextLines),
-		withContextLines: x.options.contextLines > 0,
+		lc:     0,
+		blines: make([]line, x.options.actualBeforeContextLines),
 	}
 
 	for scanner.Scan() {
@@ -332,14 +330,14 @@ func (x *xfg) isMatchLine(line string) bool {
 
 func (x *xfg) processContentLine(gf *scanFile) {
 	if x.isMatchLine(gf.l) {
-		if !x.options.showMatchCount && gf.withContextLines {
+		if !x.options.showMatchCount && x.options.withBeforeContextLines {
 			for _, bl := range gf.blines {
 				if bl.lc == 0 {
 					continue // skip
 				}
 				gf.matchedContents = append(gf.matchedContents, bl)
 			}
-			gf.blines = make([]line, x.options.contextLines)
+			gf.blines = make([]line, x.options.actualBeforeContextLines)
 		}
 
 		if x.options.showMatchCount {
@@ -358,15 +356,15 @@ func (x *xfg) processContentLine(gf *scanFile) {
 
 		gf.matchedContents = append(gf.matchedContents, line{lc: gf.lc, content: gf.l, matched: true})
 
-		if !x.options.showMatchCount && gf.withContextLines {
-			gf.aline = x.options.contextLines // start countdown for `aline`
+		if !x.options.showMatchCount && x.options.withAfterContextLines {
+			gf.aline = x.options.actualAfterContextLines // start countdown for `aline`
 		}
 	} else {
-		if !x.options.showMatchCount && gf.withContextLines {
-			if gf.aline > 0 {
+		if !x.options.showMatchCount {
+			if x.options.withAfterContextLines && gf.aline > 0 {
 				gf.aline--
 				gf.matchedContents = append(gf.matchedContents, line{lc: gf.lc, content: gf.l})
-			} else {
+			} else if x.options.withBeforeContextLines {
 				// rotate blines
 				// join "2nd to last elements of `blines`" and "current `line`"
 				gf.blines = append(gf.blines[1:], line{lc: gf.lc, content: gf.l})
