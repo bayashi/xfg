@@ -124,44 +124,44 @@ func TestArgsVersion(t *testing.T) {
 
 func TestArgs(t *testing.T) {
 	for tname, tt := range map[string]struct {
-		args   []string
-		expect func(o *options)
+		args          []string
+		prepareExpect func(o *options)
 	}{
 		"only path arg": {
 			args: []string{"foo"},
-			expect: func(o *options) {
+			prepareExpect: func(o *options) {
 				o.searchPath = []string{"foo"}
 			},
 		},
 		"only specific path arg": {
 			args: []string{"--path", "foo"},
-			expect: func(o *options) {
+			prepareExpect: func(o *options) {
 				o.searchPath = []string{"foo"}
 			},
 		},
 		"specific multiple paths": {
 			args: []string{"--path", "foo", "--path", "bar"},
-			expect: func(o *options) {
+			prepareExpect: func(o *options) {
 				o.searchPath = []string{"foo", "bar"}
 			},
 		},
 		"path and grep arg": {
 			args: []string{"foo", "bar"},
-			expect: func(o *options) {
+			prepareExpect: func(o *options) {
 				o.searchPath = []string{"foo"}
 				o.searchGrep = []string{"bar"}
 			},
 		},
 		"path and specific grep args": {
 			args: []string{"foo", "--grep", "bar"},
-			expect: func(o *options) {
+			prepareExpect: func(o *options) {
 				o.searchPath = []string{"foo"}
 				o.searchGrep = []string{"bar"}
 			},
 		},
 		"path and specific multiple greps": {
 			args: []string{"foo", "--grep", "bar", "--grep", "baz"},
-			expect: func(o *options) {
+			prepareExpect: func(o *options) {
 				o.searchPath = []string{"foo"}
 				o.searchGrep = []string{"bar", "baz"}
 			},
@@ -176,7 +176,7 @@ func TestArgs(t *testing.T) {
 			o := cli.parseArgs()
 
 			expectOptions := defaultOptions()
-			tt.expect(expectOptions)
+			tt.prepareExpect(expectOptions)
 
 			a.Got(o).Expect(expectOptions).Same(t)
 			a.Got(stubCalled).False(t)
