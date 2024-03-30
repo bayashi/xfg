@@ -10,6 +10,13 @@ import (
 )
 
 const (
+	exitOK  int = 0
+	exitErr int = 1
+)
+
+const (
+	cmdName string = "xfg"
+
 	errNeedToSetPath = "Err: You should specify a directory path `--path`"
 
 	defaultGroupSeparator = "--"
@@ -54,6 +61,9 @@ func (cli *runner) parseArgs() *options {
 
 	o := &options{}
 
+	flag.CommandLine.SetOutput(cli.err)
+	flag.CommandLine.SortFlags = false
+
 	var flagHelp bool
 	var flagVersion bool
 	flag.StringArrayVarP(&o.searchPath, "path", "p", []string{}, "A string to find paths")
@@ -85,19 +95,14 @@ func (cli *runner) parseArgs() *options {
 	flag.BoolVarP(&flagHelp, "help", "h", false, "Show help (This message) and exit")
 	flag.BoolVarP(&flagVersion, "version", "v", false, "Show version and build command info and exit")
 
-	flag.CommandLine.SortFlags = false
 	flag.Parse()
 
 	if noArgs || flagHelp {
 		cli.putHelp(fmt.Sprintf("Version %s", getVersion()))
-	}
-
-	if flagVersion {
+	} else if flagVersion {
 		cli.putErr(versionDetails())
-		os.Exit(exitOK)
-	}
-
-	if len(o.searchPath) == 0 && len(flag.Args()) == 0 {
+		funcExit(exitOK)
+	} else if len(o.searchPath) == 0 && len(flag.Args()) == 0 {
 		cli.putHelp(errNeedToSetPath)
 	}
 
@@ -141,4 +146,20 @@ func getVersion() string {
 	}
 
 	return i.Main.Version
+}
+
+func (cli *runner) putErr(message ...interface{}) {
+	fmt.Fprintln(cli.err, message...)
+}
+
+func (cli *runner) putUsage() {
+	cli.putErr(fmt.Sprintf("Usage: %s [SEARCH_PATH_KEYWORD] [SEARCH_CONTENT_KEYWORD] [OPTIONS]", cmdName))
+}
+
+func (cli *runner) putHelp(message string) {
+	cli.putErr(message)
+	cli.putUsage()
+	cli.putErr("Options:")
+	flag.PrintDefaults()
+	funcExit(exitOK)
 }
