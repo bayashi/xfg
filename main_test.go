@@ -10,6 +10,17 @@ import (
 	a "github.com/bayashi/actually"
 )
 
+const noMatchKeyword = "#NotMatch:4770&4cd-fe9cf87_29706c1@8ab965d!$% ;-P"
+
+func TestMain_OK(t *testing.T) {
+	resetFlag()
+	stubExit()
+	os.Args = []string{fakeCmd, noMatchKeyword}
+	main()
+	a.Got(stubCalled).True(t)
+	a.Got(stubCode).Expect(exitOK).Same(t)
+}
+
 func TestRun_OK(t *testing.T) {
 	var outOutput bytes.Buffer
 	cli := &runner{
@@ -17,7 +28,7 @@ func TestRun_OK(t *testing.T) {
 	}
 	resetFlag()
 	stubExit()
-	os.Args = []string{fakeCmd, "#NotMatch:47704cd-fe9cf87_29706c1@8ab965d!"}
+	os.Args = []string{fakeCmd, noMatchKeyword}
 	cli.run()
 	a.Got(stubCalled).False(t)
 	a.Got(stubCode).Expect(exitOK).Same(t)
