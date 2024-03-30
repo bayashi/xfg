@@ -31,7 +31,12 @@ func main() {
 }
 
 func (cli *runner) run() {
-	err := cli.xfg(cli.parseArgs())
+	o := cli.parseArgs()
+	if !cli.isTTY {
+		o.noColor = true // Turn off color
+	}
+
+	err := cli.xfg(o)
 	if err != nil {
 		cli.putErr(fmt.Sprintf("Err: %s", err))
 		funcExit(exitErr)
