@@ -17,6 +17,15 @@ func output(writer *bufio.Writer, out string) error {
 }
 
 func (cli *runner) showResult(x *xfg) error {
+	if x.options.quiet {
+		if x.hasMatchedAny() {
+			cli.exitCode = exitOK
+		} else {
+			cli.exitCode = exitErr
+		}
+		return nil
+	}
+
 	if x.options.noIndent {
 		x.options.indent = ""
 	}
@@ -26,6 +35,8 @@ func (cli *runner) showResult(x *xfg) error {
 	} else {
 		cli.outputForNonTTY(x)
 	}
+
+	cli.exitCode = exitOK
 
 	return nil
 }

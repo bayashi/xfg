@@ -36,8 +36,9 @@ func TestRun_OK(t *testing.T) {
 
 func TestXfg_OK(t *testing.T) {
 	for tname, tt := range map[string]struct {
-		opt    *options
-		expect string
+		opt            *options
+		expect         string
+		expectExitCode int
 	}{
 		"service-b": {
 			opt: &options{
@@ -47,6 +48,7 @@ func TestXfg_OK(t *testing.T) {
                 testdata/service-b/
                 testdata/service-b/main.go
 			`),
+			expectExitCode: exitOK,
 		},
 		"service-b grep": {
 			opt: &options{
@@ -59,6 +61,7 @@ func TestXfg_OK(t *testing.T) {
                 testdata/service-b/main.go
                  3: func main() {
 			`),
+			expectExitCode: exitOK,
 		},
 		"service grep relax": {
 			opt: &options{
@@ -75,6 +78,7 @@ func TestXfg_OK(t *testing.T) {
                 testdata/service-c/main.go
                 testdata/service-h/main.go
 			`),
+			expectExitCode: exitOK,
 		},
 		"service-b grep bar with C1": {
 			opt: &options{
@@ -90,6 +94,7 @@ func TestXfg_OK(t *testing.T) {
 				 3: func main() {
 				 4: 	bar := 34
 			`),
+			expectExitCode: exitOK,
 		},
 		"service-b grep bar with C2": {
 			opt: &options{
@@ -107,6 +112,7 @@ func TestXfg_OK(t *testing.T) {
 				 4: 	bar := 34
 				 5: }
 			`),
+			expectExitCode: exitOK,
 		},
 		"service-c grep 56 with C2. Match 2 consecutive lines": {
 			opt: &options{
@@ -125,6 +131,7 @@ func TestXfg_OK(t *testing.T) {
 				 6: 
 				 7: 	foo()
 			`),
+			expectExitCode: exitOK,
 		},
 		"service-b grep onlyMatch": {
 			opt: &options{
@@ -137,6 +144,7 @@ func TestXfg_OK(t *testing.T) {
                 testdata/service-b/main.go
                  3: func main() {
 			`),
+			expectExitCode: exitOK,
 		},
 		"service-b grep foo": {
 			opt: &options{
@@ -151,6 +159,7 @@ func TestXfg_OK(t *testing.T) {
                 testdata/service-a/main.go
                  4: 	foo := 12
 			`),
+			expectExitCode: exitOK,
 		},
 		"service-c grep foo": {
 			opt: &options{
@@ -164,6 +173,7 @@ func TestXfg_OK(t *testing.T) {
                  7: 	foo()
                  10: func foo() {
 			`),
+			expectExitCode: exitOK,
 		},
 		"service-c grep foo noIndent": {
 			opt: &options{
@@ -178,6 +188,7 @@ func TestXfg_OK(t *testing.T) {
                 7: 	foo()
                 10: func foo() {
 			`),
+			expectExitCode: exitOK,
 		},
 		"service-b grep custom indent string": {
 			opt: &options{
@@ -190,6 +201,7 @@ func TestXfg_OK(t *testing.T) {
                 testdata/service-b/main.go
                 	3: func main() {
 			`),
+			expectExitCode: exitOK,
 		},
 		"service-d ignore .gitkeep": {
 			opt: &options{
@@ -198,6 +210,7 @@ func TestXfg_OK(t *testing.T) {
 			expect: here.Doc(`
                 testdata/service-d/
 			`),
+			expectExitCode: exitOK,
 		},
 		"not pick .gitkeep even with --hidden option": {
 			opt: &options{
@@ -207,6 +220,7 @@ func TestXfg_OK(t *testing.T) {
 			expect: here.Doc(`
                 testdata/service-d/
 			`),
+			expectExitCode: exitOK,
 		},
 		"not pick dotfile by default": {
 			opt: &options{
@@ -216,6 +230,7 @@ func TestXfg_OK(t *testing.T) {
 			expect: here.Doc(`
                 testdata/service-e/
 			`),
+			expectExitCode: exitOK,
 		},
 		"pick dotfile with --hidden option": {
 			opt: &options{
@@ -226,6 +241,7 @@ func TestXfg_OK(t *testing.T) {
                 testdata/service-e/
                 testdata/service-e/.config
 			`),
+			expectExitCode: exitOK,
 		},
 		"not pick up ignorez dir due to .gitignore": {
 			opt: &options{
@@ -234,6 +250,7 @@ func TestXfg_OK(t *testing.T) {
 			expect: here.Doc(`
                 testdata/service-f/
 			`),
+			expectExitCode: exitOK,
 		},
 		"pick up ignorez dir with --skip-gitignore option": {
 			opt: &options{
@@ -244,6 +261,7 @@ func TestXfg_OK(t *testing.T) {
                 testdata/service-f/
                 testdata/service-f/ignorez/
 			`),
+			expectExitCode: exitOK,
 		},
 		"ignore *min.js by default": {
 			opt: &options{
@@ -252,6 +270,7 @@ func TestXfg_OK(t *testing.T) {
 			expect: here.Doc(`
                 testdata/service-g/
 			`),
+			expectExitCode: exitOK,
 		},
 		"ignore option": {
 			opt: &options{
@@ -262,6 +281,7 @@ func TestXfg_OK(t *testing.T) {
                 testdata/service-a/
                 testdata/service-a/main.go
 			`),
+			expectExitCode: exitOK,
 		},
 		"ignore anyway even with --hidden option": {
 			opt: &options{
@@ -272,6 +292,7 @@ func TestXfg_OK(t *testing.T) {
 			expect: here.Doc(`
                 testdata/service-e/
 			`),
+			expectExitCode: exitOK,
 		},
 		"ignore anyway even with --search-all option": {
 			opt: &options{
@@ -282,6 +303,7 @@ func TestXfg_OK(t *testing.T) {
 			expect: here.Doc(`
                 testdata/service-e/
 			`),
+			expectExitCode: exitOK,
 		},
 		"pick *min.js with --search-all option": {
 			opt: &options{
@@ -292,6 +314,7 @@ func TestXfg_OK(t *testing.T) {
                 testdata/service-g/
                 testdata/service-g/service-g.min.js
 			`),
+			expectExitCode: exitOK,
 		},
 		"pick up ignorez dir with --search-all option": {
 			opt: &options{
@@ -302,6 +325,7 @@ func TestXfg_OK(t *testing.T) {
                 testdata/service-f/
                 testdata/service-f/ignorez/
 			`),
+			expectExitCode: exitOK,
 		},
 		"service-h": {
 			opt: &options{
@@ -318,6 +342,7 @@ func TestXfg_OK(t *testing.T) {
                  8: func hi() {
                  11: func hello() {
 			`),
+			expectExitCode: exitOK,
 		},
 		"service-h with maxMatchCount": {
 			opt: &options{
@@ -333,6 +358,7 @@ func TestXfg_OK(t *testing.T) {
                  4: 	hi()
                  5: 	hello()
 			`),
+			expectExitCode: exitOK,
 		},
 		"service-h show count": {
 			opt: &options{
@@ -344,6 +370,7 @@ func TestXfg_OK(t *testing.T) {
                 testdata/service-h/
                 testdata/service-h/main.go:5
 			`),
+			expectExitCode: exitOK,
 		},
 		"service-c with contextLines": {
 			opt: &options{
@@ -364,6 +391,7 @@ func TestXfg_OK(t *testing.T) {
                  10: func foo() {
                  11: 	println("Result")
 			`),
+			expectExitCode: exitOK,
 		},
 		"service-c with contextLines groupSeparator": {
 			opt: &options{
@@ -384,6 +412,7 @@ func TestXfg_OK(t *testing.T) {
                  10: func foo() {
                  11: 	println("Result")
 			`),
+			expectExitCode: exitOK,
 		},
 		"service-b ignore case to match": {
 			opt: &options{
@@ -397,6 +426,7 @@ func TestXfg_OK(t *testing.T) {
                 testdata/service-b/main.go
                  3: func main() {
 			`),
+			expectExitCode: exitOK,
 		},
 		"service-c with afterContextLines": {
 			opt: &options{
@@ -415,6 +445,7 @@ func TestXfg_OK(t *testing.T) {
                  10: func foo() {
                  11: 	println("Result")
 			`),
+			expectExitCode: exitOK,
 		},
 		"service-c with beforeContextLines": {
 			opt: &options{
@@ -433,6 +464,32 @@ func TestXfg_OK(t *testing.T) {
                  9: 
                  10: func foo() {
 			`),
+			expectExitCode: exitOK,
+		},
+		"service-b quiet": {
+			opt: &options{
+				searchPath: []string{"service-b"},
+				quiet:      true,
+			},
+			expect:         "",
+			expectExitCode: exitOK,
+		},
+		"service-b quiet no match": {
+			opt: &options{
+				searchPath: []string{noMatchKeyword},
+				quiet:      true,
+			},
+			expect:         "",
+			expectExitCode: exitErr,
+		},
+		"service-b quiet no match both search and grep": {
+			opt: &options{
+				searchPath: []string{noMatchKeyword},
+				searchGrep: []string{noMatchKeyword},
+				quiet:      true,
+			},
+			expect:         "",
+			expectExitCode: exitErr,
 		},
 	} {
 		t.Run(tname, func(t *testing.T) {
@@ -446,10 +503,12 @@ func TestXfg_OK(t *testing.T) {
 			tt.opt.noColor = true
 			tt.opt.searchStart = "./testdata"
 
-			cli.xfg(tt.opt)
+			code, err := cli.xfg(tt.opt)
+
+			a.Got(err).Debug("options", tt.opt).NoError(t)
+			a.Got(code).Expect(tt.expectExitCode).Same(t)
 
 			tt.expect = windowsBK(tt.expect)
-
 			a.Got(o.String()).Expect(tt.expect).X().Debug("options", tt.opt).Same(t)
 		})
 	}
