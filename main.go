@@ -47,7 +47,7 @@ func (cli *runner) run() int {
 }
 
 func (cli *runner) xfg(o *options) (int, error) {
-	o.prepareContextLines()
+	o.prepareContextLines(cli.isTTY)
 	x := newX(o)
 
 	if err := x.search(); err != nil {
