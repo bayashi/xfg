@@ -88,7 +88,7 @@ func (cli *runner) parseArgs() *options {
 	flag.Uint32VarP(&o.maxMatchCount, "max-count", "m", 0, "Stop reading a file after NUM matching lines")
 
 	flag.StringArrayVarP(&o.ignore, "ignore", "", []string{}, "Ignore path to pick up even with '--search-all'")
-	flag.BoolVarP(&o.hidden, "hidden", "", false, "Enable to search hidden files")
+	flag.BoolVarP(&o.hidden, "hidden", ".", false, "Enable to search hidden files")
 	flag.BoolVarP(&o.skipGitIgnore, "skip-git-ignore", "", false, "Search files and directories even if a path matches a line of .gitignore")
 	flag.BoolVarP(&o.searchAll, "search-all", "", false, "Search all files and directories except specific ignoring files and directories")
 	flag.BoolVarP(&o.ignoreCase, "ignore-case", "i", false, "Ignore case distinctions to search. Also affects keywords of ignore option")
