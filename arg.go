@@ -137,7 +137,21 @@ func (o *options) targetPathFromArgs() {
 	}
 }
 
-func (o *options) prepareContextLines() {
+func (o *options) prepareContextLines(isTTY bool) {
+	if !isTTY {
+		o.contextLines = 0
+		o.afterContextLines = 0
+		o.beforeContextLines = 0
+
+		o.actualAfterContextLines = 0
+		o.actualBeforeContextLines = 0
+
+		o.withAfterContextLines = false
+		o.withBeforeContextLines = false
+
+		return
+	}
+
 	if o.afterContextLines > 0 {
 		o.actualAfterContextLines = o.afterContextLines
 	} else if o.contextLines > 0 {

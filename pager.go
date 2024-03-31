@@ -21,7 +21,7 @@ const (
 )
 
 func (cli *runner) pager(noPager bool, result int) (func(), error) {
-	if noPager || !cli.isTTY {
+	if !cli.isTTY || noPager {
 		return nil, nil
 	}
 
