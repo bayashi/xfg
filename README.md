@@ -99,6 +99,7 @@ service-b/main.go
       --no-group-separator       Do not print a separator between groups of lines
       --no-indent                Do not print an indent string
       --no-pager                 Do not invoke with the Pager
+  -q, --quiet                    Do not write anything to standard output. Exit immediately with zero status if any match is found
       --group-separator string   Print this string instead of '--' between groups of lines (default "--")
       --indent string            Indent string for the top of each line (default " ")
       --color-path string        Color name to highlight keywords in a path (default "cyan")

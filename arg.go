@@ -52,6 +52,7 @@ type options struct {
 	skipGitIgnore    bool
 	searchAll        bool
 	noPager          bool
+	quiet            bool
 
 	contextLines uint32
 
@@ -100,6 +101,7 @@ func (cli *runner) parseArgs() *options {
 	flag.BoolVarP(&o.noGroupSeparator, "no-group-separator", "", false, "Do not print a separator between groups of lines")
 	flag.BoolVarP(&o.noIndent, "no-indent", "", false, "Do not print an indent string")
 	flag.BoolVarP(&o.noPager, "no-pager", "", false, "Do not invoke with the Pager")
+	flag.BoolVarP(&o.quiet, "quiet", "q", false, "Do not write anything to standard output. Exit immediately with zero status if any match is found")
 
 	flag.StringVarP(&o.groupSeparator, "group-separator", "", defaultGroupSeparator, "Print this string instead of '--' between groups of lines")
 	flag.StringVarP(&o.indent, "indent", "", defaultIndent, "Indent string for the top of each line")

@@ -39,8 +39,9 @@ type xfg struct {
 	ignoreRe     []*regexp.Regexp
 	gitignore    *ignore.GitIgnore
 
-	result      []path
-	resultLines int
+	result             []path
+	resultLines        int
+	resultMatchContent bool
 }
 
 func (x *xfg) setHighlighter() {
@@ -124,6 +125,12 @@ func (x *xfg) search() error {
 	walkErr := filepath.Walk(x.options.searchStart, func(fPath string, fInfo os.FileInfo, err error) error {
 		if err != nil {
 			return fmt.Errorf("something went wrong within path `%s` at `%s`: %w", x.options.searchStart, fPath, err)
+		}
+
+		if x.options.quiet {
+			if x.hasMatchedAny() {
+				return nil // already match. skip after all
+			}
 		}
 
 		return x.walker(fPath, fInfo)
@@ -309,6 +316,10 @@ func (x *xfg) scanFile(scanner *bufio.Scanner, fPath string) ([]line, error) {
 		}
 	}
 
+	if x.options.quiet && len(gf.matchedContents) > 0 {
+		x.resultMatchContent = true
+	}
+
 	return gf.matchedContents, nil
 }
 
@@ -373,4 +384,13 @@ func (x *xfg) processContentLine(gf *scanFile) {
 			}
 		}
 	}
+}
+
+func (x *xfg) hasMatchedAny() bool {
+	if (len(x.options.searchGrep) == 0 && len(x.result) > 0) ||
+		(len(x.options.searchGrep) > 0 && len(x.result) > 0 && x.resultMatchContent) {
+		return true // already match
+	}
+
+	return false
 }
