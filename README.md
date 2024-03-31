@@ -87,7 +87,7 @@ service-b/main.go
   -C, --context uint32           Show several lines before and after the matched one
   -m, --max-count uint32         Stop reading a file after NUM matching lines
       --ignore stringArray       Ignore path to pick up even with '--search-all'
-      --hidden                   Enable to search hidden files
+  -., --hidden                   Enable to search hidden files
       --skip-git-ignore          Search files and directories even if a path matches a line of .gitignore
       --search-all               Search all files and directories except specific ignoring files and directories
   -i, --ignore-case              Ignore case distinctions to search. Also affects keywords of ignore option
