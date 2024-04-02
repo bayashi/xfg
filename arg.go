@@ -60,7 +60,7 @@ type options struct {
 	beforeContextLines uint32
 
 	maxMatchCount uint32
-	maxColumns uint32
+	maxColumns    uint32
 
 	// runtime options
 	actualAfterContextLines  uint32
