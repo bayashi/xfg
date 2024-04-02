@@ -367,6 +367,7 @@ func (x *xfg) processContentLine(gf *scanFile) {
 			}
 		}
 
+		x.optimizeLine(gf)
 		gf.matchedContents = append(gf.matchedContents, line{lc: gf.lc, content: gf.l, matched: true})
 
 		if !x.options.showMatchCount && x.options.withAfterContextLines {
@@ -376,10 +377,12 @@ func (x *xfg) processContentLine(gf *scanFile) {
 		if !x.options.showMatchCount {
 			if x.options.withAfterContextLines && gf.aline > 0 {
 				gf.aline--
+				x.optimizeLine(gf)
 				gf.matchedContents = append(gf.matchedContents, line{lc: gf.lc, content: gf.l})
 			} else if x.options.withBeforeContextLines {
 				// rotate blines
 				// join "2nd to last elements of `blines`" and "current `line`"
+				x.optimizeLine(gf)
 				gf.blines = append(gf.blines[1:], line{lc: gf.lc, content: gf.l})
 			}
 		}
@@ -393,4 +396,10 @@ func (x *xfg) hasMatchedAny() bool {
 	}
 
 	return false
+}
+
+func (x *xfg) optimizeLine(gf *scanFile) {
+	if x.options.maxColumns > 0 && len(gf.l) > int(x.options.maxColumns) {
+		gf.l = gf.l[:x.options.maxColumns]
+	}
 }

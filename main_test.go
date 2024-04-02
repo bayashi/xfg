@@ -491,6 +491,23 @@ func TestXfg_OK(t *testing.T) {
 			expect:         "",
 			expectExitCode: exitErr,
 		},
+		"service-b grep bar with C1 and max-columns": {
+			opt: &options{
+				searchPath:   []string{"service-b"},
+				searchGrep:   []string{"main"},
+				indent:       defaultIndent,
+				contextLines: 1,
+				maxColumns:   7,
+			},
+			expect: here.Doc(`
+				testdata/service-b/
+				testdata/service-b/main.go
+				 2: 
+				 3: func ma
+				 4: 	bar :=
+			`),
+			expectExitCode: exitOK,
+		},
 	} {
 		t.Run(tname, func(t *testing.T) {
 			var o bytes.Buffer
