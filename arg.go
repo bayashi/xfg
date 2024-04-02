@@ -60,6 +60,7 @@ type options struct {
 	beforeContextLines uint32
 
 	maxMatchCount uint32
+	maxColumns uint32
 
 	// runtime options
 	actualAfterContextLines  uint32
@@ -86,6 +87,7 @@ func (cli *runner) parseArgs() *options {
 	flag.Uint32VarP(&o.beforeContextLines, "before-context", "B", 0, "Show several lines before the matched one. Override context option")
 	flag.Uint32VarP(&o.contextLines, "context", "C", 0, "Show several lines before and after the matched one")
 	flag.Uint32VarP(&o.maxMatchCount, "max-count", "m", 0, "Stop reading a file after NUM matching lines")
+	flag.Uint32VarP(&o.maxColumns, "max-columns", "", 0, "Do not print lines longer than this limit")
 
 	flag.StringArrayVarP(&o.ignore, "ignore", "", []string{}, "Ignore path to pick up even with '--search-all'")
 	flag.BoolVarP(&o.hidden, "hidden", ".", false, "Enable to search hidden files")
