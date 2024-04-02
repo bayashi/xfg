@@ -497,7 +497,7 @@ func TestXfg_OK(t *testing.T) {
 				searchGrep:   []string{"main"},
 				indent:       defaultIndent,
 				contextLines: 1,
-				maxColumns: 7,
+				maxColumns:   7,
 			},
 			expect: here.Doc(`
 				testdata/service-b/
