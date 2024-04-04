@@ -3,6 +3,7 @@ package main
 import (
 	"bytes"
 	"os"
+	"path/filepath"
 	"testing"
 
 	here "github.com/MakeNowJust/heredoc/v2"
@@ -505,6 +506,40 @@ func TestXfg_OK(t *testing.T) {
 				 2: 
 				 3: func ma
 				 4: 	bar :=
+			`),
+			expectExitCode: exitOK,
+		},
+		"not pick up ignorex dir due to .xfgignore": {
+			opt: &options{
+				searchPath:    []string{"service-i"},
+				xfgIgnoreFile: filepath.Join("testdata", ".xfgignore"),
+			},
+			expect: here.Doc(`
+                testdata/service-i/
+			`),
+			expectExitCode: exitOK,
+		},
+		"pick up ignorex dir with --skip-xfgignore option": {
+			opt: &options{
+				searchPath:    []string{"service-i"},
+				xfgIgnoreFile: filepath.Join("testdata", ".xfgignore"),
+				skipXfgIgnore: true,
+			},
+			expect: here.Doc(`
+                testdata/service-i/
+                testdata/service-i/ignorex/
+			`),
+			expectExitCode: exitOK,
+		},
+		"pick up ignorex dir with --search-all option": {
+			opt: &options{
+				searchPath:    []string{"service-i"},
+				xfgIgnoreFile: filepath.Join("testdata", ".xfgignore"),
+				searchAll:     true,
+			},
+			expect: here.Doc(`
+                testdata/service-i/
+                testdata/service-i/ignorex/
 			`),
 			expectExitCode: exitOK,
 		},

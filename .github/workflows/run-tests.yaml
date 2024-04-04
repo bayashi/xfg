@@ -46,6 +46,7 @@ jobs:
       - name: Create dirs which cannot add due to git-ignore features
         run: |
             mkdir -p testdata/service-f/ignorez
+            mkdir -p testdata/service-i/ignorex
 
       - name: Test with the Go CLI
         shell: 'script -q -e -c "bash {0}"'
@@ -80,6 +81,7 @@ jobs:
       - name: Create dirs which cannot add due to git-ignore features
         run: |
             mkdir -p testdata/service-f/ignorez
+            mkdir -p testdata/service-i/ignorex
 
       - name: Test with the Go CLI
         run: go test ./... -race -shuffle=on -timeout=3m -cover -v

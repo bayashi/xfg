@@ -7,6 +7,7 @@ import (
 	"regexp"
 	"strings"
 
+	"github.com/adrg/xdg"
 	ignore "github.com/sabhiram/go-gitignore"
 	"golang.org/x/term"
 )
@@ -23,6 +24,25 @@ func compileGitIgnore(sPath string) *ignore.GitIgnore {
 	}
 
 	return gitignore
+}
+
+func compileXfgIgnore(xfgFilePath string) *ignore.GitIgnore {
+	xfgignore, _ := ignore.CompileIgnoreFile(xfgFilePath)
+	if xfgignore != nil {
+		return xfgignore
+	}
+
+	const XFG_IGNOE_FILE_NAME = ".xfgignore"
+	// read .xfgignore file in XDG Base directory or home directory
+	// There would be no .xfgignore file, then `xfgignore` variable will be `nil`.
+	xfgignore, _ = ignore.CompileIgnoreFile(filepath.Join(xdg.ConfigHome, XFG_IGNOE_FILE_NAME))
+	if xfgignore == nil {
+		if homeDir, err := os.UserHomeDir(); err == nil {
+			xfgignore, _ = ignore.CompileIgnoreFile(filepath.Join(homeDir, XFG_IGNOE_FILE_NAME))
+		}
+	}
+
+	return xfgignore
 }
 
 func isBinaryFile(fh *os.File) (bool, error) {
