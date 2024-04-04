@@ -102,7 +102,7 @@ service-b/main.go
       --relax                    Insert blank space between contents for relaxing view
       --abs                      Show absolute paths
   -c, --count                    Show a count of matching lines instead of contents
-  -o, --only-match               Show paths only matched contents
+  -o, --only-match               Show paths only matched contents. If there is grep condition, then this option is enabled automatically
       --no-group-separator       Do not print a separator between groups of lines
       --no-indent                Do not print an indent string
       --no-pager                 Do not invoke with the Pager
