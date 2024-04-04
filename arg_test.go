@@ -102,6 +102,7 @@ func TestArgs(t *testing.T) {
 			prepareExpect: func(o *options) {
 				o.searchPath = []string{"foo"}
 				o.searchGrep = []string{"bar"}
+				o.onlyMatchContent = true
 			},
 		},
 		"path and specific grep args": {
@@ -109,6 +110,7 @@ func TestArgs(t *testing.T) {
 			prepareExpect: func(o *options) {
 				o.searchPath = []string{"foo"}
 				o.searchGrep = []string{"bar"}
+				o.onlyMatchContent = true
 			},
 		},
 		"path and specific multiple greps": {
@@ -116,6 +118,7 @@ func TestArgs(t *testing.T) {
 			prepareExpect: func(o *options) {
 				o.searchPath = []string{"foo"}
 				o.searchGrep = []string{"bar", "baz"}
+				o.onlyMatchContent = true
 			},
 		},
 	} {

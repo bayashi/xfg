@@ -130,6 +130,10 @@ func (cli *runner) parseArgs() *options {
 
 	o.targetPathFromArgs()
 
+	if len(o.searchGrep) > 0 {
+		o.onlyMatchContent = true
+	}
+
 	return o
 }
 
