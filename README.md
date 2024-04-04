@@ -72,8 +72,13 @@ service-b/main.go
         * Still ignore `.git` and `.gitkeep`
 * Ignored `*.min.js` file by default
 * Support .gitignore file to ignore files and directories by default
-    * Use `--skip-gitignore` option to enable `.gitignore` file
-* Pick up all files and directories with `--search-all` option
+    * Read `.gitignore` file from starting directory to search or HOME directory.
+    * Use `--skip-gitignore` option to avoid reading `.gitignore` file.
+* Support .xfgignore file to ignore files and directories as same as .gitignore by default
+    * `.xfgignore` file should be located in [XDG Base Directory](https://specifications.freedesktop.org/basedir-spec/basedir-spec-latest.html) or HOME directory
+    * You can specify `.xfgignore` file path by `--xfgignore-file` option
+    * Use `--skip-xfgignore` option to avoid reading `.xfgignore` file
+* Pick up all files and directories to search with `--search-all` option
     * You can ignore specific files and directories with `--ignore` option
 
 ## Options
@@ -89,7 +94,8 @@ service-b/main.go
       --max-columns uint32       Do not print lines longer than this limit
       --ignore stringArray       Ignore path to pick up even with '--search-all'
   -., --hidden                   Enable to search hidden files
-      --skip-git-ignore          Search files and directories even if a path matches a line of .gitignore
+      --skip-gitignore           Search files and directories even if a path matches a line of .gitignore
+      --skip-xfgignore           Search files and directories even if a path matches a line of .xfgignore
       --search-all               Search all files and directories except specific ignoring files and directories
   -i, --ignore-case              Ignore case distinctions to search. Also affects keywords of ignore option
       --no-color                 Disable colors for an output
@@ -105,6 +111,7 @@ service-b/main.go
       --indent string            Indent string for the top of each line (default " ")
       --color-path string        Color name to highlight keywords in a path (default "cyan")
       --color-content string     Color name to highlight keywords in a content line (default "red")
+      --xfgignore-file string    .xfgignore file path if you have it except XDG base directory or HOME directory
   -h, --help                     Show help (This message) and exit
   -v, --version                  Show version and build command info and exit
 ```

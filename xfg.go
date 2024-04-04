@@ -38,6 +38,7 @@ type xfg struct {
 	searchGrepRe []*regexp.Regexp
 	ignoreRe     []*regexp.Regexp
 	gitignore    *ignore.GitIgnore
+	xfgignore    *ignore.GitIgnore
 
 	result             []path
 	resultLines        int
@@ -82,6 +83,10 @@ func (x *xfg) preSearch() error {
 
 	if !x.options.skipGitIgnore {
 		x.gitignore = compileGitIgnore(x.options.searchStart)
+	}
+
+	if !x.options.skipXfgIgnore {
+		x.xfgignore = compileXfgIgnore(x.options.xfgIgnoreFile)
 	}
 
 	if x.options.ignoreCase {
@@ -189,8 +194,13 @@ func (x *xfg) canSkip(fPath string, fInfo fs.FileInfo) bool {
 		}
 	}
 
-	if !x.options.searchAll && x.gitignore != nil && x.gitignore.MatchesPath(fPath) {
-		return true // skip a file by .gitignore
+	if !x.options.searchAll {
+		if x.gitignore != nil && x.gitignore.MatchesPath(fPath) {
+			return true // skip a file by .gitignore
+		}
+		if x.xfgignore != nil && x.xfgignore.MatchesPath(fPath) {
+			return true // skip a file by .xfgignore
+		}
 	}
 
 	if fInfo.IsDir() && x.options.onlyMatchContent {
