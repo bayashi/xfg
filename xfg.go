@@ -76,6 +76,38 @@ func newX(o *options) *xfg {
 	return x
 }
 
+func (x *xfg) setRe() error {
+	for _, sp := range x.options.searchPath {
+		searchPathRe, err := regexp.Compile("(?i)(" + regexp.QuoteMeta(sp) + ")")
+		if err != nil {
+			return err
+		}
+		x.searchPathRe = append(x.searchPathRe, searchPathRe)
+	}
+
+	if len(x.options.searchGrep) > 0 {
+		for _, sg := range x.options.searchGrep {
+			searchGrepRe, err := regexp.Compile("(?i)(" + regexp.QuoteMeta(sg) + ")")
+			if err != nil {
+				return err
+			}
+			x.searchGrepRe = append(x.searchGrepRe, searchGrepRe)
+		}
+	}
+
+	if len(x.options.ignore) > 0 {
+		for _, i := range x.options.ignore {
+			ignoreRe, err := regexp.Compile(`(?i)` + regexp.QuoteMeta(i))
+			if err != nil {
+				return err
+			}
+			x.ignoreRe = append(x.ignoreRe, ignoreRe)
+		}
+	}
+
+	return nil
+}
+
 func (x *xfg) preSearch() error {
 	if err := validateStartPath(x.options.searchStart); err != nil {
 		return err
@@ -90,32 +122,8 @@ func (x *xfg) preSearch() error {
 	}
 
 	if x.options.ignoreCase {
-		for _, sp := range x.options.searchPath {
-			searchPathRe, err := regexp.Compile("(?i)(" + regexp.QuoteMeta(sp) + ")")
-			if err != nil {
-				return err
-			}
-			x.searchPathRe = append(x.searchPathRe, searchPathRe)
-		}
-
-		if len(x.options.searchGrep) > 0 {
-			for _, sg := range x.options.searchGrep {
-				searchGrepRe, err := regexp.Compile("(?i)(" + regexp.QuoteMeta(sg) + ")")
-				if err != nil {
-					return err
-				}
-				x.searchGrepRe = append(x.searchGrepRe, searchGrepRe)
-			}
-		}
-
-		if len(x.options.ignore) > 0 {
-			for _, i := range x.options.ignore {
-				ignoreRe, err := regexp.Compile(`(?i)` + regexp.QuoteMeta(i))
-				if err != nil {
-					return err
-				}
-				x.ignoreRe = append(x.ignoreRe, ignoreRe)
-			}
+		if err := x.setRe(); err != nil {
+			return err
 		}
 	}
 
