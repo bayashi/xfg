@@ -355,6 +355,18 @@ func (x *xfg) isMatchLine(line string) bool {
 	}
 }
 
+func (x *xfg) highlightLine(gf *scanFile) {
+	if x.options.ignoreCase {
+		for _, sgr := range x.searchGrepRe {
+			gf.l = sgr.ReplaceAllString(gf.l, x.grepHighlightColor.Sprintf("$1"))
+		}
+	} else {
+		for i, sg := range x.options.searchGrep {
+			gf.l = strings.ReplaceAll(gf.l, sg, x.grepHighlighter[i])
+		}
+	}
+}
+
 func (x *xfg) processContentLine(gf *scanFile) {
 	if x.isMatchLine(gf.l) {
 		if !x.options.showMatchCount && x.options.withBeforeContextLines {
@@ -370,15 +382,7 @@ func (x *xfg) processContentLine(gf *scanFile) {
 		if x.options.showMatchCount {
 			gf.l = ""
 		} else if !x.options.noColor {
-			if x.options.ignoreCase {
-				for _, sgr := range x.searchGrepRe {
-					gf.l = sgr.ReplaceAllString(gf.l, x.grepHighlightColor.Sprintf("$1"))
-				}
-			} else {
-				for i, sg := range x.options.searchGrep {
-					gf.l = strings.ReplaceAll(gf.l, sg, x.grepHighlighter[i])
-				}
-			}
+			x.highlightLine(gf)
 		}
 
 		x.optimizeLine(gf)
