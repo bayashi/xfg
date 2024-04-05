@@ -187,7 +187,7 @@ func (x *xfg) isIgnorePath(fPath string) bool {
 
 func (x *xfg) canSkip(fPath string, fInfo fs.FileInfo) bool {
 	if !x.options.searchAll {
-		if !fInfo.IsDir() && (fInfo.Name() == ".gitkeep" || strings.HasSuffix(fInfo.Name(), ".min.js")) {
+		if canSkipStuff(fInfo) {
 			return true // not pick .gitkeep file
 		} else if !x.options.hidden && strings.HasPrefix(fInfo.Name(), ".") {
 			return true // skip dot-file/dir
@@ -207,21 +207,25 @@ func (x *xfg) canSkip(fPath string, fInfo fs.FileInfo) bool {
 		return true // not pick up
 	}
 
+	return x.canSkipPath(fPath)
+}
+
+func (x *xfg) canSkipPath(fPath string) bool {
 	if x.options.ignoreCase {
 		for _, spr := range x.searchPathRe {
 			if !isMatchRegexp(fPath, spr) {
 				return true // OK, skip
 			}
 		}
-		return false // match all, cannot skip
 	} else {
 		for _, sp := range x.options.searchPath {
 			if !isMatch(fPath, sp) {
 				return true // OK, skip
 			}
 		}
-		return false // match all, cannot skip
 	}
+
+	return false // match all, cannot skip
 }
 
 func (x *xfg) onMatchPath(fPath string, fInfo fs.FileInfo) (err error) {
@@ -351,6 +355,18 @@ func (x *xfg) isMatchLine(line string) bool {
 	}
 }
 
+func (x *xfg) highlightLine(gf *scanFile) {
+	if x.options.ignoreCase {
+		for _, sgr := range x.searchGrepRe {
+			gf.l = sgr.ReplaceAllString(gf.l, x.grepHighlightColor.Sprintf("$1"))
+		}
+	} else {
+		for i, sg := range x.options.searchGrep {
+			gf.l = strings.ReplaceAll(gf.l, sg, x.grepHighlighter[i])
+		}
+	}
+}
+
 func (x *xfg) processContentLine(gf *scanFile) {
 	if x.isMatchLine(gf.l) {
 		if !x.options.showMatchCount && x.options.withBeforeContextLines {
@@ -366,15 +382,7 @@ func (x *xfg) processContentLine(gf *scanFile) {
 		if x.options.showMatchCount {
 			gf.l = ""
 		} else if !x.options.noColor {
-			if x.options.ignoreCase {
-				for _, sgr := range x.searchGrepRe {
-					gf.l = sgr.ReplaceAllString(gf.l, x.grepHighlightColor.Sprintf("$1"))
-				}
-			} else {
-				for i, sg := range x.options.searchGrep {
-					gf.l = strings.ReplaceAll(gf.l, sg, x.grepHighlighter[i])
-				}
-			}
+			x.highlightLine(gf)
 		}
 
 		x.optimizeLine(gf)
