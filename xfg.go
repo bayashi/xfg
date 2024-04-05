@@ -261,15 +261,7 @@ func (x *xfg) onMatchPath(fPath string, fInfo fs.FileInfo) (err error) {
 
 	matchedPath.path = fPath
 	if !x.options.noColor {
-		if x.options.ignoreCase {
-			for _, spr := range x.searchPathRe {
-				matchedPath.path = spr.ReplaceAllString(matchedPath.path, x.pathHighlightColor.Sprintf("$1"))
-			}
-		} else {
-			for i, sp := range x.options.searchPath {
-				matchedPath.path = strings.ReplaceAll(matchedPath.path, sp, x.pathHighlighter[i])
-			}
-		}
+		matchedPath.path = x.highlightPath(fPath)
 	}
 
 	if fInfo.IsDir() {
@@ -280,6 +272,20 @@ func (x *xfg) onMatchPath(fPath string, fInfo fs.FileInfo) (err error) {
 	x.resultLines = x.resultLines + len(matchedPath.contents) + 1
 
 	return nil
+}
+
+func (x *xfg) highlightPath(fPath string) string {
+	if x.options.ignoreCase {
+		for _, spr := range x.searchPathRe {
+			fPath = spr.ReplaceAllString(fPath, x.pathHighlightColor.Sprintf("$1"))
+		}
+	} else {
+		for i, sp := range x.options.searchPath {
+			fPath = strings.ReplaceAll(fPath, sp, x.pathHighlighter[i])
+		}
+	}
+
+	return fPath
 }
 
 func (x *xfg) checkFile(fPath string) ([]line, error) {
