@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"io/fs"
 	"os"
 	"path/filepath"
 	"regexp"
@@ -101,4 +102,8 @@ func getTermWindowRows(fd int) (int, error) {
 	}
 
 	return rows, nil
+}
+
+func canSkipStuff(fInfo fs.FileInfo) bool {
+	return !fInfo.IsDir() && (fInfo.Name() == ".gitkeep" || strings.HasSuffix(fInfo.Name(), ".min.js"))
 }

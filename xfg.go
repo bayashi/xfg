@@ -187,7 +187,7 @@ func (x *xfg) isIgnorePath(fPath string) bool {
 
 func (x *xfg) canSkip(fPath string, fInfo fs.FileInfo) bool {
 	if !x.options.searchAll {
-		if !fInfo.IsDir() && (fInfo.Name() == ".gitkeep" || strings.HasSuffix(fInfo.Name(), ".min.js")) {
+		if canSkipStuff(fInfo) {
 			return true // not pick .gitkeep file
 		} else if !x.options.hidden && strings.HasPrefix(fInfo.Name(), ".") {
 			return true // skip dot-file/dir
@@ -207,21 +207,25 @@ func (x *xfg) canSkip(fPath string, fInfo fs.FileInfo) bool {
 		return true // not pick up
 	}
 
+	return x.canSkipPath(fPath)
+}
+
+func (x *xfg) canSkipPath(fPath string) bool {
 	if x.options.ignoreCase {
 		for _, spr := range x.searchPathRe {
 			if !isMatchRegexp(fPath, spr) {
 				return true // OK, skip
 			}
 		}
-		return false // match all, cannot skip
 	} else {
 		for _, sp := range x.options.searchPath {
 			if !isMatch(fPath, sp) {
 				return true // OK, skip
 			}
 		}
-		return false // match all, cannot skip
 	}
+
+	return false // match all, cannot skip
 }
 
 func (x *xfg) onMatchPath(fPath string, fInfo fs.FileInfo) (err error) {
