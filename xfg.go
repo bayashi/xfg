@@ -76,6 +76,38 @@ func newX(o *options) *xfg {
 	return x
 }
 
+func (x *xfg) setRe() error {
+	for _, sp := range x.options.searchPath {
+		searchPathRe, err := regexp.Compile("(?i)(" + regexp.QuoteMeta(sp) + ")")
+		if err != nil {
+			return err
+		}
+		x.searchPathRe = append(x.searchPathRe, searchPathRe)
+	}
+
+	if len(x.options.searchGrep) > 0 {
+		for _, sg := range x.options.searchGrep {
+			searchGrepRe, err := regexp.Compile("(?i)(" + regexp.QuoteMeta(sg) + ")")
+			if err != nil {
+				return err
+			}
+			x.searchGrepRe = append(x.searchGrepRe, searchGrepRe)
+		}
+	}
+
+	if len(x.options.ignore) > 0 {
+		for _, i := range x.options.ignore {
+			ignoreRe, err := regexp.Compile(`(?i)` + regexp.QuoteMeta(i))
+			if err != nil {
+				return err
+			}
+			x.ignoreRe = append(x.ignoreRe, ignoreRe)
+		}
+	}
+
+	return nil
+}
+
 func (x *xfg) preSearch() error {
 	if err := validateStartPath(x.options.searchStart); err != nil {
 		return err
@@ -90,32 +122,8 @@ func (x *xfg) preSearch() error {
 	}
 
 	if x.options.ignoreCase {
-		for _, sp := range x.options.searchPath {
-			searchPathRe, err := regexp.Compile("(?i)(" + regexp.QuoteMeta(sp) + ")")
-			if err != nil {
-				return err
-			}
-			x.searchPathRe = append(x.searchPathRe, searchPathRe)
-		}
-
-		if len(x.options.searchGrep) > 0 {
-			for _, sg := range x.options.searchGrep {
-				searchGrepRe, err := regexp.Compile("(?i)(" + regexp.QuoteMeta(sg) + ")")
-				if err != nil {
-					return err
-				}
-				x.searchGrepRe = append(x.searchGrepRe, searchGrepRe)
-			}
-		}
-
-		if len(x.options.ignore) > 0 {
-			for _, i := range x.options.ignore {
-				ignoreRe, err := regexp.Compile(`(?i)` + regexp.QuoteMeta(i))
-				if err != nil {
-					return err
-				}
-				x.ignoreRe = append(x.ignoreRe, ignoreRe)
-			}
+		if err := x.setRe(); err != nil {
+			return err
 		}
 	}
 
@@ -253,15 +261,7 @@ func (x *xfg) onMatchPath(fPath string, fInfo fs.FileInfo) (err error) {
 
 	matchedPath.path = fPath
 	if !x.options.noColor {
-		if x.options.ignoreCase {
-			for _, spr := range x.searchPathRe {
-				matchedPath.path = spr.ReplaceAllString(matchedPath.path, x.pathHighlightColor.Sprintf("$1"))
-			}
-		} else {
-			for i, sp := range x.options.searchPath {
-				matchedPath.path = strings.ReplaceAll(matchedPath.path, sp, x.pathHighlighter[i])
-			}
-		}
+		matchedPath.path = x.highlightPath(fPath)
 	}
 
 	if fInfo.IsDir() {
@@ -272,6 +272,20 @@ func (x *xfg) onMatchPath(fPath string, fInfo fs.FileInfo) (err error) {
 	x.resultLines = x.resultLines + len(matchedPath.contents) + 1
 
 	return nil
+}
+
+func (x *xfg) highlightPath(fPath string) string {
+	if x.options.ignoreCase {
+		for _, spr := range x.searchPathRe {
+			fPath = spr.ReplaceAllString(fPath, x.pathHighlightColor.Sprintf("$1"))
+		}
+	} else {
+		for i, sp := range x.options.searchPath {
+			fPath = strings.ReplaceAll(fPath, sp, x.pathHighlighter[i])
+		}
+	}
+
+	return fPath
 }
 
 func (x *xfg) checkFile(fPath string) ([]line, error) {
