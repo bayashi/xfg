@@ -8,6 +8,11 @@ import (
 	"github.com/mattn/go-isatty"
 )
 
+const (
+	exitOK  int = 0
+	exitErr int = 1
+)
+
 var funcExit = func(code int) {
 	os.Exit(code)
 }

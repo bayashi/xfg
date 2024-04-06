@@ -10,19 +10,14 @@ import (
 )
 
 const (
-	exitOK  int = 0
-	exitErr int = 1
-)
-
-const (
 	cmdName string = "xfg"
 
 	XFG_RC_FILE string = ".xfgrc"
 
-	errNeedToSetPath = "Err: You should specify a directory path `--path`"
+	errNeedToSetPath string = "Err: You should specify a directory path `--path`"
 
-	defaultGroupSeparator = "--"
-	defaultIndent         = " "
+	defaultGroupSeparator string = "--"
+	defaultIndent         string = " "
 )
 
 var (
@@ -81,8 +76,6 @@ func (cli *runner) parseArgs(d *options) *options {
 	flag.CommandLine.SetOutput(cli.err)
 	flag.CommandLine.SortFlags = false
 
-	var flagHelp bool
-	var flagVersion bool
 	flag.StringArrayVarP(&o.SearchPath, "path", "p", d.SearchPath, "A string to find paths")
 	flag.StringArrayVarP(&o.SearchGrep, "grep", "g", d.SearchGrep, "A string to search for contents")
 	flag.StringVarP(&o.SearchStart, "start", "s", d.SearchStart, "A location to start searching")
@@ -121,6 +114,8 @@ func (cli *runner) parseArgs(d *options) *options {
 	flag.BoolVarP(&o.NoPager, "no-pager", "", d.NoPager, "Do not invoke with the Pager")
 	flag.BoolVarP(&o.Quiet, "quiet", "q", d.Quiet, "Do not write anything to standard output. Exit immediately with zero status if any match is found")
 
+	var flagHelp bool
+	var flagVersion bool
 	flag.BoolVarP(&flagHelp, "help", "h", false, "Show help (This message) and exit")
 	flag.BoolVarP(&flagVersion, "version", "v", false, "Show version and build command info and exit")
 
