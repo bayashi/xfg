@@ -160,10 +160,8 @@ func (x *xfg) walker(fPath string, fInfo os.FileInfo) error {
 		return nil // skip by --ignore option
 	}
 
-	if !x.options.SearchAll {
-		if fInfo.IsDir() && fInfo.Name() == ".git" {
-			return filepath.SkipDir // not search for .git directory
-		}
+	if !x.options.SearchAll && (fInfo.IsDir() && fInfo.Name() == ".git") {
+		return filepath.SkipDir // not search for .git directory
 	}
 
 	if x.canSkip(fPath, fInfo) {
