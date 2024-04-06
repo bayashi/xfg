@@ -87,34 +87,39 @@ func (cli *runner) parseArgs(d *options) *options {
 	flag.StringArrayVarP(&o.SearchGrep, "grep", "g", d.SearchGrep, "A string to search for contents")
 	flag.StringVarP(&o.SearchStart, "start", "s", d.SearchStart, "A location to start searching")
 
+	flag.BoolVarP(&o.IgnoreCase, "ignore-case", "i", d.IgnoreCase, "Ignore case distinctions to search. Also affects keywords of ignore option")
+	flag.BoolVarP(&o.OnlyMatchContent, "only-match", "o", d.OnlyMatchContent, "Show paths only matched contents")
+
+	flag.Uint32VarP(&o.ContextLines, "context", "C", d.ContextLines, "Show several lines before and after the matched one")
 	flag.Uint32VarP(&o.AfterContextLines, "after-context", "A", d.AfterContextLines, "Show several lines after the matched one. Override context option")
 	flag.Uint32VarP(&o.BeforeContextLines, "before-context", "B", d.BeforeContextLines, "Show several lines before the matched one. Override context option")
-	flag.Uint32VarP(&o.ContextLines, "context", "C", d.ContextLines, "Show several lines before and after the matched one")
-	flag.Uint32VarP(&o.MaxMatchCount, "max-count", "m", d.MaxMatchCount, "Stop reading a file after NUM matching lines")
-	flag.Uint32VarP(&o.MaxColumns, "max-columns", "", d.MaxColumns, "Do not print lines longer than this limit")
 
-	flag.StringArrayVarP(&o.Ignore, "ignore", "", d.Ignore, "Ignore path to pick up even with '--search-all'")
 	flag.BoolVarP(&o.Hidden, "hidden", ".", d.Hidden, "Enable to search hidden files")
 	flag.BoolVarP(&o.SkipGitIgnore, "skip-gitignore", "", d.SkipGitIgnore, "Search files and directories even if a path matches a line of .gitignore")
 	flag.BoolVarP(&o.SkipXfgIgnore, "skip-xfgignore", "", d.SkipXfgIgnore, "Search files and directories even if a path matches a line of .xfgignore")
 	flag.BoolVarP(&o.SearchAll, "search-all", "", d.SearchAll, "Search all files and directories except specific ignoring files and directories")
-	flag.BoolVarP(&o.IgnoreCase, "ignore-case", "i", d.IgnoreCase, "Ignore case distinctions to search. Also affects keywords of ignore option")
+	flag.StringArrayVarP(&o.Ignore, "ignore", "", d.Ignore, "Ignore path to pick up even with '--search-all'")
 
-	flag.BoolVarP(&o.NoColor, "no-color", "", d.NoColor, "Disable colors for an output")
 	flag.BoolVarP(&o.Relax, "relax", "", d.Relax, "Insert blank space between contents for relaxing view")
 	flag.BoolVarP(&o.Abs, "abs", "", d.Abs, "Show absolute paths")
 	flag.BoolVarP(&o.ShowMatchCount, "count", "c", d.ShowMatchCount, "Show a count of matching lines instead of contents")
-	flag.BoolVarP(&o.OnlyMatchContent, "only-match", "o", d.OnlyMatchContent, "Show paths only matched contents")
-	flag.BoolVarP(&o.NoGroupSeparator, "no-group-separator", "", d.NoGroupSeparator, "Do not print a separator between groups of lines")
-	flag.BoolVarP(&o.NoIndent, "no-indent", "", d.NoIndent, "Do not print an indent string")
-	flag.BoolVarP(&o.NoPager, "no-pager", "", d.NoPager, "Do not invoke with the Pager")
-	flag.BoolVarP(&o.Quiet, "quiet", "q", d.Quiet, "Do not write anything to standard output. Exit immediately with zero status if any match is found")
+	flag.Uint32VarP(&o.MaxMatchCount, "max-count", "m", d.MaxMatchCount, "Stop reading a file after NUM matching lines")
+	flag.Uint32VarP(&o.MaxColumns, "max-columns", "", d.MaxColumns, "Do not print lines longer than this limit")
 
-	flag.StringVarP(&o.GroupSeparator, "group-separator", "", d.GroupSeparator, "Print this string instead of '--' between groups of lines")
-	flag.StringVarP(&o.Indent, "indent", "", d.Indent, "Indent string for the top of each line")
+	flag.BoolVarP(&o.NoColor, "no-color", "", d.NoColor, "Disable colors for an output")
 	flag.StringVarP(&o.ColorPath, "color-path", "", d.ColorPath, "Color name to highlight keywords in a path")
 	flag.StringVarP(&o.ColorContent, "color-content", "", d.ColorContent, "Color name to highlight keywords in a content line")
+
+	flag.StringVarP(&o.GroupSeparator, "group-separator", "", d.GroupSeparator, "Print this string instead of '--' between groups of lines")
+	flag.BoolVarP(&o.NoGroupSeparator, "no-group-separator", "", d.NoGroupSeparator, "Do not print a separator between groups of lines")
+
+	flag.StringVarP(&o.Indent, "indent", "", d.Indent, "Indent string for the top of each line")
+	flag.BoolVarP(&o.NoIndent, "no-indent", "", d.NoIndent, "Do not print an indent string")
+
 	flag.StringVarP(&o.XfgIgnoreFile, "xfgignore-file", "", d.XfgIgnoreFile, ".xfgignore file path if you have it except XDG base directory or HOME directory")
+
+	flag.BoolVarP(&o.NoPager, "no-pager", "", d.NoPager, "Do not invoke with the Pager")
+	flag.BoolVarP(&o.Quiet, "quiet", "q", d.Quiet, "Do not write anything to standard output. Exit immediately with zero status if any match is found")
 
 	flag.BoolVarP(&flagHelp, "help", "h", false, "Show help (This message) and exit")
 	flag.BoolVarP(&flagVersion, "version", "v", false, "Show version and build command info and exit")
