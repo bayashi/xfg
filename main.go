@@ -4,8 +4,6 @@ import (
 	"fmt"
 	"io"
 	"os"
-
-	"github.com/mattn/go-isatty"
 )
 
 const (
@@ -26,12 +24,10 @@ type runner struct {
 }
 
 func main() {
-	stdout := os.Stdout
-	fd := stdout.Fd()
 	cli := &runner{
-		out:   stdout,
+		out:   os.Stdout,
 		err:   os.Stderr,
-		isTTY: isatty.IsTerminal(fd) || isatty.IsCygwinTerminal(fd),
+		isTTY: isTTY(),
 	}
 	exitCode, message := cli.run()
 	if exitCode != exitOK {

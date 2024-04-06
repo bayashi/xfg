@@ -12,6 +12,7 @@ import (
 
 	"github.com/BurntSushi/toml"
 	"github.com/adrg/xdg"
+	"github.com/mattn/go-isatty"
 	ignore "github.com/sabhiram/go-gitignore"
 	"golang.org/x/term"
 )
@@ -24,6 +25,11 @@ func defaultOptions() *options {
 		ColorPath:      "cyan",
 		ColorContent:   "red",
 	}
+}
+
+func isTTY() bool {
+	fd := os.Stdout.Fd()
+	return isatty.IsTerminal(fd) || isatty.IsCygwinTerminal(fd)
 }
 
 func homeDir() (string, error) {
