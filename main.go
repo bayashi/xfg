@@ -33,22 +33,23 @@ func main() {
 		err:   os.Stderr,
 		isTTY: isatty.IsTerminal(fd) || isatty.IsCygwinTerminal(fd),
 	}
-	exitCode := cli.run()
+	exitCode, message := cli.run()
+	if exitCode != exitOK {
+		cli.putErr(fmt.Sprintf("Err: %s", message))
+	}
 	funcExit(exitCode)
 }
 
-func (cli *runner) run() int {
+func (cli *runner) run() (int, string) {
 	homeDir, err := homeDir()
 	if err != nil {
-		cli.putErr(fmt.Sprintf("Err: on detecting home directory : %s", err))
-		funcExit(exitErr)
+		return exitErr, fmt.Sprintf("on detecting home directory : %s", err)
 	}
 	cli.homeDir = homeDir
 
 	defaultOpt, err := readRC(cli.homeDir)
 	if err != nil {
-		cli.putErr(fmt.Sprintf("Err: on reading config : %s", err))
-		funcExit(exitErr)
+		return exitErr, fmt.Sprintf("on reading home directory : %s", err)
 	}
 
 	o := cli.parseArgs(defaultOpt)
@@ -59,11 +60,10 @@ func (cli *runner) run() int {
 
 	exitCode, err := cli.xfg(o)
 	if err != nil {
-		cli.putErr(fmt.Sprintf("Err: %s", err))
-		funcExit(exitErr)
+		return exitErr, fmt.Sprintf("on xfg : %s", err)
 	}
 
-	return exitCode
+	return exitCode, ""
 }
 
 func (cli *runner) xfg(o *options) (int, error) {
