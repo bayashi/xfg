@@ -30,8 +30,6 @@ type xfg struct {
 	cli     *runner
 	options *options
 
-	homeDir string
-
 	pathHighlightColor *color.Color
 	pathHighlighter    []string
 	grepHighlightColor *color.Color
