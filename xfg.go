@@ -114,11 +114,11 @@ func (x *xfg) preSearch() error {
 	}
 
 	if !x.options.SkipGitIgnore {
-		x.gitignore = compileGitIgnore(x.options.SearchStart)
+		x.gitignore = prepareGitIgnore(x.options.SearchStart)
 	}
 
 	if !x.options.SkipXfgIgnore {
-		x.xfgignore = compileXfgIgnore(x.options.XfgIgnoreFile)
+		x.xfgignore = prepareXfgIgnore(x.options.XfgIgnoreFile)
 	}
 
 	if x.options.IgnoreCase {

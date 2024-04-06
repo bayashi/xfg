@@ -57,7 +57,7 @@ func readRC() (*options, error) {
 	return o, nil
 }
 
-func compileGitIgnore(sPath string) *ignore.GitIgnore {
+func prepareGitIgnore(sPath string) *ignore.GitIgnore {
 	const GIT_IGNOE_FILE_NAME = ".gitignore"
 	// read .gitignore file in start directory to search or home directory
 	// There would be no .gitignore file, then `gitignore` variable will be `nil`.
@@ -71,7 +71,7 @@ func compileGitIgnore(sPath string) *ignore.GitIgnore {
 	return gitignore
 }
 
-func compileXfgIgnore(xfgFilePath string) *ignore.GitIgnore {
+func prepareXfgIgnore(xfgFilePath string) *ignore.GitIgnore {
 	xfgignore, _ := ignore.CompileIgnoreFile(xfgFilePath)
 	if xfgignore != nil {
 		return xfgignore
