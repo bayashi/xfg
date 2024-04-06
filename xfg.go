@@ -76,7 +76,7 @@ func newX(o *options) *xfg {
 	return x
 }
 
-func (x *xfg) setRe() error {
+func (x *xfg) prepareRe() error {
 	for _, sp := range x.options.SearchPath {
 		searchPathRe, err := regexp.Compile("(?i)(" + regexp.QuoteMeta(sp) + ")")
 		if err != nil {
@@ -122,7 +122,7 @@ func (x *xfg) preSearch() error {
 	}
 
 	if x.options.IgnoreCase {
-		if err := x.setRe(); err != nil {
+		if err := x.prepareRe(); err != nil {
 			return err
 		}
 	}
