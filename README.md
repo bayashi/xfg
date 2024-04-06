@@ -129,7 +129,7 @@ color-path = "blue"
 
 ```
 export XFG_RC_FILE_PATH="/path/to/your_rc_file.toml"
-
+```
 
 ## Installation
 
