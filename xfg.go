@@ -246,9 +246,10 @@ func (x *xfg) onMatchPath(fPath string, fInfo fs.FileInfo) (err error) {
 		if err != nil {
 			return fmt.Errorf("error during grep: %w", err)
 		}
-		if x.options.OnlyMatchContent && len(matchedPath.contents) == 0 {
-			return nil // not pick up
-		}
+	}
+
+	if x.options.OnlyMatchContent && len(matchedPath.contents) == 0 {
+		return nil // not pick up
 	}
 
 	if x.options.Abs {

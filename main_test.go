@@ -134,20 +134,20 @@ func TestXfg_OK(t *testing.T) {
 			`),
 			expectExitCode: exitOK,
 		},
-		"service-b grep onlyMatch": {
+		"service-a grep foo onlyMatch": {
 			opt: &options{
-				SearchPath:       []string{"service-b"},
-				SearchGrep:       []string{"func"},
+				SearchPath:       []string{"service-a"},
+				SearchGrep:       []string{"foo"},
 				Indent:           defaultIndent,
 				OnlyMatchContent: true,
 			},
 			expect: here.Doc(`
-                testdata/service-b/main.go
-                 3: func main() {
+                testdata/service-a/main.go
+                 4: 	foo := 12
 			`),
 			expectExitCode: exitOK,
 		},
-		"service-b grep foo": {
+		"service-a grep foo": {
 			opt: &options{
 				SearchPath: []string{"service-a"},
 				SearchGrep: []string{"foo"},
@@ -540,6 +540,27 @@ func TestXfg_OK(t *testing.T) {
 			expect: here.Doc(`
                 testdata/service-i/
                 testdata/service-i/ignorex/
+			`),
+			expectExitCode: exitOK,
+		},
+		"service-c with contextLines, but no-group-separator": {
+			opt: &options{
+				SearchPath:       []string{"service-c"},
+				SearchGrep:       []string{"func"},
+				GroupSeparator:   defaultGroupSeparator,
+				Indent:           defaultIndent,
+				ContextLines:     1,
+				NoGroupSeparator: true,
+			},
+			expect: here.Doc(`
+                testdata/service-c/
+                testdata/service-c/main.go
+                 2: 
+                 3: func main() {
+                 4: 	baz := 56
+                 9: 
+                 10: func foo() {
+                 11: 	println("Result")
 			`),
 			expectExitCode: exitOK,
 		},

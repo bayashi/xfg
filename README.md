@@ -87,31 +87,31 @@ service-b/main.go
   -p, --path stringArray         A string to find paths
   -g, --grep stringArray         A string to search for contents
   -s, --start string             A location to start searching (default ".")
+  -i, --ignore-case              Ignore case distinctions to search. Also affects keywords of ignore option
+  -o, --only-match               Show paths only matched contents
+  -C, --context uint32           Show several lines before and after the matched one
   -A, --after-context uint32     Show several lines after the matched one. Override context option
   -B, --before-context uint32    Show several lines before the matched one. Override context option
-  -C, --context uint32           Show several lines before and after the matched one
-  -m, --max-count uint32         Stop reading a file after NUM matching lines
-      --max-columns uint32       Do not print lines longer than this limit
-      --ignore stringArray       Ignore path to pick up even with '--search-all'
   -., --hidden                   Enable to search hidden files
       --skip-gitignore           Search files and directories even if a path matches a line of .gitignore
       --skip-xfgignore           Search files and directories even if a path matches a line of .xfgignore
       --search-all               Search all files and directories except specific ignoring files and directories
-  -i, --ignore-case              Ignore case distinctions to search. Also affects keywords of ignore option
-      --no-color                 Disable colors for an output
+      --ignore stringArray       Ignore path to pick up even with '--search-all'
       --relax                    Insert blank space between contents for relaxing view
       --abs                      Show absolute paths
   -c, --count                    Show a count of matching lines instead of contents
-  -o, --only-match               Show paths only matched contents. If there is grep condition, then this option is enabled automatically
-      --no-group-separator       Do not print a separator between groups of lines
-      --no-indent                Do not print an indent string
-      --no-pager                 Do not invoke with the Pager
-  -q, --quiet                    Do not write anything to standard output. Exit immediately with zero status if any match is found
-      --group-separator string   Print this string instead of '--' between groups of lines (default "--")
-      --indent string            Indent string for the top of each line (default " ")
+  -m, --max-count uint32         Stop reading a file after NUM matching lines
+      --max-columns uint32       Do not print lines longer than this limit
+      --no-color                 Disable colors for an output
       --color-path string        Color name to highlight keywords in a path (default "cyan")
       --color-content string     Color name to highlight keywords in a content line (default "red")
+      --group-separator string   Print this string instead of '--' between groups of lines (default "--")
+      --no-group-separator       Do not print a separator between groups of lines
+      --indent string            Indent string for the top of each line (default " ")
+      --no-indent                Do not print an indent string
       --xfgignore-file string    .xfgignore file path if you have it except XDG base directory or HOME directory
+      --no-pager                 Do not invoke with the Pager
+  -q, --quiet                    Do not write anything to standard output. Exit immediately with zero status if any match is found
   -h, --help                     Show help (This message) and exit
   -v, --version                  Show version and build command info and exit
 ```
