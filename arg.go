@@ -14,10 +14,10 @@ const (
 
 	XFG_RC_FILE string = ".xfgrc"
 
-	errNeedToSetPath = "Err: You should specify a directory path `--path`"
+	errNeedToSetPath string = "Err: You should specify a directory path `--path`"
 
-	defaultGroupSeparator = "--"
-	defaultIndent         = " "
+	defaultGroupSeparator string = "--"
+	defaultIndent         string = " "
 )
 
 var (
