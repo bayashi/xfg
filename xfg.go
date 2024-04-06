@@ -140,10 +140,8 @@ func (x *xfg) search() error {
 			return fmt.Errorf("something went wrong within path `%s` at `%s`: %w", x.options.SearchStart, fPath, err)
 		}
 
-		if x.options.Quiet {
-			if x.hasMatchedAny() {
-				return nil // already match. skip after all
-			}
+		if x.options.Quiet && x.hasMatchedAny() {
+			return nil // already match. skip after all
 		}
 
 		return x.walker(fPath, fInfo)
