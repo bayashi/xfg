@@ -134,20 +134,20 @@ func TestXfg_OK(t *testing.T) {
 			`),
 			expectExitCode: exitOK,
 		},
-		"service-b grep onlyMatch": {
+		"service-a grep foo onlyMatch": {
 			opt: &options{
-				SearchPath:       []string{"service-b"},
-				SearchGrep:       []string{"func"},
+				SearchPath:       []string{"service-a"},
+				SearchGrep:       []string{"foo"},
 				Indent:           defaultIndent,
 				OnlyMatchContent: true,
 			},
 			expect: here.Doc(`
-                testdata/service-b/main.go
-                 3: func main() {
+                testdata/service-a/main.go
+                 4: 	foo := 12
 			`),
 			expectExitCode: exitOK,
 		},
-		"service-b grep foo": {
+		"service-a grep foo": {
 			opt: &options{
 				SearchPath: []string{"service-a"},
 				SearchGrep: []string{"foo"},
