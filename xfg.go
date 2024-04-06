@@ -359,15 +359,15 @@ func (x *xfg) isMatchLine(line string) bool {
 				return false
 			}
 		}
-		return true // OK, match all
 	} else {
 		for _, sg := range x.options.SearchGrep {
 			if !isMatch(line, sg) {
 				return false
 			}
 		}
-		return true // OK, match all
 	}
+
+	return true // OK, match all
 }
 
 func (x *xfg) highlightLine(gf *scanFile) {
