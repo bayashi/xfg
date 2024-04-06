@@ -32,9 +32,14 @@ func main() {
 }
 
 func (cli *runner) run() int {
-	o := cli.parseArgs()
+	defaultOpt, err := readRC()
+	if err != nil {
+		cli.putErr(fmt.Sprintf("Err: on reading config : %s", err))
+		funcExit(exitErr)
+	}
+	o := cli.parseArgs(defaultOpt)
 	if !cli.isTTY {
-		o.noColor = true // Turn off color
+		o.NoColor = true // Turn off color
 	}
 
 	exitCode, err := cli.xfg(o)
@@ -54,7 +59,7 @@ func (cli *runner) xfg(o *options) (int, error) {
 		return exitErr, fmt.Errorf("error during Search %w", err)
 	}
 
-	closer, err := cli.pager(o.noPager, x.resultLines)
+	closer, err := cli.pager(o.NoPager, x.resultLines)
 	if err != nil {
 		return exitErr, fmt.Errorf("pgaer is wrong: %w", err)
 	}

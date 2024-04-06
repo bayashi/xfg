@@ -17,7 +17,7 @@ func output(writer *bufio.Writer, out string) error {
 }
 
 func (cli *runner) showResult(x *xfg) error {
-	if x.options.quiet {
+	if x.options.Quiet {
 		if x.hasMatchedAny() {
 			cli.exitCode = exitOK
 		} else {
@@ -26,8 +26,8 @@ func (cli *runner) showResult(x *xfg) error {
 		return nil
 	}
 
-	if x.options.noIndent {
-		x.options.indent = ""
+	if x.options.NoIndent {
+		x.options.Indent = ""
 	}
 
 	if cli.isTTY {
@@ -45,16 +45,16 @@ func (cli *runner) outputForTTY(x *xfg) error {
 	writer := bufio.NewWriter(cli.out)
 	for _, p := range x.result {
 		out := p.path
-		if x.options.showMatchCount && !p.info.IsDir() {
+		if x.options.ShowMatchCount && !p.info.IsDir() {
 			out = out + fmt.Sprintf(":%d", len(p.contents))
 		}
 		out = out + "\n"
 
-		if !x.options.showMatchCount {
+		if !x.options.ShowMatchCount {
 			if len(p.contents) > 0 {
 				cli.buildContentOutput(x, &out, p.contents)
 			}
-			if x.options.relax && len(p.contents) > 0 {
+			if x.options.Relax && len(p.contents) > 0 {
 				out = out + "\n"
 			}
 		}
@@ -70,13 +70,13 @@ func (cli *runner) buildContentOutput(x *xfg, out *string, contents []line) erro
 	var blc int32 = 0
 	for _, line := range contents {
 		if x.needToShowGroupSeparator(blc, line.lc) {
-			*out = *out + x.options.indent + x.options.groupSeparator + "\n"
+			*out = *out + x.options.Indent + x.options.GroupSeparator + "\n"
 		}
 		lc := fmt.Sprintf("%d", line.lc)
-		if !x.options.noColor && line.matched {
+		if !x.options.NoColor && line.matched {
 			lc = x.grepHighlightColor.Sprint(lc)
 		}
-		*out = *out + fmt.Sprintf("%s%s: %s\n", x.options.indent, lc, line.content)
+		*out = *out + fmt.Sprintf("%s%s: %s\n", x.options.Indent, lc, line.content)
 		blc = line.lc
 	}
 

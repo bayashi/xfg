@@ -116,6 +116,21 @@ service-b/main.go
   -v, --version                  Show version and build command info and exit
 ```
 
+## Default Options
+
+You can use default options by `.xfgrc` file. It's TOML file even without `.toml` extention, anyway.
+
+```
+relax = true
+color-path = "blue"
+```
+
+`.xfgrc` file should be in [XDG Base Directory](https://specifications.freedesktop.org/basedir-spec/basedir-spec-latest.html) or HOME directory. Or, you can specify a file path by ENV key: `XFG_RC_FILE_PATH` as you like.
+
+```
+export XFG_RC_FILE_PATH="/path/to/your_rc_file.toml"
+
+
 ## Installation
 
 ### Mac

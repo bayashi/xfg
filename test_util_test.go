@@ -28,29 +28,29 @@ func resetFlag() {
 	flag.CommandLine = flag.NewFlagSet(fakeCmd, 1)
 }
 
-func defaultOptions() *options {
-	return &options{
-		searchPath:       []string{},
-		searchGrep:       []string{},
-		searchStart:      ".",
-		groupSeparator:   "--",
-		indent:           " ",
-		colorPath:        "cyan",
-		colorContent:     "red",
-		ignore:           []string{},
-		ignoreCase:       false,
-		relax:            false,
-		noColor:          false,
-		abs:              false,
-		showMatchCount:   false,
-		onlyMatchContent: false,
-		noGroupSeparator: false,
-		noIndent:         false,
-		hidden:           false,
-		skipGitIgnore:    false,
-		searchAll:        false,
-		contextLines:     0,
-		maxMatchCount:    0,
+func expectedDefaultOptions() options {
+	return options{
+		SearchPath:       nil,
+		SearchGrep:       nil,
+		SearchStart:      ".",
+		GroupSeparator:   "--",
+		Indent:           " ",
+		ColorPath:        "cyan",
+		ColorContent:     "red",
+		Ignore:           nil,
+		IgnoreCase:       false,
+		Relax:            false,
+		NoColor:          false,
+		Abs:              false,
+		ShowMatchCount:   false,
+		OnlyMatchContent: false,
+		NoGroupSeparator: false,
+		NoIndent:         false,
+		Hidden:           false,
+		SkipGitIgnore:    false,
+		SearchAll:        false,
+		ContextLines:     0,
+		MaxMatchCount:    0,
 	}
 }
 

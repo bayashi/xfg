@@ -17,6 +17,8 @@ const (
 const (
 	cmdName string = "xfg"
 
+	XFG_RC_FILE string = ".xfgrc"
+
 	errNeedToSetPath = "Err: You should specify a directory path `--path`"
 
 	defaultGroupSeparator = "--"
@@ -29,40 +31,40 @@ var (
 )
 
 type options struct {
-	searchPath  []string
-	searchGrep  []string
-	searchStart string
+	SearchPath  []string `toml:"path"`
+	SearchGrep  []string `toml:"grep"`
+	SearchStart string   `toml:"start"`
 
-	groupSeparator string
-	indent         string
-	colorPath      string
-	colorContent   string
-	xfgIgnoreFile  string
+	GroupSeparator string `toml:"gourp-separator"`
+	Indent         string `toml:"indent"`
+	ColorPath      string `toml:"color-path"`
+	ColorContent   string `toml:"color-conetnt"`
+	XfgIgnoreFile  string `toml:"xfgignore-file"`
 
-	ignore []string
+	Ignore []string `toml:"ignore"`
 
-	ignoreCase       bool
-	relax            bool
-	noColor          bool
-	abs              bool
-	showMatchCount   bool
-	onlyMatchContent bool
-	noGroupSeparator bool
-	noIndent         bool
-	hidden           bool
-	skipGitIgnore    bool
-	skipXfgIgnore    bool
-	searchAll        bool
-	noPager          bool
-	quiet            bool
+	IgnoreCase       bool `toml:"ignore-case"`
+	Relax            bool `toml:"relax"`
+	NoColor          bool `toml:"no-color"`
+	Abs              bool `toml:"abs"`
+	ShowMatchCount   bool `toml:"count"`
+	OnlyMatchContent bool `toml:"only-match"`
+	NoGroupSeparator bool `toml:"no-group-separator"`
+	NoIndent         bool `toml:"no-indent"`
+	Hidden           bool `toml:"hidden"`
+	SkipGitIgnore    bool `toml:"skip-gitignore"`
+	SkipXfgIgnore    bool `toml:"skip-xfgignore"`
+	SearchAll        bool `toml:"search-all"`
+	NoPager          bool `toml:"no-pager"`
+	Quiet            bool `toml:"quiet"`
 
-	contextLines uint32
+	ContextLines uint32 `toml:"context"`
 
-	afterContextLines  uint32
-	beforeContextLines uint32
+	AfterContextLines  uint32 `toml:"after-context"`
+	BeforeContextLines uint32 `toml:"before-context"`
 
-	maxMatchCount uint32
-	maxColumns    uint32
+	MaxMatchCount uint32 `toml:"max-count"`
+	MaxColumns    uint32 `toml:"max-columns"`
 
 	// runtime options
 	actualAfterContextLines  uint32
@@ -71,7 +73,7 @@ type options struct {
 	withBeforeContextLines   bool
 }
 
-func (cli *runner) parseArgs() *options {
+func (cli *runner) parseArgs(d *options) *options {
 	noArgs := len(os.Args) == 1
 
 	o := &options{}
@@ -81,38 +83,38 @@ func (cli *runner) parseArgs() *options {
 
 	var flagHelp bool
 	var flagVersion bool
-	flag.StringArrayVarP(&o.searchPath, "path", "p", []string{}, "A string to find paths")
-	flag.StringArrayVarP(&o.searchGrep, "grep", "g", []string{}, "A string to search for contents")
-	flag.StringVarP(&o.searchStart, "start", "s", ".", "A location to start searching")
+	flag.StringArrayVarP(&o.SearchPath, "path", "p", d.SearchPath, "A string to find paths")
+	flag.StringArrayVarP(&o.SearchGrep, "grep", "g", d.SearchGrep, "A string to search for contents")
+	flag.StringVarP(&o.SearchStart, "start", "s", d.SearchStart, "A location to start searching")
 
-	flag.Uint32VarP(&o.afterContextLines, "after-context", "A", 0, "Show several lines after the matched one. Override context option")
-	flag.Uint32VarP(&o.beforeContextLines, "before-context", "B", 0, "Show several lines before the matched one. Override context option")
-	flag.Uint32VarP(&o.contextLines, "context", "C", 0, "Show several lines before and after the matched one")
-	flag.Uint32VarP(&o.maxMatchCount, "max-count", "m", 0, "Stop reading a file after NUM matching lines")
-	flag.Uint32VarP(&o.maxColumns, "max-columns", "", 0, "Do not print lines longer than this limit")
+	flag.Uint32VarP(&o.AfterContextLines, "after-context", "A", d.AfterContextLines, "Show several lines after the matched one. Override context option")
+	flag.Uint32VarP(&o.BeforeContextLines, "before-context", "B", d.BeforeContextLines, "Show several lines before the matched one. Override context option")
+	flag.Uint32VarP(&o.ContextLines, "context", "C", d.ContextLines, "Show several lines before and after the matched one")
+	flag.Uint32VarP(&o.MaxMatchCount, "max-count", "m", d.MaxMatchCount, "Stop reading a file after NUM matching lines")
+	flag.Uint32VarP(&o.MaxColumns, "max-columns", "", d.MaxColumns, "Do not print lines longer than this limit")
 
-	flag.StringArrayVarP(&o.ignore, "ignore", "", []string{}, "Ignore path to pick up even with '--search-all'")
-	flag.BoolVarP(&o.hidden, "hidden", ".", false, "Enable to search hidden files")
-	flag.BoolVarP(&o.skipGitIgnore, "skip-gitignore", "", false, "Search files and directories even if a path matches a line of .gitignore")
-	flag.BoolVarP(&o.skipXfgIgnore, "skip-xfgignore", "", false, "Search files and directories even if a path matches a line of .xfgignore")
-	flag.BoolVarP(&o.searchAll, "search-all", "", false, "Search all files and directories except specific ignoring files and directories")
-	flag.BoolVarP(&o.ignoreCase, "ignore-case", "i", false, "Ignore case distinctions to search. Also affects keywords of ignore option")
+	flag.StringArrayVarP(&o.Ignore, "ignore", "", d.Ignore, "Ignore path to pick up even with '--search-all'")
+	flag.BoolVarP(&o.Hidden, "hidden", ".", d.Hidden, "Enable to search hidden files")
+	flag.BoolVarP(&o.SkipGitIgnore, "skip-gitignore", "", d.SkipGitIgnore, "Search files and directories even if a path matches a line of .gitignore")
+	flag.BoolVarP(&o.SkipXfgIgnore, "skip-xfgignore", "", d.SkipXfgIgnore, "Search files and directories even if a path matches a line of .xfgignore")
+	flag.BoolVarP(&o.SearchAll, "search-all", "", d.SearchAll, "Search all files and directories except specific ignoring files and directories")
+	flag.BoolVarP(&o.IgnoreCase, "ignore-case", "i", d.IgnoreCase, "Ignore case distinctions to search. Also affects keywords of ignore option")
 
-	flag.BoolVarP(&o.noColor, "no-color", "", false, "Disable colors for an output")
-	flag.BoolVarP(&o.relax, "relax", "", false, "Insert blank space between contents for relaxing view")
-	flag.BoolVarP(&o.abs, "abs", "", false, "Show absolute paths")
-	flag.BoolVarP(&o.showMatchCount, "count", "c", false, "Show a count of matching lines instead of contents")
-	flag.BoolVarP(&o.onlyMatchContent, "only-match", "o", false, "Show paths only matched contents")
-	flag.BoolVarP(&o.noGroupSeparator, "no-group-separator", "", false, "Do not print a separator between groups of lines")
-	flag.BoolVarP(&o.noIndent, "no-indent", "", false, "Do not print an indent string")
-	flag.BoolVarP(&o.noPager, "no-pager", "", false, "Do not invoke with the Pager")
-	flag.BoolVarP(&o.quiet, "quiet", "q", false, "Do not write anything to standard output. Exit immediately with zero status if any match is found")
+	flag.BoolVarP(&o.NoColor, "no-color", "", d.NoColor, "Disable colors for an output")
+	flag.BoolVarP(&o.Relax, "relax", "", d.Relax, "Insert blank space between contents for relaxing view")
+	flag.BoolVarP(&o.Abs, "Abs", "", d.Abs, "Show absolute paths")
+	flag.BoolVarP(&o.ShowMatchCount, "count", "c", d.ShowMatchCount, "Show a count of matching lines instead of contents")
+	flag.BoolVarP(&o.OnlyMatchContent, "only-match", "o", d.OnlyMatchContent, "Show paths only matched contents")
+	flag.BoolVarP(&o.NoGroupSeparator, "no-group-separator", "", d.NoGroupSeparator, "Do not print a separator between groups of lines")
+	flag.BoolVarP(&o.NoIndent, "no-indent", "", d.NoIndent, "Do not print an indent string")
+	flag.BoolVarP(&o.NoPager, "no-pager", "", d.NoPager, "Do not invoke with the Pager")
+	flag.BoolVarP(&o.Quiet, "quiet", "q", d.Quiet, "Do not write anything to standard output. Exit immediately with zero status if any match is found")
 
-	flag.StringVarP(&o.groupSeparator, "group-separator", "", defaultGroupSeparator, "Print this string instead of '--' between groups of lines")
-	flag.StringVarP(&o.indent, "indent", "", defaultIndent, "Indent string for the top of each line")
-	flag.StringVarP(&o.colorPath, "color-path", "", "cyan", "Color name to highlight keywords in a path")
-	flag.StringVarP(&o.colorContent, "color-content", "", "red", "Color name to highlight keywords in a content line")
-	flag.StringVarP(&o.xfgIgnoreFile, "xfgignore-file", "", "", ".xfgignore file path if you have it except XDG base directory or HOME directory")
+	flag.StringVarP(&o.GroupSeparator, "group-separator", "", d.GroupSeparator, "Print this string instead of '--' between groups of lines")
+	flag.StringVarP(&o.Indent, "indent", "", d.Indent, "Indent string for the top of each line")
+	flag.StringVarP(&o.ColorPath, "color-path", "", d.ColorPath, "Color name to highlight keywords in a path")
+	flag.StringVarP(&o.ColorContent, "color-content", "", d.ColorContent, "Color name to highlight keywords in a content line")
+	flag.StringVarP(&o.XfgIgnoreFile, "xfgignore-file", "", d.XfgIgnoreFile, ".xfgignore file path if you have it except XDG base directory or HOME directory")
 
 	flag.BoolVarP(&flagHelp, "help", "h", false, "Show help (This message) and exit")
 	flag.BoolVarP(&flagVersion, "version", "v", false, "Show version and build command info and exit")
@@ -124,14 +126,14 @@ func (cli *runner) parseArgs() *options {
 	} else if flagVersion {
 		cli.putErr(versionDetails())
 		funcExit(exitOK)
-	} else if len(o.searchPath) == 0 && len(flag.Args()) == 0 {
+	} else if len(o.SearchPath) == 0 && len(flag.Args()) == 0 {
 		cli.putHelp(errNeedToSetPath)
 	}
 
 	o.targetPathFromArgs()
 
-	if len(o.searchGrep) > 0 {
-		o.onlyMatchContent = true
+	if len(o.SearchGrep) > 0 {
+		o.OnlyMatchContent = true
 	}
 
 	return o
@@ -139,19 +141,19 @@ func (cli *runner) parseArgs() *options {
 
 func (o *options) targetPathFromArgs() {
 	if len(flag.Args()) > 0 && flag.Args()[0] != "" {
-		o.searchPath = append(o.searchPath, flag.Args()[0])
+		o.SearchPath = append(o.SearchPath, flag.Args()[0])
 	}
 
 	if len(flag.Args()) == 2 && flag.Args()[1] != "" {
-		o.searchGrep = append(o.searchGrep, flag.Args()[1])
+		o.SearchGrep = append(o.SearchGrep, flag.Args()[1])
 	}
 }
 
 func (o *options) prepareContextLines(isTTY bool) {
 	if !isTTY {
-		o.contextLines = 0
-		o.afterContextLines = 0
-		o.beforeContextLines = 0
+		o.ContextLines = 0
+		o.AfterContextLines = 0
+		o.BeforeContextLines = 0
 
 		o.actualAfterContextLines = 0
 		o.actualBeforeContextLines = 0
@@ -162,21 +164,21 @@ func (o *options) prepareContextLines(isTTY bool) {
 		return
 	}
 
-	if o.afterContextLines > 0 {
-		o.actualAfterContextLines = o.afterContextLines
-	} else if o.contextLines > 0 {
-		o.actualAfterContextLines = o.contextLines
+	if o.AfterContextLines > 0 {
+		o.actualAfterContextLines = o.AfterContextLines
+	} else if o.ContextLines > 0 {
+		o.actualAfterContextLines = o.ContextLines
 	}
 
-	o.withAfterContextLines = o.contextLines > 0 || o.afterContextLines > 0
+	o.withAfterContextLines = o.ContextLines > 0 || o.AfterContextLines > 0
 
-	if o.beforeContextLines > 0 {
-		o.actualBeforeContextLines = o.beforeContextLines
-	} else if o.contextLines > 0 {
-		o.actualBeforeContextLines = o.contextLines
+	if o.BeforeContextLines > 0 {
+		o.actualBeforeContextLines = o.BeforeContextLines
+	} else if o.ContextLines > 0 {
+		o.actualBeforeContextLines = o.ContextLines
 	}
 
-	o.withBeforeContextLines = o.contextLines > 0 || o.beforeContextLines > 0
+	o.withBeforeContextLines = o.ContextLines > 0 || o.BeforeContextLines > 0
 }
 
 func versionDetails() string {
