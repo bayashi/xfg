@@ -19,9 +19,9 @@ func TestArgsNoArgs(t *testing.T) {
 	resetFlag()
 	stubExit()
 	os.Args = []string{fakeCmd}
-	o := cli.parseArgs(defaultOptions())
+	o := cli.parseArgs(&options{})
 
-	a.Got(o).Expect(expectedDefaultOptions()).Same(t)
+	a.Got(o).Expect(&options{}).Same(t)
 
 	a.Got(stubCalled).True(t)
 	a.Got(stubCode).Expect(exitOK).Same(t)
@@ -43,7 +43,8 @@ func TestArgsHelp(t *testing.T) {
 	os.Args = []string{fakeCmd, "--help"}
 	o := cli.parseArgs(defaultOptions())
 
-	a.Got(o).Expect(expectedDefaultOptions()).Same(t)
+	e := expectedDefaultOptions()
+	a.Got(o).Expect(&e).Same(t)
 
 	a.Got(stubCalled).True(t)
 	a.Got(stubCode).Expect(exitOK).Same(t)
@@ -65,7 +66,8 @@ func TestArgsVersion(t *testing.T) {
 	os.Args = []string{fakeCmd, "--version"}
 	o := cli.parseArgs(defaultOptions())
 
-	a.Got(o).Expect(expectedDefaultOptions()).Same(t)
+	e := expectedDefaultOptions()
+	a.Got(o).Expect(&e).Same(t)
 
 	a.Got(stubCalled).True(t)
 	a.Got(stubCode).Expect(exitOK).Same(t)
@@ -130,9 +132,9 @@ func TestArgs(t *testing.T) {
 			o := cli.parseArgs(defaultOptions())
 
 			expectOptions := expectedDefaultOptions()
-			tt.prepareExpect(expectOptions)
+			tt.prepareExpect(&expectOptions)
 
-			a.Got(o).Expect(expectOptions).Same(t)
+			a.Got(o).Expect(&expectOptions).Same(t)
 			a.Got(stubCalled).False(t)
 			a.Got(stubCode).Expect(exitOK).Same(t)
 		})
