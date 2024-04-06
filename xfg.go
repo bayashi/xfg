@@ -71,7 +71,7 @@ func (x *xfg) setHighlighter() {
 
 func newX(cli *runner, o *options) *xfg {
 	x := &xfg{
-		cli: cli,
+		cli:     cli,
 		options: o,
 	}
 
