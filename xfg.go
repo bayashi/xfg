@@ -27,7 +27,10 @@ type path struct {
 }
 
 type xfg struct {
+	cli     *runner
 	options *options
+
+	homeDir string
 
 	pathHighlightColor *color.Color
 	pathHighlighter    []string
@@ -66,8 +69,9 @@ func (x *xfg) setHighlighter() {
 	}
 }
 
-func newX(o *options) *xfg {
+func newX(cli *runner, o *options) *xfg {
 	x := &xfg{
+		cli: cli,
 		options: o,
 	}
 
@@ -114,11 +118,11 @@ func (x *xfg) preSearch() error {
 	}
 
 	if !x.options.SkipGitIgnore {
-		x.gitignore = prepareGitIgnore(x.options.SearchStart)
+		x.gitignore = prepareGitIgnore(x.cli.homeDir, x.options.SearchStart)
 	}
 
 	if !x.options.SkipXfgIgnore {
-		x.xfgignore = prepareXfgIgnore(x.options.XfgIgnoreFile)
+		x.xfgignore = prepareXfgIgnore(x.cli.homeDir, x.options.XfgIgnoreFile)
 	}
 
 	if x.options.IgnoreCase {

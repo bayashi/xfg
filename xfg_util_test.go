@@ -16,7 +16,15 @@ func TestReadRC(t *testing.T) {
 	a.Got(err).NoError(t)
 	t.Setenv(XFG_RC_ENV_KEY, rcFilePath)
 
-	o, err := readRC()
+	fakeHomeDir := "fake" // not used so far
+
+	o, err := readRC(fakeHomeDir)
 	a.Got(err).NoError(t)
 	a.Got(o.Relax).True(t)
+}
+
+func TestHomeDir(t *testing.T) {
+	homeDir, err := homeDir()
+	a.Got(err).NoError(t)
+	a.Got(homeDir).Expect("").NotSame(t)
 }

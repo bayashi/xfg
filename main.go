@@ -22,6 +22,7 @@ type runner struct {
 	err      io.Writer
 	isTTY    bool
 	exitCode int
+	homeDir  string
 }
 
 func main() {
@@ -37,12 +38,21 @@ func main() {
 }
 
 func (cli *runner) run() int {
-	defaultOpt, err := readRC()
+	homeDir, err := homeDir()
+	if err != nil {
+		cli.putErr(fmt.Sprintf("Err: on detecting home directory : %s", err))
+		funcExit(exitErr)
+	}
+	cli.homeDir = homeDir
+
+	defaultOpt, err := readRC(cli.homeDir)
 	if err != nil {
 		cli.putErr(fmt.Sprintf("Err: on reading config : %s", err))
 		funcExit(exitErr)
 	}
+
 	o := cli.parseArgs(defaultOpt)
+
 	if !cli.isTTY {
 		o.NoColor = true // Turn off color
 	}
@@ -58,7 +68,7 @@ func (cli *runner) run() int {
 
 func (cli *runner) xfg(o *options) (int, error) {
 	o.prepareContextLines(cli.isTTY)
-	x := newX(o)
+	x := newX(cli, o)
 
 	if err := x.search(); err != nil {
 		return exitErr, fmt.Errorf("error during Search %w", err)
