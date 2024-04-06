@@ -19,24 +19,24 @@ func TestHighlight(t *testing.T) {
 	}{
 		"service-b": {
 			opt: &options{
-				searchPath: []string{"service-b"},
+				SearchPath: []string{"service-b"},
 			},
 			expect: "testdata/\x1b[96mservice-b\x1b[0m/\n" +
 				"testdata/\x1b[96mservice-b\x1b[0m/main.go\n",
 		},
 		"service-b color green": {
 			opt: &options{
-				searchPath: []string{"service-b"},
-				colorPath:  "green",
+				SearchPath: []string{"service-b"},
+				ColorPath:  "green",
 			},
 			expect: "testdata/\x1b[92mservice-b\x1b[0m/\n" +
 				"testdata/\x1b[92mservice-b\x1b[0m/main.go\n",
 		},
 		"service-b grep": {
 			opt: &options{
-				searchPath: []string{"service-b"},
-				searchGrep: []string{"func"},
-				indent:     defaultIndent,
+				SearchPath: []string{"service-b"},
+				SearchGrep: []string{"func"},
+				Indent:     defaultIndent,
 			},
 			expect: "testdata/\x1b[96mservice-b\x1b[0m/\n" +
 				"testdata/\x1b[96mservice-b\x1b[0m/main.go\n" +
@@ -44,10 +44,10 @@ func TestHighlight(t *testing.T) {
 		},
 		"service-b grep green": {
 			opt: &options{
-				searchPath:   []string{"service-b"},
-				searchGrep:   []string{"func"},
-				indent:       defaultIndent,
-				colorContent: "green",
+				SearchPath:   []string{"service-b"},
+				SearchGrep:   []string{"func"},
+				Indent:       defaultIndent,
+				ColorContent: "green",
 			},
 			expect: "testdata/\x1b[96mservice-b\x1b[0m/\n" +
 				"testdata/\x1b[96mservice-b\x1b[0m/main.go\n" +
@@ -55,16 +55,16 @@ func TestHighlight(t *testing.T) {
 		},
 		"serv ice-b": {
 			opt: &options{
-				searchPath: []string{"ser", "ice-b"},
+				SearchPath: []string{"ser", "ice-b"},
 			},
 			expect: "testdata/\x1b[96mser\x1b[0mv\x1b[96mice-b\x1b[0m/\n" +
 				"testdata/\x1b[96mser\x1b[0mv\x1b[96mice-b\x1b[0m/main.go\n",
 		},
 		"service-b grep multiple keywords": {
 			opt: &options{
-				searchPath: []string{"service-b"},
-				searchGrep: []string{"func", "main"},
-				indent:     defaultIndent,
+				SearchPath: []string{"service-b"},
+				SearchGrep: []string{"func", "main"},
+				Indent:     defaultIndent,
 			},
 			expect: "testdata/\x1b[96mservice-b\x1b[0m/\n" +
 				"testdata/\x1b[96mservice-b\x1b[0m/main.go\n" +
@@ -78,8 +78,8 @@ func TestHighlight(t *testing.T) {
 				isTTY: true,
 			}
 
-			tt.opt.noPager = true
-			tt.opt.searchStart = "./testdata"
+			tt.opt.NoPager = true
+			tt.opt.SearchStart = "./testdata"
 
 			cli.xfg(tt.opt)
 

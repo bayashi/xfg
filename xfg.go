@@ -47,21 +47,21 @@ type xfg struct {
 
 func (x *xfg) setHighlighter() {
 	o := x.options
-	if o.colorPath != "" && colorpalette.Exists(o.colorPath) {
-		x.pathHighlightColor = colorpalette.Get(o.colorPath)
+	if o.ColorPath != "" && colorpalette.Exists(o.ColorPath) {
+		x.pathHighlightColor = colorpalette.Get(o.ColorPath)
 	} else {
 		x.pathHighlightColor = colorpalette.Get("cyan")
 	}
-	for _, sp := range o.searchPath {
+	for _, sp := range o.SearchPath {
 		x.pathHighlighter = append(x.pathHighlighter, x.pathHighlightColor.Sprintf(sp))
 	}
 
-	if o.colorContent != "" && colorpalette.Exists(o.colorContent) {
-		x.grepHighlightColor = colorpalette.Get(o.colorContent)
+	if o.ColorContent != "" && colorpalette.Exists(o.ColorContent) {
+		x.grepHighlightColor = colorpalette.Get(o.ColorContent)
 	} else {
 		x.grepHighlightColor = colorpalette.Get("red")
 	}
-	for _, sg := range o.searchGrep {
+	for _, sg := range o.SearchGrep {
 		x.grepHighlighter = append(x.grepHighlighter, x.grepHighlightColor.Sprintf(sg))
 	}
 }
@@ -77,7 +77,7 @@ func newX(o *options) *xfg {
 }
 
 func (x *xfg) setRe() error {
-	for _, sp := range x.options.searchPath {
+	for _, sp := range x.options.SearchPath {
 		searchPathRe, err := regexp.Compile("(?i)(" + regexp.QuoteMeta(sp) + ")")
 		if err != nil {
 			return err
@@ -85,8 +85,8 @@ func (x *xfg) setRe() error {
 		x.searchPathRe = append(x.searchPathRe, searchPathRe)
 	}
 
-	if len(x.options.searchGrep) > 0 {
-		for _, sg := range x.options.searchGrep {
+	if len(x.options.SearchGrep) > 0 {
+		for _, sg := range x.options.SearchGrep {
 			searchGrepRe, err := regexp.Compile("(?i)(" + regexp.QuoteMeta(sg) + ")")
 			if err != nil {
 				return err
@@ -95,8 +95,8 @@ func (x *xfg) setRe() error {
 		}
 	}
 
-	if len(x.options.ignore) > 0 {
-		for _, i := range x.options.ignore {
+	if len(x.options.Ignore) > 0 {
+		for _, i := range x.options.Ignore {
 			ignoreRe, err := regexp.Compile(`(?i)` + regexp.QuoteMeta(i))
 			if err != nil {
 				return err
@@ -109,19 +109,19 @@ func (x *xfg) setRe() error {
 }
 
 func (x *xfg) preSearch() error {
-	if err := validateStartPath(x.options.searchStart); err != nil {
+	if err := validateStartPath(x.options.SearchStart); err != nil {
 		return err
 	}
 
-	if !x.options.skipGitIgnore {
-		x.gitignore = compileGitIgnore(x.options.searchStart)
+	if !x.options.SkipGitIgnore {
+		x.gitignore = compileGitIgnore(x.options.SearchStart)
 	}
 
-	if !x.options.skipXfgIgnore {
-		x.xfgignore = compileXfgIgnore(x.options.xfgIgnoreFile)
+	if !x.options.SkipXfgIgnore {
+		x.xfgignore = compileXfgIgnore(x.options.XfgIgnoreFile)
 	}
 
-	if x.options.ignoreCase {
+	if x.options.IgnoreCase {
 		if err := x.setRe(); err != nil {
 			return err
 		}
@@ -135,12 +135,12 @@ func (x *xfg) search() error {
 		return fmt.Errorf("error in preSearch: %w", err)
 	}
 
-	walkErr := filepath.Walk(x.options.searchStart, func(fPath string, fInfo os.FileInfo, err error) error {
+	walkErr := filepath.Walk(x.options.SearchStart, func(fPath string, fInfo os.FileInfo, err error) error {
 		if err != nil {
-			return fmt.Errorf("something went wrong within path `%s` at `%s`: %w", x.options.searchStart, fPath, err)
+			return fmt.Errorf("something went wrong within path `%s` at `%s`: %w", x.options.SearchStart, fPath, err)
 		}
 
-		if x.options.quiet {
+		if x.options.Quiet {
 			if x.hasMatchedAny() {
 				return nil // already match. skip after all
 			}
@@ -160,7 +160,7 @@ func (x *xfg) walker(fPath string, fInfo os.FileInfo) error {
 		return nil // skip by --ignore option
 	}
 
-	if !x.options.searchAll {
+	if !x.options.SearchAll {
 		if fInfo.IsDir() && fInfo.Name() == ".git" {
 			return filepath.SkipDir // not search for .git directory
 		}
@@ -176,14 +176,14 @@ func (x *xfg) walker(fPath string, fInfo os.FileInfo) error {
 }
 
 func (x *xfg) isIgnorePath(fPath string) bool {
-	if x.options.ignoreCase {
+	if x.options.IgnoreCase {
 		for _, re := range x.ignoreRe {
 			if isMatchRegexp(fPath, re) {
 				return true // ignore
 			}
 		}
 	} else {
-		for _, i := range x.options.ignore {
+		for _, i := range x.options.Ignore {
 			if isMatch(fPath, i) {
 				return true // ignore
 			}
@@ -194,15 +194,15 @@ func (x *xfg) isIgnorePath(fPath string) bool {
 }
 
 func (x *xfg) canSkip(fPath string, fInfo fs.FileInfo) bool {
-	if !x.options.searchAll {
+	if !x.options.SearchAll {
 		if canSkipStuff(fInfo) {
 			return true // not pick .gitkeep file
-		} else if !x.options.hidden && strings.HasPrefix(fInfo.Name(), ".") {
+		} else if !x.options.Hidden && strings.HasPrefix(fInfo.Name(), ".") {
 			return true // skip dot-file/dir
 		}
 	}
 
-	if !x.options.searchAll {
+	if !x.options.SearchAll {
 		if x.gitignore != nil && x.gitignore.MatchesPath(fPath) {
 			return true // skip a file by .gitignore
 		}
@@ -211,7 +211,7 @@ func (x *xfg) canSkip(fPath string, fInfo fs.FileInfo) bool {
 		}
 	}
 
-	if fInfo.IsDir() && x.options.onlyMatchContent {
+	if fInfo.IsDir() && x.options.OnlyMatchContent {
 		return true // not pick up
 	}
 
@@ -219,14 +219,14 @@ func (x *xfg) canSkip(fPath string, fInfo fs.FileInfo) bool {
 }
 
 func (x *xfg) canSkipPath(fPath string) bool {
-	if x.options.ignoreCase {
+	if x.options.IgnoreCase {
 		for _, spr := range x.searchPathRe {
 			if !isMatchRegexp(fPath, spr) {
 				return true // OK, skip
 			}
 		}
 	} else {
-		for _, sp := range x.options.searchPath {
+		for _, sp := range x.options.SearchPath {
 			if !isMatch(fPath, sp) {
 				return true // OK, skip
 			}
@@ -241,17 +241,17 @@ func (x *xfg) onMatchPath(fPath string, fInfo fs.FileInfo) (err error) {
 		info: fInfo,
 	}
 
-	if len(x.options.searchGrep) > 0 && isRegularFile(fInfo) {
+	if len(x.options.SearchGrep) > 0 && isRegularFile(fInfo) {
 		matchedPath.contents, err = x.checkFile(fPath)
 		if err != nil {
 			return fmt.Errorf("error during grep: %w", err)
 		}
-		if x.options.onlyMatchContent && len(matchedPath.contents) == 0 {
+		if x.options.OnlyMatchContent && len(matchedPath.contents) == 0 {
 			return nil // not pick up
 		}
 	}
 
-	if x.options.abs {
+	if x.options.Abs {
 		absPath, err := filepath.Abs(fPath)
 		if err != nil {
 			return fmt.Errorf("failed to get absolute path from `%s`: %w", fPath, err)
@@ -260,7 +260,7 @@ func (x *xfg) onMatchPath(fPath string, fInfo fs.FileInfo) (err error) {
 	}
 
 	matchedPath.path = fPath
-	if !x.options.noColor {
+	if !x.options.NoColor {
 		matchedPath.path = x.highlightPath(fPath)
 	}
 
@@ -275,12 +275,12 @@ func (x *xfg) onMatchPath(fPath string, fInfo fs.FileInfo) (err error) {
 }
 
 func (x *xfg) highlightPath(fPath string) string {
-	if x.options.ignoreCase {
+	if x.options.IgnoreCase {
 		for _, spr := range x.searchPathRe {
 			fPath = spr.ReplaceAllString(fPath, x.pathHighlightColor.Sprintf("$1"))
 		}
 	} else {
-		for i, sp := range x.options.searchPath {
+		for i, sp := range x.options.SearchPath {
 			fPath = strings.ReplaceAll(fPath, sp, x.pathHighlighter[i])
 		}
 	}
@@ -339,12 +339,12 @@ func (x *xfg) scanFile(scanner *bufio.Scanner, fPath string) ([]line, error) {
 
 		x.processContentLine(gf)
 
-		if x.options.maxMatchCount != 0 && int(x.options.maxMatchCount) <= len(gf.matchedContents) {
+		if x.options.MaxMatchCount != 0 && int(x.options.MaxMatchCount) <= len(gf.matchedContents) {
 			break
 		}
 	}
 
-	if x.options.quiet && len(gf.matchedContents) > 0 {
+	if x.options.Quiet && len(gf.matchedContents) > 0 {
 		x.resultMatchContent = true
 	}
 
@@ -352,7 +352,7 @@ func (x *xfg) scanFile(scanner *bufio.Scanner, fPath string) ([]line, error) {
 }
 
 func (x *xfg) isMatchLine(line string) bool {
-	if x.options.ignoreCase {
+	if x.options.IgnoreCase {
 		for _, sgr := range x.searchGrepRe {
 			if !isMatchRegexp(line, sgr) {
 				return false
@@ -360,7 +360,7 @@ func (x *xfg) isMatchLine(line string) bool {
 		}
 		return true // OK, match all
 	} else {
-		for _, sg := range x.options.searchGrep {
+		for _, sg := range x.options.SearchGrep {
 			if !isMatch(line, sg) {
 				return false
 			}
@@ -370,12 +370,12 @@ func (x *xfg) isMatchLine(line string) bool {
 }
 
 func (x *xfg) highlightLine(gf *scanFile) {
-	if x.options.ignoreCase {
+	if x.options.IgnoreCase {
 		for _, sgr := range x.searchGrepRe {
 			gf.l = sgr.ReplaceAllString(gf.l, x.grepHighlightColor.Sprintf("$1"))
 		}
 	} else {
-		for i, sg := range x.options.searchGrep {
+		for i, sg := range x.options.SearchGrep {
 			gf.l = strings.ReplaceAll(gf.l, sg, x.grepHighlighter[i])
 		}
 	}
@@ -383,7 +383,7 @@ func (x *xfg) highlightLine(gf *scanFile) {
 
 func (x *xfg) processContentLine(gf *scanFile) {
 	if x.isMatchLine(gf.l) {
-		if !x.options.showMatchCount && x.options.withBeforeContextLines {
+		if !x.options.ShowMatchCount && x.options.withBeforeContextLines {
 			for _, bl := range gf.blines {
 				if bl.lc == 0 {
 					continue // skip
@@ -393,20 +393,20 @@ func (x *xfg) processContentLine(gf *scanFile) {
 			gf.blines = make([]line, x.options.actualBeforeContextLines)
 		}
 
-		if x.options.showMatchCount {
+		if x.options.ShowMatchCount {
 			gf.l = ""
-		} else if !x.options.noColor {
+		} else if !x.options.NoColor {
 			x.highlightLine(gf)
 		}
 
 		x.optimizeLine(gf)
 		gf.matchedContents = append(gf.matchedContents, line{lc: gf.lc, content: gf.l, matched: true})
 
-		if !x.options.showMatchCount && x.options.withAfterContextLines {
+		if !x.options.ShowMatchCount && x.options.withAfterContextLines {
 			gf.aline = x.options.actualAfterContextLines // start countdown for `aline`
 		}
 	} else {
-		if !x.options.showMatchCount {
+		if !x.options.ShowMatchCount {
 			if x.options.withAfterContextLines && gf.aline > 0 {
 				gf.aline--
 				x.optimizeLine(gf)
@@ -422,8 +422,8 @@ func (x *xfg) processContentLine(gf *scanFile) {
 }
 
 func (x *xfg) hasMatchedAny() bool {
-	if (len(x.options.searchGrep) == 0 && len(x.result) > 0) ||
-		(len(x.options.searchGrep) > 0 && len(x.result) > 0 && x.resultMatchContent) {
+	if (len(x.options.SearchGrep) == 0 && len(x.result) > 0) ||
+		(len(x.options.SearchGrep) > 0 && len(x.result) > 0 && x.resultMatchContent) {
 		return true // already match
 	}
 
@@ -431,7 +431,7 @@ func (x *xfg) hasMatchedAny() bool {
 }
 
 func (x *xfg) optimizeLine(gf *scanFile) {
-	if x.options.maxColumns > 0 && len(gf.l) > int(x.options.maxColumns) {
-		gf.l = gf.l[:x.options.maxColumns]
+	if x.options.MaxColumns > 0 && len(gf.l) > int(x.options.MaxColumns) {
+		gf.l = gf.l[:x.options.MaxColumns]
 	}
 }

@@ -19,9 +19,9 @@ func TestArgsNoArgs(t *testing.T) {
 	resetFlag()
 	stubExit()
 	os.Args = []string{fakeCmd}
-	o := cli.parseArgs()
+	o := cli.parseArgs(defaultOptions())
 
-	a.Got(o).Expect(defaultOptions()).Same(t)
+	a.Got(o).Expect(expectedDefaultOptions()).Same(t)
 
 	a.Got(stubCalled).True(t)
 	a.Got(stubCode).Expect(exitOK).Same(t)
@@ -41,9 +41,9 @@ func TestArgsHelp(t *testing.T) {
 	resetFlag()
 	stubExit()
 	os.Args = []string{fakeCmd, "--help"}
-	o := cli.parseArgs()
+	o := cli.parseArgs(defaultOptions())
 
-	a.Got(o).Expect(defaultOptions()).Same(t)
+	a.Got(o).Expect(expectedDefaultOptions()).Same(t)
 
 	a.Got(stubCalled).True(t)
 	a.Got(stubCode).Expect(exitOK).Same(t)
@@ -63,9 +63,9 @@ func TestArgsVersion(t *testing.T) {
 	resetFlag()
 	stubExit()
 	os.Args = []string{fakeCmd, "--version"}
-	o := cli.parseArgs()
+	o := cli.parseArgs(defaultOptions())
 
-	a.Got(o).Expect(defaultOptions()).Same(t)
+	a.Got(o).Expect(expectedDefaultOptions()).Same(t)
 
 	a.Got(stubCalled).True(t)
 	a.Got(stubCode).Expect(exitOK).Same(t)
@@ -82,43 +82,43 @@ func TestArgs(t *testing.T) {
 		"only path arg": {
 			args: []string{"foo"},
 			prepareExpect: func(o *options) {
-				o.searchPath = []string{"foo"}
+				o.SearchPath = []string{"foo"}
 			},
 		},
 		"only specific path arg": {
 			args: []string{"--path", "foo"},
 			prepareExpect: func(o *options) {
-				o.searchPath = []string{"foo"}
+				o.SearchPath = []string{"foo"}
 			},
 		},
 		"specific multiple paths": {
 			args: []string{"--path", "foo", "--path", "bar"},
 			prepareExpect: func(o *options) {
-				o.searchPath = []string{"foo", "bar"}
+				o.SearchPath = []string{"foo", "bar"}
 			},
 		},
 		"path and grep arg": {
 			args: []string{"foo", "bar"},
 			prepareExpect: func(o *options) {
-				o.searchPath = []string{"foo"}
-				o.searchGrep = []string{"bar"}
-				o.onlyMatchContent = true
+				o.SearchPath = []string{"foo"}
+				o.SearchGrep = []string{"bar"}
+				o.OnlyMatchContent = true
 			},
 		},
 		"path and specific grep args": {
 			args: []string{"foo", "--grep", "bar"},
 			prepareExpect: func(o *options) {
-				o.searchPath = []string{"foo"}
-				o.searchGrep = []string{"bar"}
-				o.onlyMatchContent = true
+				o.SearchPath = []string{"foo"}
+				o.SearchGrep = []string{"bar"}
+				o.OnlyMatchContent = true
 			},
 		},
 		"path and specific multiple greps": {
 			args: []string{"foo", "--grep", "bar", "--grep", "baz"},
 			prepareExpect: func(o *options) {
-				o.searchPath = []string{"foo"}
-				o.searchGrep = []string{"bar", "baz"}
-				o.onlyMatchContent = true
+				o.SearchPath = []string{"foo"}
+				o.SearchGrep = []string{"bar", "baz"}
+				o.OnlyMatchContent = true
 			},
 		},
 	} {
@@ -127,10 +127,9 @@ func TestArgs(t *testing.T) {
 			stubExit()
 			os.Args = append([]string{fakeCmd}, tt.args...)
 			cli := &runner{}
+			o := cli.parseArgs(defaultOptions())
 
-			o := cli.parseArgs()
-
-			expectOptions := defaultOptions()
+			expectOptions := expectedDefaultOptions()
 			tt.prepareExpect(expectOptions)
 
 			a.Got(o).Expect(expectOptions).Same(t)

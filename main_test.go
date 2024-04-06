@@ -43,7 +43,7 @@ func TestXfg_OK(t *testing.T) {
 	}{
 		"service-b": {
 			opt: &options{
-				searchPath: []string{"service-b"},
+				SearchPath: []string{"service-b"},
 			},
 			expect: here.Doc(`
                 testdata/service-b/
@@ -53,9 +53,9 @@ func TestXfg_OK(t *testing.T) {
 		},
 		"service-b grep": {
 			opt: &options{
-				searchPath: []string{"service-b"},
-				searchGrep: []string{"func"},
-				indent:     defaultIndent,
+				SearchPath: []string{"service-b"},
+				SearchGrep: []string{"func"},
+				Indent:     defaultIndent,
 			},
 			expect: here.Doc(`
                 testdata/service-b/
@@ -66,10 +66,10 @@ func TestXfg_OK(t *testing.T) {
 		},
 		"service grep relax": {
 			opt: &options{
-				searchPath: []string{"main"},
-				searchGrep: []string{"package b"},
-				indent:     defaultIndent,
-				relax:      true,
+				SearchPath: []string{"main"},
+				SearchGrep: []string{"package b"},
+				Indent:     defaultIndent,
+				Relax:      true,
 			},
 			expect: here.Doc(`
                 testdata/service-a/main.go
@@ -83,10 +83,10 @@ func TestXfg_OK(t *testing.T) {
 		},
 		"service-b grep bar with C1": {
 			opt: &options{
-				searchPath:   []string{"service-b"},
-				searchGrep:   []string{"main"},
-				indent:       defaultIndent,
-				contextLines: 1,
+				SearchPath:   []string{"service-b"},
+				SearchGrep:   []string{"main"},
+				Indent:       defaultIndent,
+				ContextLines: 1,
 			},
 			expect: here.Doc(`
 				testdata/service-b/
@@ -99,10 +99,10 @@ func TestXfg_OK(t *testing.T) {
 		},
 		"service-b grep bar with C2": {
 			opt: &options{
-				searchPath:   []string{"service-b"},
-				searchGrep:   []string{"main"},
-				indent:       defaultIndent,
-				contextLines: 2,
+				SearchPath:   []string{"service-b"},
+				SearchGrep:   []string{"main"},
+				Indent:       defaultIndent,
+				ContextLines: 2,
 			},
 			expect: here.Doc(`
 				testdata/service-b/
@@ -117,10 +117,10 @@ func TestXfg_OK(t *testing.T) {
 		},
 		"service-c grep 56 with C2. Match 2 consecutive lines": {
 			opt: &options{
-				searchPath:   []string{"service-c"},
-				searchGrep:   []string{"56"},
-				indent:       defaultIndent,
-				contextLines: 2,
+				SearchPath:   []string{"service-c"},
+				SearchGrep:   []string{"56"},
+				Indent:       defaultIndent,
+				ContextLines: 2,
 			},
 			expect: here.Doc(`
 				testdata/service-c/
@@ -136,10 +136,10 @@ func TestXfg_OK(t *testing.T) {
 		},
 		"service-b grep onlyMatch": {
 			opt: &options{
-				searchPath:       []string{"service-b"},
-				searchGrep:       []string{"func"},
-				indent:           defaultIndent,
-				onlyMatchContent: true,
+				SearchPath:       []string{"service-b"},
+				SearchGrep:       []string{"func"},
+				Indent:           defaultIndent,
+				OnlyMatchContent: true,
 			},
 			expect: here.Doc(`
                 testdata/service-b/main.go
@@ -149,9 +149,9 @@ func TestXfg_OK(t *testing.T) {
 		},
 		"service-b grep foo": {
 			opt: &options{
-				searchPath: []string{"service-a"},
-				searchGrep: []string{"foo"},
-				indent:     defaultIndent,
+				SearchPath: []string{"service-a"},
+				SearchGrep: []string{"foo"},
+				Indent:     defaultIndent,
 			},
 			expect: here.Doc(`
                 testdata/service-a/
@@ -164,9 +164,9 @@ func TestXfg_OK(t *testing.T) {
 		},
 		"service-c grep foo": {
 			opt: &options{
-				searchPath: []string{"service-c"},
-				searchGrep: []string{"foo"},
-				indent:     defaultIndent,
+				SearchPath: []string{"service-c"},
+				SearchGrep: []string{"foo"},
+				Indent:     defaultIndent,
 			},
 			expect: here.Doc(`
                 testdata/service-c/
@@ -178,10 +178,10 @@ func TestXfg_OK(t *testing.T) {
 		},
 		"service-c grep foo noIndent": {
 			opt: &options{
-				searchPath: []string{"service-c"},
-				searchGrep: []string{"foo"},
-				indent:     defaultIndent,
-				noIndent:   true,
+				SearchPath: []string{"service-c"},
+				SearchGrep: []string{"foo"},
+				Indent:     defaultIndent,
+				NoIndent:   true,
 			},
 			expect: here.Doc(`
                 testdata/service-c/
@@ -193,9 +193,9 @@ func TestXfg_OK(t *testing.T) {
 		},
 		"service-b grep custom indent string": {
 			opt: &options{
-				searchPath: []string{"service-b"},
-				searchGrep: []string{"func"},
-				indent:     "	",
+				SearchPath: []string{"service-b"},
+				SearchGrep: []string{"func"},
+				Indent:     "	",
 			},
 			expect: here.Doc(`
                 testdata/service-b/
@@ -206,7 +206,7 @@ func TestXfg_OK(t *testing.T) {
 		},
 		"service-d ignore .gitkeep": {
 			opt: &options{
-				searchPath: []string{"service-d"},
+				SearchPath: []string{"service-d"},
 			},
 			expect: here.Doc(`
                 testdata/service-d/
@@ -215,8 +215,8 @@ func TestXfg_OK(t *testing.T) {
 		},
 		"not pick .gitkeep even with --hidden option": {
 			opt: &options{
-				searchPath: []string{"service-d"},
-				hidden:     true,
+				SearchPath: []string{"service-d"},
+				Hidden:     true,
 			},
 			expect: here.Doc(`
                 testdata/service-d/
@@ -225,8 +225,8 @@ func TestXfg_OK(t *testing.T) {
 		},
 		"not pick dotfile by default": {
 			opt: &options{
-				searchPath: []string{"service-e"},
-				hidden:     false, // default false
+				SearchPath: []string{"service-e"},
+				Hidden:     false, // default false
 			},
 			expect: here.Doc(`
                 testdata/service-e/
@@ -235,8 +235,8 @@ func TestXfg_OK(t *testing.T) {
 		},
 		"pick dotfile with --hidden option": {
 			opt: &options{
-				searchPath: []string{"service-e"},
-				hidden:     true,
+				SearchPath: []string{"service-e"},
+				Hidden:     true,
 			},
 			expect: here.Doc(`
                 testdata/service-e/
@@ -246,7 +246,7 @@ func TestXfg_OK(t *testing.T) {
 		},
 		"not pick up ignorez dir due to .gitignore": {
 			opt: &options{
-				searchPath: []string{"service-f"},
+				SearchPath: []string{"service-f"},
 			},
 			expect: here.Doc(`
                 testdata/service-f/
@@ -255,8 +255,8 @@ func TestXfg_OK(t *testing.T) {
 		},
 		"pick up ignorez dir with --skip-gitignore option": {
 			opt: &options{
-				searchPath:    []string{"service-f"},
-				skipGitIgnore: true,
+				SearchPath:    []string{"service-f"},
+				SkipGitIgnore: true,
 			},
 			expect: here.Doc(`
                 testdata/service-f/
@@ -266,7 +266,7 @@ func TestXfg_OK(t *testing.T) {
 		},
 		"ignore *min.js by default": {
 			opt: &options{
-				searchPath: []string{"service-g"},
+				SearchPath: []string{"service-g"},
 			},
 			expect: here.Doc(`
                 testdata/service-g/
@@ -275,8 +275,8 @@ func TestXfg_OK(t *testing.T) {
 		},
 		"ignore option": {
 			opt: &options{
-				searchPath: []string{"service-a"},
-				ignore:     []string{"a.dat", "b"},
+				SearchPath: []string{"service-a"},
+				Ignore:     []string{"a.dat", "b"},
 			},
 			expect: here.Doc(`
                 testdata/service-a/
@@ -286,9 +286,9 @@ func TestXfg_OK(t *testing.T) {
 		},
 		"ignore anyway even with --hidden option": {
 			opt: &options{
-				searchPath: []string{"service-e"},
-				hidden:     true,
-				ignore:     []string{".config"},
+				SearchPath: []string{"service-e"},
+				Hidden:     true,
+				Ignore:     []string{".config"},
 			},
 			expect: here.Doc(`
                 testdata/service-e/
@@ -297,9 +297,9 @@ func TestXfg_OK(t *testing.T) {
 		},
 		"ignore anyway even with --search-all option": {
 			opt: &options{
-				searchPath: []string{"service-e"},
-				searchAll:  true,
-				ignore:     []string{".config"},
+				SearchPath: []string{"service-e"},
+				SearchAll:  true,
+				Ignore:     []string{".config"},
 			},
 			expect: here.Doc(`
                 testdata/service-e/
@@ -308,8 +308,8 @@ func TestXfg_OK(t *testing.T) {
 		},
 		"pick *min.js with --search-all option": {
 			opt: &options{
-				searchPath: []string{"service-g"},
-				searchAll:  true,
+				SearchPath: []string{"service-g"},
+				SearchAll:  true,
 			},
 			expect: here.Doc(`
                 testdata/service-g/
@@ -319,8 +319,8 @@ func TestXfg_OK(t *testing.T) {
 		},
 		"pick up ignorez dir with --search-all option": {
 			opt: &options{
-				searchPath: []string{"service-f"},
-				searchAll:  true,
+				SearchPath: []string{"service-f"},
+				SearchAll:  true,
 			},
 			expect: here.Doc(`
                 testdata/service-f/
@@ -330,9 +330,9 @@ func TestXfg_OK(t *testing.T) {
 		},
 		"service-h": {
 			opt: &options{
-				searchPath: []string{"service-h"},
-				searchGrep: []string{"h"},
-				indent:     defaultIndent,
+				SearchPath: []string{"service-h"},
+				SearchGrep: []string{"h"},
+				Indent:     defaultIndent,
 			},
 			expect: here.Doc(`
                 testdata/service-h/
@@ -347,10 +347,10 @@ func TestXfg_OK(t *testing.T) {
 		},
 		"service-h with maxMatchCount": {
 			opt: &options{
-				searchPath:    []string{"service-h"},
-				searchGrep:    []string{"h"},
-				indent:        defaultIndent,
-				maxMatchCount: 3,
+				SearchPath:    []string{"service-h"},
+				SearchGrep:    []string{"h"},
+				Indent:        defaultIndent,
+				MaxMatchCount: 3,
 			},
 			expect: here.Doc(`
                 testdata/service-h/
@@ -363,9 +363,9 @@ func TestXfg_OK(t *testing.T) {
 		},
 		"service-h show count": {
 			opt: &options{
-				searchPath:     []string{"service-h"},
-				searchGrep:     []string{"h"},
-				showMatchCount: true,
+				SearchPath:     []string{"service-h"},
+				SearchGrep:     []string{"h"},
+				ShowMatchCount: true,
 			},
 			expect: here.Doc(`
                 testdata/service-h/
@@ -375,11 +375,11 @@ func TestXfg_OK(t *testing.T) {
 		},
 		"service-c with contextLines": {
 			opt: &options{
-				searchPath:     []string{"service-c"},
-				searchGrep:     []string{"func"},
-				groupSeparator: defaultGroupSeparator,
-				indent:         defaultIndent,
-				contextLines:   1,
+				SearchPath:     []string{"service-c"},
+				SearchGrep:     []string{"func"},
+				GroupSeparator: defaultGroupSeparator,
+				Indent:         defaultIndent,
+				ContextLines:   1,
 			},
 			expect: here.Doc(`
                 testdata/service-c/
@@ -396,11 +396,11 @@ func TestXfg_OK(t *testing.T) {
 		},
 		"service-c with contextLines groupSeparator": {
 			opt: &options{
-				searchPath:     []string{"service-c"},
-				searchGrep:     []string{"func"},
-				groupSeparator: "====",
-				indent:         defaultIndent,
-				contextLines:   1,
+				SearchPath:     []string{"service-c"},
+				SearchGrep:     []string{"func"},
+				GroupSeparator: "====",
+				Indent:         defaultIndent,
+				ContextLines:   1,
 			},
 			expect: here.Doc(`
                 testdata/service-c/
@@ -417,10 +417,10 @@ func TestXfg_OK(t *testing.T) {
 		},
 		"service-b ignore case to match": {
 			opt: &options{
-				searchPath: []string{"Service-B"},
-				searchGrep: []string{"FunC"},
-				indent:     defaultIndent,
-				ignoreCase: true,
+				SearchPath: []string{"Service-B"},
+				SearchGrep: []string{"FunC"},
+				Indent:     defaultIndent,
+				IgnoreCase: true,
 			},
 			expect: here.Doc(`
                 testdata/service-b/
@@ -431,11 +431,11 @@ func TestXfg_OK(t *testing.T) {
 		},
 		"service-c with afterContextLines": {
 			opt: &options{
-				searchPath:        []string{"service-c"},
-				searchGrep:        []string{"func"},
-				groupSeparator:    defaultGroupSeparator,
-				indent:            defaultIndent,
-				afterContextLines: 1,
+				SearchPath:        []string{"service-c"},
+				SearchGrep:        []string{"func"},
+				GroupSeparator:    defaultGroupSeparator,
+				Indent:            defaultIndent,
+				AfterContextLines: 1,
 			},
 			expect: here.Doc(`
                 testdata/service-c/
@@ -450,11 +450,11 @@ func TestXfg_OK(t *testing.T) {
 		},
 		"service-c with beforeContextLines": {
 			opt: &options{
-				searchPath:         []string{"service-c"},
-				searchGrep:         []string{"func"},
-				groupSeparator:     defaultGroupSeparator,
-				indent:             defaultIndent,
-				beforeContextLines: 1,
+				SearchPath:         []string{"service-c"},
+				SearchGrep:         []string{"func"},
+				GroupSeparator:     defaultGroupSeparator,
+				Indent:             defaultIndent,
+				BeforeContextLines: 1,
 			},
 			expect: here.Doc(`
                 testdata/service-c/
@@ -469,36 +469,36 @@ func TestXfg_OK(t *testing.T) {
 		},
 		"service-b quiet": {
 			opt: &options{
-				searchPath: []string{"service-b"},
-				quiet:      true,
+				SearchPath: []string{"service-b"},
+				Quiet:      true,
 			},
 			expect:         "",
 			expectExitCode: exitOK,
 		},
 		"service-b quiet no match": {
 			opt: &options{
-				searchPath: []string{noMatchKeyword},
-				quiet:      true,
+				SearchPath: []string{noMatchKeyword},
+				Quiet:      true,
 			},
 			expect:         "",
 			expectExitCode: exitErr,
 		},
 		"service-b quiet no match both search and grep": {
 			opt: &options{
-				searchPath: []string{noMatchKeyword},
-				searchGrep: []string{noMatchKeyword},
-				quiet:      true,
+				SearchPath: []string{noMatchKeyword},
+				SearchGrep: []string{noMatchKeyword},
+				Quiet:      true,
 			},
 			expect:         "",
 			expectExitCode: exitErr,
 		},
 		"service-b grep bar with C1 and max-columns": {
 			opt: &options{
-				searchPath:   []string{"service-b"},
-				searchGrep:   []string{"main"},
-				indent:       defaultIndent,
-				contextLines: 1,
-				maxColumns:   7,
+				SearchPath:   []string{"service-b"},
+				SearchGrep:   []string{"main"},
+				Indent:       defaultIndent,
+				ContextLines: 1,
+				MaxColumns:   7,
 			},
 			expect: here.Doc(`
 				testdata/service-b/
@@ -511,8 +511,8 @@ func TestXfg_OK(t *testing.T) {
 		},
 		"not pick up ignorex dir due to .xfgignore": {
 			opt: &options{
-				searchPath:    []string{"service-i"},
-				xfgIgnoreFile: filepath.Join("testdata", ".xfgignore"),
+				SearchPath:    []string{"service-i"},
+				XfgIgnoreFile: filepath.Join("testdata", ".xfgignore"),
 			},
 			expect: here.Doc(`
                 testdata/service-i/
@@ -521,9 +521,9 @@ func TestXfg_OK(t *testing.T) {
 		},
 		"pick up ignorex dir with --skip-xfgignore option": {
 			opt: &options{
-				searchPath:    []string{"service-i"},
-				xfgIgnoreFile: filepath.Join("testdata", ".xfgignore"),
-				skipXfgIgnore: true,
+				SearchPath:    []string{"service-i"},
+				XfgIgnoreFile: filepath.Join("testdata", ".xfgignore"),
+				SkipXfgIgnore: true,
 			},
 			expect: here.Doc(`
                 testdata/service-i/
@@ -533,9 +533,9 @@ func TestXfg_OK(t *testing.T) {
 		},
 		"pick up ignorex dir with --search-all option": {
 			opt: &options{
-				searchPath:    []string{"service-i"},
-				xfgIgnoreFile: filepath.Join("testdata", ".xfgignore"),
-				searchAll:     true,
+				SearchPath:    []string{"service-i"},
+				XfgIgnoreFile: filepath.Join("testdata", ".xfgignore"),
+				SearchAll:     true,
 			},
 			expect: here.Doc(`
                 testdata/service-i/
@@ -551,9 +551,9 @@ func TestXfg_OK(t *testing.T) {
 				isTTY: true,
 			}
 
-			tt.opt.noPager = true
-			tt.opt.noColor = true
-			tt.opt.searchStart = "./testdata"
+			tt.opt.NoPager = true
+			tt.opt.NoColor = true
+			tt.opt.SearchStart = "./testdata"
 
 			code, err := cli.xfg(tt.opt)
 

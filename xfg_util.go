@@ -1,17 +1,61 @@
 package main
 
 import (
+	"errors"
 	"fmt"
 	"io/fs"
 	"os"
 	"path/filepath"
 	"regexp"
 	"strings"
+	"syscall"
 
+	"github.com/BurntSushi/toml"
 	"github.com/adrg/xdg"
 	ignore "github.com/sabhiram/go-gitignore"
 	"golang.org/x/term"
 )
+
+func defaultOptions() *options {
+	return &options{
+		SearchStart:    ".",
+		Indent:         defaultIndent,
+		GroupSeparator: defaultGroupSeparator,
+		ColorPath:      "cyan",
+		ColorContent:   "red",
+	}
+}
+
+const XFG_RC_ENV_KEY = "XFG_RC_FILE_PATH"
+
+func readRC() (*options, error) {
+	o := defaultOptions()
+
+	if xfgRCFilePath := os.Getenv(XFG_RC_ENV_KEY); xfgRCFilePath != "" {
+		if _, err := toml.DecodeFile(xfgRCFilePath, &o); err != nil {
+			return nil, fmt.Errorf("config path from env `%s` : %w", XFG_RC_ENV_KEY, err)
+		}
+		return o, nil
+	}
+
+	xfgRCFilePath := filepath.Join(xdg.ConfigHome, XFG_RC_FILE)
+	_, err := toml.DecodeFile(xfgRCFilePath, &o)
+	if err == nil {
+		return o, nil
+	} else if !errors.Is(err, syscall.ENOENT) {
+		return nil, fmt.Errorf("%s : %w", xfgRCFilePath, err)
+	}
+
+	if homeDir, err := os.UserHomeDir(); err == nil {
+		xfgRCFilePath := filepath.Join(homeDir, XFG_RC_FILE)
+		_, err := toml.DecodeFile(xfgRCFilePath, &o)
+		if err != nil && !errors.Is(err, syscall.ENOENT) {
+			return nil, fmt.Errorf("%s : %w", xfgRCFilePath, err)
+		}
+	}
+
+	return o, nil
+}
 
 func compileGitIgnore(sPath string) *ignore.GitIgnore {
 	const GIT_IGNOE_FILE_NAME = ".gitignore"
