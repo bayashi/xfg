@@ -69,7 +69,7 @@ func (cli *runner) outputForTTY(x *xfg) error {
 func (cli *runner) buildContentOutput(x *xfg, out *string, contents []line) error {
 	var blc int32 = 0
 	for _, line := range contents {
-		if x.needToShowGroupSeparator(blc, line.lc) {
+		if !x.options.NoGroupSeparator && x.needToShowGroupSeparator(blc, line.lc) {
 			*out = *out + x.options.Indent + x.options.GroupSeparator + "\n"
 		}
 		lc := fmt.Sprintf("%d", line.lc)

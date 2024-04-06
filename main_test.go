@@ -543,6 +543,27 @@ func TestXfg_OK(t *testing.T) {
 			`),
 			expectExitCode: exitOK,
 		},
+		"service-c with contextLines, but no-group-separator": {
+			opt: &options{
+				SearchPath:     []string{"service-c"},
+				SearchGrep:     []string{"func"},
+				GroupSeparator: defaultGroupSeparator,
+				Indent:         defaultIndent,
+				ContextLines:   1,
+				NoGroupSeparator: true,
+			},
+			expect: here.Doc(`
+                testdata/service-c/
+                testdata/service-c/main.go
+                 2: 
+                 3: func main() {
+                 4: 	baz := 56
+                 9: 
+                 10: func foo() {
+                 11: 	println("Result")
+			`),
+			expectExitCode: exitOK,
+		},
 	} {
 		t.Run(tname, func(t *testing.T) {
 			var o bytes.Buffer
