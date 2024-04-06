@@ -10,11 +10,6 @@ import (
 )
 
 const (
-	exitOK  int = 0
-	exitErr int = 1
-)
-
-const (
 	cmdName string = "xfg"
 
 	XFG_RC_FILE string = ".xfgrc"
