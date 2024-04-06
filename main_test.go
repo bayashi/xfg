@@ -545,11 +545,11 @@ func TestXfg_OK(t *testing.T) {
 		},
 		"service-c with contextLines, but no-group-separator": {
 			opt: &options{
-				SearchPath:     []string{"service-c"},
-				SearchGrep:     []string{"func"},
-				GroupSeparator: defaultGroupSeparator,
-				Indent:         defaultIndent,
-				ContextLines:   1,
+				SearchPath:       []string{"service-c"},
+				SearchGrep:       []string{"func"},
+				GroupSeparator:   defaultGroupSeparator,
+				Indent:           defaultIndent,
+				ContextLines:     1,
 				NoGroupSeparator: true,
 			},
 			expect: here.Doc(`
