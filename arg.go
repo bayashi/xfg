@@ -102,7 +102,7 @@ func (cli *runner) parseArgs(d *options) *options {
 
 	flag.BoolVarP(&o.NoColor, "no-color", "", d.NoColor, "Disable colors for an output")
 	flag.BoolVarP(&o.Relax, "relax", "", d.Relax, "Insert blank space between contents for relaxing view")
-	flag.BoolVarP(&o.Abs, "Abs", "", d.Abs, "Show absolute paths")
+	flag.BoolVarP(&o.Abs, "abs", "", d.Abs, "Show absolute paths")
 	flag.BoolVarP(&o.ShowMatchCount, "count", "c", d.ShowMatchCount, "Show a count of matching lines instead of contents")
 	flag.BoolVarP(&o.OnlyMatchContent, "only-match", "o", d.OnlyMatchContent, "Show paths only matched contents")
 	flag.BoolVarP(&o.NoGroupSeparator, "no-group-separator", "", d.NoGroupSeparator, "Do not print a separator between groups of lines")
