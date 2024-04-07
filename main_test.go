@@ -64,6 +64,18 @@ func TestXfg_OK(t *testing.T) {
 			`),
 			expectExitCode: exitOK,
 		},
+		"grep `package b`": {
+			opt: &options{
+				SearchGrep:       []string{"package b"},
+				Indent:           defaultIndent,
+				OnlyMatchContent: true,
+			},
+			expect: here.Doc(`
+                testdata/service-b/main.go
+                 1: package b
+			`),
+			expectExitCode: exitOK,
+		},
 		"service grep relax": {
 			opt: &options{
 				SearchPath: []string{"main"},

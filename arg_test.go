@@ -93,6 +93,13 @@ func TestArgs(t *testing.T) {
 				o.SearchPath = []string{"foo"}
 			},
 		},
+		"only specific grep arg": {
+			args: []string{"--grep", "foo"},
+			prepareExpect: func(o *options) {
+				o.SearchGrep = []string{"foo"}
+				o.OnlyMatchContent = true
+			},
+		},
 		"specific multiple paths": {
 			args: []string{"--path", "foo", "--path", "bar"},
 			prepareExpect: func(o *options) {

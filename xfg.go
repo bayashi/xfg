@@ -117,6 +117,8 @@ func (x *xfg) preSearch() error {
 		return err
 	}
 
+	x.options.SearchStart = filepath.Clean(x.options.SearchStart)
+
 	if !x.options.SkipGitIgnore {
 		x.gitignore = prepareGitIgnore(x.cli.homeDir, x.options.SearchStart)
 	}
