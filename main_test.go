@@ -68,7 +68,7 @@ func TestXfg_OK(t *testing.T) {
 			opt: &options{
 				SearchGrep:       []string{"package b"},
 				Indent:           defaultIndent,
-				OnlyMatchContent: true,
+				onlyMatchContent: true,
 			},
 			expect: here.Doc(`
                 testdata/service-b/main.go
@@ -151,7 +151,7 @@ func TestXfg_OK(t *testing.T) {
 				SearchPath:       []string{"service-a"},
 				SearchGrep:       []string{"foo"},
 				Indent:           defaultIndent,
-				OnlyMatchContent: true,
+				onlyMatchContent: true,
 			},
 			expect: here.Doc(`
                 testdata/service-a/main.go
