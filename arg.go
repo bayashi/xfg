@@ -14,7 +14,7 @@ const (
 
 	XFG_RC_FILE string = ".xfgrc"
 
-	errNeedToSetPath string = "Err: You should specify a directory path `--path`"
+	errNeedToSetPathOrGrep string = "Err: required a directory path `-p`, `--path` or grep keyword `-g`, `--grep`"
 
 	defaultGroupSeparator string = "--"
 	defaultIndent         string = " "
@@ -126,11 +126,13 @@ func (cli *runner) parseArgs(d *options) *options {
 	} else if flagVersion {
 		cli.putErr(versionDetails())
 		funcExit(exitOK)
-	} else if len(o.SearchPath) == 0 && len(flag.Args()) == 0 {
-		cli.putHelp(errNeedToSetPath)
 	}
 
 	o.targetPathFromArgs()
+
+	if len(o.SearchPath) == 0 && len(o.SearchGrep) == 0 {
+		cli.putHelp(errNeedToSetPathOrGrep)
+	}
 
 	if len(o.SearchGrep) > 0 {
 		o.OnlyMatchContent = true
