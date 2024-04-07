@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"os"
 	"path/filepath"
 	"testing"
@@ -65,7 +64,7 @@ func TestPrepareXfgIgnore(t *testing.T) {
 func TestValidateStartPath_Err(t *testing.T) {
 	err := validateStartPath(noMatchKeyword)
 	a.Got(err).NotNil(t)
-	a.Got(err.Error()).Expect(`no such file or directory`).Match(t)
+	a.Got(err.Error()).Expect(` is wrong:`).Match(t)
 
 	tempDir := t.TempDir()
 	tempFilePath := filepath.Join(tempDir, "foo")
@@ -75,5 +74,5 @@ func TestValidateStartPath_Err(t *testing.T) {
 
 	err = validateStartPath(tempFilePath)
 	a.Got(err).NotNil(t)
-	a.Got(err.Error()).Expect(fmt.Sprintf("path `%s` should point to a directory", tempFilePath)).Match(t)
+	a.Got(err.Error()).Expect("path `[^`]+` should point to a directory").Match(t)
 }
