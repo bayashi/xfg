@@ -641,6 +641,11 @@ func TestNonTTY(t *testing.T) {
 			`),
 			expectExitCode: exitOK,
 		},
+		"service-b func --files-with-matches --null": {
+			args:           []string{"service-b", "func", "--files-with-matches", "--null"},
+			expect:         "testdata/service-b/main.go\x00",
+			expectExitCode: exitOK,
+		},
 	} {
 		t.Run(tname, func(t *testing.T) {
 			resetFlag()

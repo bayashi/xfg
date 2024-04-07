@@ -53,6 +53,7 @@ type options struct {
 	NoPager          bool `toml:"no-pager"`
 	Quiet            bool `toml:"quiet"`
 	FilesWithMatches bool `toml:"files-with-matches"`
+	Null             bool `toml:"null"`
 
 	ContextLines uint32 `toml:"context"`
 
@@ -100,6 +101,7 @@ func (cli *runner) parseArgs(d *options) *options {
 	flag.Uint32VarP(&o.MaxMatchCount, "max-count", "m", d.MaxMatchCount, "Stop reading a file after NUM matching lines")
 	flag.Uint32VarP(&o.MaxColumns, "max-columns", "", d.MaxColumns, "Do not print lines longer than this limit")
 	flag.BoolVarP(&o.FilesWithMatches, "files-with-matches", "l", d.FilesWithMatches, "Only print the names of matching files")
+	flag.BoolVarP(&o.Null, "null", "0", d.Null, "Separate the filenames with \\0, rather than \\n")
 
 	flag.BoolVarP(&o.NoColor, "no-color", "", d.NoColor, "Disable colors for an output")
 	flag.StringVarP(&o.ColorPath, "color-path", "", d.ColorPath, "Color name to highlight keywords in a path")
