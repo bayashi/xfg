@@ -213,7 +213,7 @@ func (x *xfg) canSkip(fPath string, fInfo fs.FileInfo) bool {
 		}
 	}
 
-	if fInfo.IsDir() && x.options.OnlyMatchContent {
+	if fInfo.IsDir() && x.options.onlyMatchContent {
 		return true // not pick up
 	}
 
@@ -250,7 +250,7 @@ func (x *xfg) onMatchPath(fPath string, fInfo fs.FileInfo) (err error) {
 		}
 	}
 
-	if x.options.OnlyMatchContent && len(matchedPath.contents) == 0 {
+	if x.options.onlyMatchContent && len(matchedPath.contents) == 0 {
 		return nil // not pick up
 	}
 

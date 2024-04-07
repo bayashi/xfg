@@ -43,7 +43,7 @@ func expectedDefaultOptions() options {
 		NoColor:          false,
 		Abs:              false,
 		ShowMatchCount:   false,
-		OnlyMatchContent: false,
+		onlyMatchContent: false,
 		NoGroupSeparator: false,
 		NoIndent:         false,
 		Hidden:           false,

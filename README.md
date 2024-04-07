@@ -88,7 +88,6 @@ service-b/main.go
   -g, --grep stringArray         A string to search for contents
   -s, --start string             A location to start searching (default ".")
   -i, --ignore-case              Ignore case distinctions to search. Also affects keywords of ignore option
-  -o, --only-match               Show paths only matched contents
   -C, --context uint32           Show several lines before and after the matched one
   -A, --after-context uint32     Show several lines after the matched one. Override context option
   -B, --before-context uint32    Show several lines before the matched one. Override context option
@@ -102,6 +101,8 @@ service-b/main.go
   -c, --count                    Show a count of matching lines instead of contents
   -m, --max-count uint32         Stop reading a file after NUM matching lines
       --max-columns uint32       Do not print lines longer than this limit
+  -l, --files-with-matches       Only print the names of matching files
+  -0, --null                     Separate the filenames with \0, rather than \n
       --no-color                 Disable colors for an output
       --color-path string        Color name to highlight keywords in a path (default "cyan")
       --color-content string     Color name to highlight keywords in a content line (default "red")

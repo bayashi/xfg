@@ -43,7 +43,6 @@ type options struct {
 	NoColor          bool `toml:"no-color"`
 	Abs              bool `toml:"abs"`
 	ShowMatchCount   bool `toml:"count"`
-	OnlyMatchContent bool `toml:"only-match"`
 	NoGroupSeparator bool `toml:"no-group-separator"`
 	NoIndent         bool `toml:"no-indent"`
 	Hidden           bool `toml:"hidden"`
@@ -68,6 +67,8 @@ type options struct {
 	actualBeforeContextLines uint32
 	withAfterContextLines    bool
 	withBeforeContextLines   bool
+
+	onlyMatchContent bool
 }
 
 func (cli *runner) parseArgs(d *options) *options {
@@ -83,7 +84,6 @@ func (cli *runner) parseArgs(d *options) *options {
 	flag.StringVarP(&o.SearchStart, "start", "s", d.SearchStart, "A location to start searching")
 
 	flag.BoolVarP(&o.IgnoreCase, "ignore-case", "i", d.IgnoreCase, "Ignore case distinctions to search. Also affects keywords of ignore option")
-	flag.BoolVarP(&o.OnlyMatchContent, "only-match", "o", d.OnlyMatchContent, "Show paths only matched contents")
 
 	flag.Uint32VarP(&o.ContextLines, "context", "C", d.ContextLines, "Show several lines before and after the matched one")
 	flag.Uint32VarP(&o.AfterContextLines, "after-context", "A", d.AfterContextLines, "Show several lines after the matched one. Override context option")
@@ -139,7 +139,7 @@ func (cli *runner) parseArgs(d *options) *options {
 	}
 
 	if len(o.SearchGrep) > 0 {
-		o.OnlyMatchContent = true
+		o.onlyMatchContent = true
 	}
 
 	return o
