@@ -68,12 +68,12 @@ func (cli *runner) xfg(o *options) (int, error) {
 		return exitErr, fmt.Errorf("error during Search %w", err)
 	}
 
-	closer, err := cli.pager(o.NoPager, x.resultLines)
+	pagerCloser, err := cli.pager(o.NoPager, x.resultLines)
 	if err != nil {
 		return exitErr, fmt.Errorf("pgaer is wrong: %w", err)
 	}
-	if closer != nil {
-		defer closer()
+	if pagerCloser != nil {
+		defer pagerCloser()
 	}
 
 	if err := cli.showResult(x); err != nil {
