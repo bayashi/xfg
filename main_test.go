@@ -576,6 +576,27 @@ func TestXfg_OK(t *testing.T) {
 			`),
 			expectExitCode: exitOK,
 		},
+		"service-b --files-with-matches": {
+			opt: &options{
+				SearchPath:       []string{"service-b"},
+				FilesWithMatches: true,
+			},
+			expect: here.Doc(`
+                testdata/service-b/main.go
+			`),
+			expectExitCode: exitOK,
+		},
+		"service grep bar --files-with-matches": {
+			opt: &options{
+				SearchPath:       []string{"service-b"},
+				SearchGrep:       []string{"bar"},
+				FilesWithMatches: true,
+			},
+			expect: here.Doc(`
+                testdata/service-b/main.go
+			`),
+			expectExitCode: exitOK,
+		},
 	} {
 		t.Run(tname, func(t *testing.T) {
 			var o bytes.Buffer
@@ -599,24 +620,50 @@ func TestXfg_OK(t *testing.T) {
 	}
 }
 
+// no color, no pager
 func TestNonTTY(t *testing.T) {
-	resetFlag()
-	stubExit()
-	os.Args = []string{fakeCmd, "service-b", "func", "-s", "./testdata"}
-	var o bytes.Buffer
-	cli := &runner{
-		out:   &o,
-		isTTY: false,
+	for tname, tt := range map[string]struct {
+		args           []string
+		expect         string
+		expectExitCode int
+	}{
+		"service-b func": {
+			args: []string{"service-b", "func"},
+			expect: here.Doc(`
+			    testdata/service-b/main.go:3:func main() {
+			`),
+			expectExitCode: exitOK,
+		},
+		"service-b func --files-with-matches": {
+			args: []string{"service-b", "func", "--files-with-matches"},
+			expect: here.Doc(`
+			    testdata/service-b/main.go
+			`),
+			expectExitCode: exitOK,
+		},
+		"service-b func --files-with-matches --null": {
+			args:           []string{"service-b", "func", "--files-with-matches", "--null"},
+			expect:         "testdata/service-b/main.go\x00",
+			expectExitCode: exitOK,
+		},
+	} {
+		t.Run(tname, func(t *testing.T) {
+			resetFlag()
+			stubExit()
+			os.Args = append([]string{fakeCmd, "-s", "./testdata"}, tt.args...)
+			var o bytes.Buffer
+			cli := &runner{
+				out:   &o,
+				isTTY: false,
+			}
+
+			exitCode, msg := cli.run()
+			a.Got(msg).Expect("").Same(t)
+			a.Got(exitCode).Expect(exitOK).Same(t)
+
+			actualExpect := windowsBK(tt.expect)
+
+			a.Got(o.String()).Expect(actualExpect).X().Same(t)
+		})
 	}
-
-	cli.run()
-
-	// no color, no pager
-	expect := here.Doc(`
-	    testdata/service-b/main.go:3:func main() {
-	`)
-
-	expect = windowsBK(expect)
-
-	a.Got(o.String()).Expect(expect).X().Same(t)
 }
