@@ -68,6 +68,8 @@ func (x *xfg) setHighlighter() {
 }
 
 func newX(cli *runner, o *options) *xfg {
+	o.prepareContextLines(cli.isTTY)
+
 	x := &xfg{
 		cli:     cli,
 		options: o,

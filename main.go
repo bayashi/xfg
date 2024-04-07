@@ -49,7 +49,6 @@ func (cli *runner) run() (int, string) {
 	}
 
 	o := cli.parseArgs(defaultOpt)
-
 	if !cli.isTTY {
 		o.NoColor = true // Turn off color
 	}
@@ -63,7 +62,6 @@ func (cli *runner) run() (int, string) {
 }
 
 func (cli *runner) xfg(o *options) (int, error) {
-	o.prepareContextLines(cli.isTTY)
 	x := newX(cli, o)
 
 	if err := x.search(); err != nil {
