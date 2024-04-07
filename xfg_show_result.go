@@ -44,13 +44,16 @@ func (cli *runner) showResult(x *xfg) error {
 func (cli *runner) outputForTTY(x *xfg) error {
 	writer := bufio.NewWriter(cli.out)
 	for _, p := range x.result {
+		if x.options.FilesWithMatches && p.info.IsDir() {
+			continue
+		}
 		out := p.path
 		if x.options.ShowMatchCount && !p.info.IsDir() {
 			out = out + fmt.Sprintf(":%d", len(p.contents))
 		}
 		out = out + "\n"
 
-		if !x.options.ShowMatchCount {
+		if !x.options.ShowMatchCount && !x.options.FilesWithMatches {
 			if len(p.contents) > 0 {
 				cli.buildContentOutput(x, &out, p.contents)
 			}
@@ -91,13 +94,15 @@ func (cli *runner) outputForNonTTY(x *xfg) error {
 	writer := bufio.NewWriter(cli.out)
 	for _, p := range x.result {
 		out := ""
-		if p.info.IsDir() {
-			out = fmt.Sprintf("%s\n", p.path)
-		} else {
+		if len(p.contents) > 0 && !x.options.FilesWithMatches {
 			for _, l := range p.contents {
 				if l.matched {
 					out = out + fmt.Sprintf("%s:%d:%s\n", p.path, l.lc, l.content)
 				}
+			}
+		} else {
+			if !x.options.FilesWithMatches || !p.info.IsDir() {
+				out = out + fmt.Sprintf("%s\n", p.path)
 			}
 		}
 
