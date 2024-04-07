@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"os"
 	"path/filepath"
 	"testing"
@@ -8,11 +9,23 @@ import (
 	a "github.com/bayashi/actually"
 )
 
+func TestIsTTY(t *testing.T) {
+	// testing envs are non-TTY, comomnly. Local and Github Actions are non-TTY.
+	a.Got(isTTY()).False(t)
+}
+
+func TestHomeDir(t *testing.T) {
+	homeDir, err := homeDir()
+	a.Got(err).NoError(t)
+	a.Got(homeDir).Expect("").NotSame(t)
+}
+
 func TestReadRC(t *testing.T) {
 	rcFilePath := filepath.Join(t.TempDir(), "test.toml")
 	f, _ := os.Create(rcFilePath)
-	defer f.Close()
 	_, err := f.WriteString("relax = true")
+	f.Close()
+
 	a.Got(err).NoError(t)
 	t.Setenv(XFG_RC_ENV_KEY, rcFilePath)
 
@@ -23,8 +36,44 @@ func TestReadRC(t *testing.T) {
 	a.Got(o.Relax).True(t)
 }
 
-func TestHomeDir(t *testing.T) {
-	homeDir, err := homeDir()
+func TestPrepareGitIgnore(t *testing.T) {
+	tempDir := t.TempDir()
+	gitignoreFilePath := filepath.Join(tempDir, ".gitignore")
+	f, _ := os.Create(gitignoreFilePath)
+	f.WriteString("ignorez")
+	f.Close()
+
+	gitignore := prepareGitIgnore("", tempDir)
+
+	a.Got(gitignore.MatchesPath("ignorez")).True(t)
+}
+
+func TestPrepareXfgIgnore(t *testing.T) {
+	tempDir := t.TempDir()
+	xfgignoreFilePath := filepath.Join(tempDir, ".xfgignore")
+	f, err := os.Create(xfgignoreFilePath)
 	a.Got(err).NoError(t)
-	a.Got(homeDir).Expect("").NotSame(t)
+	f.WriteString("ignorex")
+	f.Close()
+
+	xfgignore := prepareXfgIgnore("", xfgignoreFilePath)
+	a.Got(xfgignore).NotNil(t)
+
+	a.Got(xfgignore.MatchesPath("ignorex")).True(t)
+}
+
+func TestValidateStartPath_Err(t *testing.T) {
+	err := validateStartPath(noMatchKeyword)
+	a.Got(err).NotNil(t)
+	a.Got(err.Error()).Expect(`no such file or directory`).Match(t)
+
+	tempDir := t.TempDir()
+	tempFilePath := filepath.Join(tempDir, "foo")
+	f, _ := os.Create(tempFilePath)
+	f.WriteString("123")
+	f.Close()
+
+	err = validateStartPath(tempFilePath)
+	a.Got(err).NotNil(t)
+	a.Got(err.Error()).Expect(fmt.Sprintf("path `%s` should point to a directory", tempFilePath)).Match(t)
 }

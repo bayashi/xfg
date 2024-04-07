@@ -82,16 +82,18 @@ func prepareGitIgnore(homeDir string, sPath string) *ignore.GitIgnore {
 	return gitignore
 }
 
-func prepareXfgIgnore(homeDir string, xfgFilePath string) *ignore.GitIgnore {
-	xfgignore, _ := ignore.CompileIgnoreFile(xfgFilePath)
-	if xfgignore != nil {
-		return xfgignore
+func prepareXfgIgnore(homeDir string, xfgignoreFilePath string) *ignore.GitIgnore {
+	if xfgignoreFilePath != "" {
+		xfgignore, _ := ignore.CompileIgnoreFile(xfgignoreFilePath)
+		if xfgignore != nil {
+			return xfgignore
+		}
 	}
 
 	const XFG_IGNOE_FILE_NAME = ".xfgignore"
 	// read .xfgignore file in XDG Base directory or home directory
 	// There would be no .xfgignore file, then `xfgignore` variable will be `nil`.
-	xfgignore, _ = ignore.CompileIgnoreFile(filepath.Join(xdg.ConfigHome, XFG_IGNOE_FILE_NAME))
+	xfgignore, _ := ignore.CompileIgnoreFile(filepath.Join(xdg.ConfigHome, XFG_IGNOE_FILE_NAME))
 	if xfgignore == nil {
 		xfgignore, _ = ignore.CompileIgnoreFile(filepath.Join(homeDir, XFG_IGNOE_FILE_NAME))
 	}
