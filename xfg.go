@@ -27,6 +27,7 @@ type path struct {
 }
 
 type xfg struct {
+	cli     *runner
 	options *options
 
 	pathHighlightColor *color.Color
@@ -66,8 +67,11 @@ func (x *xfg) setHighlighter() {
 	}
 }
 
-func newX(o *options) *xfg {
+func newX(cli *runner, o *options) *xfg {
+	o.prepareContextLines(cli.isTTY)
+
 	x := &xfg{
+		cli:     cli,
 		options: o,
 	}
 
@@ -76,7 +80,7 @@ func newX(o *options) *xfg {
 	return x
 }
 
-func (x *xfg) setRe() error {
+func (x *xfg) prepareRe() error {
 	for _, sp := range x.options.SearchPath {
 		searchPathRe, err := regexp.Compile("(?i)(" + regexp.QuoteMeta(sp) + ")")
 		if err != nil {
@@ -114,15 +118,15 @@ func (x *xfg) preSearch() error {
 	}
 
 	if !x.options.SkipGitIgnore {
-		x.gitignore = compileGitIgnore(x.options.SearchStart)
+		x.gitignore = prepareGitIgnore(x.cli.homeDir, x.options.SearchStart)
 	}
 
 	if !x.options.SkipXfgIgnore {
-		x.xfgignore = compileXfgIgnore(x.options.XfgIgnoreFile)
+		x.xfgignore = prepareXfgIgnore(x.cli.homeDir, x.options.XfgIgnoreFile)
 	}
 
 	if x.options.IgnoreCase {
-		if err := x.setRe(); err != nil {
+		if err := x.prepareRe(); err != nil {
 			return err
 		}
 	}
@@ -140,10 +144,8 @@ func (x *xfg) search() error {
 			return fmt.Errorf("something went wrong within path `%s` at `%s`: %w", x.options.SearchStart, fPath, err)
 		}
 
-		if x.options.Quiet {
-			if x.hasMatchedAny() {
-				return nil // already match. skip after all
-			}
+		if x.options.Quiet && x.hasMatchedAny() {
+			return nil // already match. skip after all
 		}
 
 		return x.walker(fPath, fInfo)
@@ -160,10 +162,8 @@ func (x *xfg) walker(fPath string, fInfo os.FileInfo) error {
 		return nil // skip by --ignore option
 	}
 
-	if !x.options.SearchAll {
-		if fInfo.IsDir() && fInfo.Name() == ".git" {
-			return filepath.SkipDir // not search for .git directory
-		}
+	if !x.options.SearchAll && (fInfo.IsDir() && fInfo.Name() == ".git") {
+		return filepath.SkipDir // not search for .git directory
 	}
 
 	if x.canSkip(fPath, fInfo) {
@@ -359,15 +359,15 @@ func (x *xfg) isMatchLine(line string) bool {
 				return false
 			}
 		}
-		return true // OK, match all
 	} else {
 		for _, sg := range x.options.SearchGrep {
 			if !isMatch(line, sg) {
 				return false
 			}
 		}
-		return true // OK, match all
 	}
+
+	return true // OK, match all
 }
 
 func (x *xfg) highlightLine(gf *scanFile) {

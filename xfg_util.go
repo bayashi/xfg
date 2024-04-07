@@ -12,6 +12,7 @@ import (
 
 	"github.com/BurntSushi/toml"
 	"github.com/adrg/xdg"
+	"github.com/mattn/go-isatty"
 	ignore "github.com/sabhiram/go-gitignore"
 	"golang.org/x/term"
 )
@@ -26,9 +27,23 @@ func defaultOptions() *options {
 	}
 }
 
+func isTTY() bool {
+	fd := os.Stdout.Fd()
+	return isatty.IsTerminal(fd) || isatty.IsCygwinTerminal(fd)
+}
+
+func homeDir() (string, error) {
+	homeDir, err := os.UserHomeDir()
+	if err != nil {
+		return "", err
+	}
+
+	return homeDir, nil
+}
+
 const XFG_RC_ENV_KEY = "XFG_RC_FILE_PATH"
 
-func readRC() (*options, error) {
+func readRC(homeDir string) (*options, error) {
 	o := defaultOptions()
 
 	if xfgRCFilePath := os.Getenv(XFG_RC_ENV_KEY); xfgRCFilePath != "" {
@@ -46,32 +61,28 @@ func readRC() (*options, error) {
 		return nil, fmt.Errorf("%s : %w", xfgRCFilePath, err)
 	}
 
-	if homeDir, err := os.UserHomeDir(); err == nil {
-		xfgRCFilePath := filepath.Join(homeDir, XFG_RC_FILE)
-		_, err := toml.DecodeFile(xfgRCFilePath, &o)
-		if err != nil && !errors.Is(err, syscall.ENOENT) {
-			return nil, fmt.Errorf("%s : %w", xfgRCFilePath, err)
-		}
+	xfgRCFilePath = filepath.Join(homeDir, XFG_RC_FILE)
+	_, err = toml.DecodeFile(xfgRCFilePath, &o)
+	if err != nil && !errors.Is(err, syscall.ENOENT) {
+		return nil, fmt.Errorf("%s : %w", xfgRCFilePath, err)
 	}
 
 	return o, nil
 }
 
-func compileGitIgnore(sPath string) *ignore.GitIgnore {
+func prepareGitIgnore(homeDir string, sPath string) *ignore.GitIgnore {
 	const GIT_IGNOE_FILE_NAME = ".gitignore"
 	// read .gitignore file in start directory to search or home directory
 	// There would be no .gitignore file, then `gitignore` variable will be `nil`.
 	gitignore, _ := ignore.CompileIgnoreFile(filepath.Join(sPath, GIT_IGNOE_FILE_NAME))
 	if gitignore == nil {
-		if homeDir, err := os.UserHomeDir(); err == nil {
-			gitignore, _ = ignore.CompileIgnoreFile(filepath.Join(homeDir, GIT_IGNOE_FILE_NAME))
-		}
+		gitignore, _ = ignore.CompileIgnoreFile(filepath.Join(homeDir, GIT_IGNOE_FILE_NAME))
 	}
 
 	return gitignore
 }
 
-func compileXfgIgnore(xfgFilePath string) *ignore.GitIgnore {
+func prepareXfgIgnore(homeDir string, xfgFilePath string) *ignore.GitIgnore {
 	xfgignore, _ := ignore.CompileIgnoreFile(xfgFilePath)
 	if xfgignore != nil {
 		return xfgignore
@@ -82,9 +93,7 @@ func compileXfgIgnore(xfgFilePath string) *ignore.GitIgnore {
 	// There would be no .xfgignore file, then `xfgignore` variable will be `nil`.
 	xfgignore, _ = ignore.CompileIgnoreFile(filepath.Join(xdg.ConfigHome, XFG_IGNOE_FILE_NAME))
 	if xfgignore == nil {
-		if homeDir, err := os.UserHomeDir(); err == nil {
-			xfgignore, _ = ignore.CompileIgnoreFile(filepath.Join(homeDir, XFG_IGNOE_FILE_NAME))
-		}
+		xfgignore, _ = ignore.CompileIgnoreFile(filepath.Join(homeDir, XFG_IGNOE_FILE_NAME))
 	}
 
 	return xfgignore
