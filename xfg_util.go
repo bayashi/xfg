@@ -117,8 +117,13 @@ func isBinaryFile(fh *os.File) (bool, error) {
 	return false, nil
 }
 
-func isRegularFile(fInfo os.FileInfo) bool {
-	return fInfo.Size() > 0 && fInfo.Mode().Type() == 0
+func isRegularFile(fInfo fs.DirEntry) bool {
+	if fInfo.Type() != 0 {
+		return false
+	}
+
+	fi, err := fInfo.Info()
+	return err == nil && fi.Size() > 0
 }
 
 func validateStartPath(startPath string) error {
@@ -159,6 +164,6 @@ func getTermWindowRows(fd int) (int, error) {
 	return rows, nil
 }
 
-func canSkipStuff(fInfo fs.FileInfo) bool {
+func canSkipStuff(fInfo fs.DirEntry) bool {
 	return !fInfo.IsDir() && (fInfo.Name() == ".gitkeep" || strings.HasSuffix(fInfo.Name(), ".min.js"))
 }
