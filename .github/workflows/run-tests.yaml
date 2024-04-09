@@ -9,6 +9,7 @@ on:
     paths-ignore:
       - '**/*.md'
       - '**/.gitignore'
+  pull_request:
 
 jobs:
   test-linux:
