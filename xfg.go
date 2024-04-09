@@ -172,7 +172,7 @@ func (x *xfg) walker(fPath string, fInfo fs.DirEntry) error {
 		return nil // skip
 	}
 
-	x.onMatchPath(fPath, fInfo)
+	x.postMatchPath(fPath, fInfo)
 
 	return nil
 }
@@ -238,13 +238,13 @@ func (x *xfg) canSkipPath(fPath string) bool {
 	return false // match all, cannot skip
 }
 
-func (x *xfg) onMatchPath(fPath string, fInfo fs.DirEntry) (err error) {
+func (x *xfg) postMatchPath(fPath string, fInfo fs.DirEntry) (err error) {
 	matchedPath := path{
 		info: fInfo,
 	}
 
 	if len(x.options.SearchGrep) > 0 && isRegularFile(fInfo) {
-		matchedPath.contents, err = x.checkFile(fPath)
+		matchedPath.contents, err = x.scanFile(fPath)
 		if err != nil {
 			return fmt.Errorf("error during grep: %w", err)
 		}
@@ -291,7 +291,7 @@ func (x *xfg) highlightPath(fPath string) string {
 	return fPath
 }
 
-func (x *xfg) checkFile(fPath string) ([]line, error) {
+func (x *xfg) scanFile(fPath string) ([]line, error) {
 	fh, err := os.Open(fPath)
 	if err != nil {
 		return nil, fmt.Errorf("could not open file `%s`: %w", fPath, err)
@@ -310,7 +310,7 @@ func (x *xfg) checkFile(fPath string) ([]line, error) {
 		return nil, fmt.Errorf("could not seek `%s`: %w", fPath, err)
 	}
 
-	matchedContents, err := x.scanFile(bufio.NewScanner(fh), fPath)
+	matchedContents, err := x.scanContent(bufio.NewScanner(fh), fPath)
 	if err != nil {
 		return nil, fmt.Errorf("could not grepFile `%s`: %w", fPath, err)
 	}
@@ -327,7 +327,7 @@ type scanFile struct {
 	matchedContents []line // result
 }
 
-func (x *xfg) scanFile(scanner *bufio.Scanner, fPath string) ([]line, error) {
+func (x *xfg) scanContent(scanner *bufio.Scanner, fPath string) ([]line, error) {
 	gf := &scanFile{
 		lc:     0,
 		blines: make([]line, x.options.actualBeforeContextLines),
