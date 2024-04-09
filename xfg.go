@@ -22,7 +22,7 @@ type line struct {
 
 type path struct {
 	path     string
-	info     os.FileInfo
+	info     fs.DirEntry
 	contents []line
 }
 
@@ -141,7 +141,7 @@ func (x *xfg) search() error {
 		return fmt.Errorf("error in preSearch: %w", err)
 	}
 
-	walkErr := filepath.Walk(x.options.SearchStart, func(fPath string, fInfo os.FileInfo, err error) error {
+	walkErr := filepath.WalkDir(x.options.SearchStart, func(fPath string, fInfo fs.DirEntry, err error) error {
 		if err != nil {
 			return fmt.Errorf("something went wrong within path `%s` at `%s`: %w", x.options.SearchStart, fPath, err)
 		}
@@ -159,7 +159,7 @@ func (x *xfg) search() error {
 	return nil
 }
 
-func (x *xfg) walker(fPath string, fInfo os.FileInfo) error {
+func (x *xfg) walker(fPath string, fInfo fs.DirEntry) error {
 	if x.isIgnorePath(fPath) {
 		return nil // skip by --ignore option
 	}
@@ -195,7 +195,7 @@ func (x *xfg) isIgnorePath(fPath string) bool {
 	return false
 }
 
-func (x *xfg) canSkip(fPath string, fInfo fs.FileInfo) bool {
+func (x *xfg) canSkip(fPath string, fInfo fs.DirEntry) bool {
 	if !x.options.SearchAll {
 		if canSkipStuff(fInfo) {
 			return true // not pick .gitkeep file
@@ -238,7 +238,7 @@ func (x *xfg) canSkipPath(fPath string) bool {
 	return false // match all, cannot skip
 }
 
-func (x *xfg) postMatchPath(fPath string, fInfo fs.FileInfo) (err error) {
+func (x *xfg) postMatchPath(fPath string, fInfo fs.DirEntry) (err error) {
 	matchedPath := path{
 		info: fInfo,
 	}
