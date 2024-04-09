@@ -46,6 +46,19 @@ type xfg struct {
 	resultMatchContent bool
 }
 
+func newX(cli *runner, o *options) *xfg {
+	o.prepareContextLines(cli.isTTY)
+
+	x := &xfg{
+		cli:     cli,
+		options: o,
+	}
+
+	x.setHighlighter()
+
+	return x
+}
+
 func (x *xfg) setHighlighter() {
 	o := x.options
 	if o.ColorPath != "" && colorpalette.Exists(o.ColorPath) {
@@ -67,46 +80,24 @@ func (x *xfg) setHighlighter() {
 	}
 }
 
-func newX(cli *runner, o *options) *xfg {
-	o.prepareContextLines(cli.isTTY)
-
-	x := &xfg{
-		cli:     cli,
-		options: o,
+func (x *xfg) search() error {
+	if err := x.preSearch(); err != nil {
+		return fmt.Errorf("error in preSearch: %w", err)
 	}
 
-	x.setHighlighter()
-
-	return x
-}
-
-func (x *xfg) prepareRe() error {
-	for _, sp := range x.options.SearchPath {
-		searchPathRe, err := regexp.Compile("(?i)(" + regexp.QuoteMeta(sp) + ")")
+	walkErr := filepath.WalkDir(x.options.SearchStart, func(fPath string, fInfo fs.DirEntry, err error) error {
 		if err != nil {
-			return err
+			return fmt.Errorf("something went wrong within path `%s` at `%s`: %w", x.options.SearchStart, fPath, err)
 		}
-		x.searchPathRe = append(x.searchPathRe, searchPathRe)
-	}
 
-	if len(x.options.SearchGrep) > 0 {
-		for _, sg := range x.options.SearchGrep {
-			searchGrepRe, err := regexp.Compile("(?i)(" + regexp.QuoteMeta(sg) + ")")
-			if err != nil {
-				return err
-			}
-			x.searchGrepRe = append(x.searchGrepRe, searchGrepRe)
+		if x.options.Quiet && x.hasMatchedAny() {
+			return nil // already match. skip after all
 		}
-	}
 
-	if len(x.options.Ignore) > 0 {
-		for _, i := range x.options.Ignore {
-			ignoreRe, err := regexp.Compile(`(?i)` + regexp.QuoteMeta(i))
-			if err != nil {
-				return err
-			}
-			x.ignoreRe = append(x.ignoreRe, ignoreRe)
-		}
+		return x.walker(fPath, fInfo)
+	})
+	if walkErr != nil {
+		return fmt.Errorf("failed to walk: %w", walkErr)
 	}
 
 	return nil
@@ -136,24 +127,33 @@ func (x *xfg) preSearch() error {
 	return nil
 }
 
-func (x *xfg) search() error {
-	if err := x.preSearch(); err != nil {
-		return fmt.Errorf("error in preSearch: %w", err)
+func (x *xfg) prepareRe() error {
+	for _, sp := range x.options.SearchPath {
+		searchPathRe, err := regexp.Compile("(?i)(" + regexp.QuoteMeta(sp) + ")")
+		if err != nil {
+			return err
+		}
+		x.searchPathRe = append(x.searchPathRe, searchPathRe)
 	}
 
-	walkErr := filepath.WalkDir(x.options.SearchStart, func(fPath string, fInfo fs.DirEntry, err error) error {
-		if err != nil {
-			return fmt.Errorf("something went wrong within path `%s` at `%s`: %w", x.options.SearchStart, fPath, err)
+	if len(x.options.SearchGrep) > 0 {
+		for _, sg := range x.options.SearchGrep {
+			searchGrepRe, err := regexp.Compile("(?i)(" + regexp.QuoteMeta(sg) + ")")
+			if err != nil {
+				return err
+			}
+			x.searchGrepRe = append(x.searchGrepRe, searchGrepRe)
 		}
+	}
 
-		if x.options.Quiet && x.hasMatchedAny() {
-			return nil // already match. skip after all
+	if len(x.options.Ignore) > 0 {
+		for _, i := range x.options.Ignore {
+			ignoreRe, err := regexp.Compile(`(?i)` + regexp.QuoteMeta(i))
+			if err != nil {
+				return err
+			}
+			x.ignoreRe = append(x.ignoreRe, ignoreRe)
 		}
-
-		return x.walker(fPath, fInfo)
-	})
-	if walkErr != nil {
-		return fmt.Errorf("failed to walk: %w", walkErr)
 	}
 
 	return nil
@@ -277,20 +277,6 @@ func (x *xfg) postMatchPath(fPath string, fInfo fs.DirEntry) (err error) {
 	return nil
 }
 
-func (x *xfg) highlightPath(fPath string) string {
-	if x.options.IgnoreCase {
-		for _, spr := range x.searchPathRe {
-			fPath = spr.ReplaceAllString(fPath, x.pathHighlightColor.Sprintf("$1"))
-		}
-	} else {
-		for i, sp := range x.options.SearchPath {
-			fPath = strings.ReplaceAll(fPath, sp, x.pathHighlighter[i])
-		}
-	}
-
-	return fPath
-}
-
 func (x *xfg) scanFile(fPath string) ([]line, error) {
 	fh, err := os.Open(fPath)
 	if err != nil {
@@ -316,6 +302,20 @@ func (x *xfg) scanFile(fPath string) ([]line, error) {
 	}
 
 	return matchedContents, nil
+}
+
+func (x *xfg) highlightPath(fPath string) string {
+	if x.options.IgnoreCase {
+		for _, spr := range x.searchPathRe {
+			fPath = spr.ReplaceAllString(fPath, x.pathHighlightColor.Sprintf("$1"))
+		}
+	} else {
+		for i, sp := range x.options.SearchPath {
+			fPath = strings.ReplaceAll(fPath, sp, x.pathHighlighter[i])
+		}
+	}
+
+	return fPath
 }
 
 type scanFile struct {
