@@ -42,7 +42,7 @@ jobs:
         run: |
           go install github.com/bayashi/irir@latest
           mkdir -p $HOME/.config/irir
-          curl -L https://bit.ly/irir-gotest-conf > $HOME/.config/irir/irir_rule.yaml
+          curl -L https://bit.ly/irir-gotest > `irir --dump-config-path`
 
       - name: Create dirs which cannot add due to git-ignore features
         run: |
