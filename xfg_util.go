@@ -48,7 +48,7 @@ func readRC(homeDir string) (*options, error) {
 
 	if xfgRCFilePath := os.Getenv(XFG_RC_ENV_KEY); xfgRCFilePath != "" {
 		if _, err := toml.DecodeFile(xfgRCFilePath, &o); err != nil {
-			return nil, fmt.Errorf("config path from env `%s` : %w", XFG_RC_ENV_KEY, err)
+			return nil, fmt.Errorf("could not decode toml config env:%s `%s` : %w", XFG_RC_ENV_KEY, xfgRCFilePath, err)
 		}
 		return o, nil
 	}
@@ -105,7 +105,7 @@ func isBinaryFile(fh *os.File) (bool, error) {
 	dat := make([]byte, 8000)
 	n, err := fh.Read(dat)
 	if err != nil {
-		return false, fmt.Errorf("could not read fh: %w", err)
+		return false, fmt.Errorf("could not read fh : %w", err)
 	}
 
 	for _, c := range dat[:n] {
@@ -129,7 +129,7 @@ func isRegularFile(fInfo fs.DirEntry) bool {
 func validateStartPath(startPath string) error {
 	d, err := os.Stat(startPath)
 	if err != nil {
-		return fmt.Errorf("path `%s` is wrong: %w", startPath, err)
+		return fmt.Errorf("wrong path `%s` : %w", startPath, err)
 	}
 
 	if !d.IsDir() {
