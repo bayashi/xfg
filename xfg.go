@@ -82,12 +82,12 @@ func (x *xfg) setHighlighter() {
 
 func (x *xfg) search() error {
 	if err := x.preSearch(); err != nil {
-		return fmt.Errorf("error in preSearch: %w", err)
+		return fmt.Errorf("preSearch() : %w", err)
 	}
 
 	walkErr := filepath.WalkDir(x.options.SearchStart, func(fPath string, fInfo fs.DirEntry, err error) error {
 		if err != nil {
-			return fmt.Errorf("something went wrong within path `%s` at `%s`: %w", x.options.SearchStart, fPath, err)
+			return fmt.Errorf("WalkDir started from `%s` at `%s`: %w", x.options.SearchStart, fPath, err)
 		}
 
 		if x.options.Quiet && x.hasMatchedAny() {
@@ -97,7 +97,7 @@ func (x *xfg) search() error {
 		return x.walker(fPath, fInfo)
 	})
 	if walkErr != nil {
-		return fmt.Errorf("failed to walk: %w", walkErr)
+		return fmt.Errorf("walkErr : %w", walkErr)
 	}
 
 	return nil
@@ -246,7 +246,7 @@ func (x *xfg) postMatchPath(fPath string, fInfo fs.DirEntry) (err error) {
 	if len(x.options.SearchGrep) > 0 && isRegularFile(fInfo) {
 		matchedPath.contents, err = x.scanFile(fPath)
 		if err != nil {
-			return fmt.Errorf("error during grep: %w", err)
+			return fmt.Errorf("scanFile() : %w", err)
 		}
 	}
 
@@ -257,7 +257,7 @@ func (x *xfg) postMatchPath(fPath string, fInfo fs.DirEntry) (err error) {
 	if x.options.Abs {
 		absPath, err := filepath.Abs(fPath)
 		if err != nil {
-			return fmt.Errorf("failed to get absolute path from `%s`: %w", fPath, err)
+			return fmt.Errorf("failed to get abs path of `%s` : %w", fPath, err)
 		}
 		fPath = absPath
 	}
@@ -280,25 +280,25 @@ func (x *xfg) postMatchPath(fPath string, fInfo fs.DirEntry) (err error) {
 func (x *xfg) scanFile(fPath string) ([]line, error) {
 	fh, err := os.Open(fPath)
 	if err != nil {
-		return nil, fmt.Errorf("could not open file `%s`: %w", fPath, err)
+		return nil, fmt.Errorf("path `%s` : %w", fPath, err)
 	}
 	defer fh.Close()
 
 	isBinary, err := isBinaryFile(fh)
 	if err != nil {
-		return nil, fmt.Errorf("error during isBinary file `%s`: %w", fPath, err)
+		return nil, fmt.Errorf("path `%s` : %w", fPath, err)
 	}
 	if isBinary {
 		return nil, nil
 	}
 
 	if _, err := fh.Seek(0, 0); err != nil {
-		return nil, fmt.Errorf("could not seek `%s`: %w", fPath, err)
+		return nil, fmt.Errorf("could not seek `%s` : %w", fPath, err)
 	}
 
 	matchedContents, err := x.scanContent(bufio.NewScanner(fh), fPath)
 	if err != nil {
-		return nil, fmt.Errorf("could not grepFile `%s`: %w", fPath, err)
+		return nil, fmt.Errorf("scanContent() `%s` : %w", fPath, err)
 	}
 
 	return matchedContents, nil
