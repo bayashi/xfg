@@ -3,6 +3,7 @@ package main
 import (
 	"bufio"
 	"fmt"
+	"sort"
 )
 
 func output(writer *bufio.Writer, out string) error {
@@ -34,6 +35,8 @@ func (cli *runner) showResult(x *xfg) error {
 	if x.options.Null {
 		lf = "\x00"
 	}
+
+	sort.Slice(x.result.paths, func(i, j int) bool { return x.result.paths[i].path < x.result.paths[j].path })
 
 	if cli.isTTY {
 		cli.outputForTTY(x, lf)
