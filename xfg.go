@@ -26,6 +26,12 @@ type path struct {
 	contents []line
 }
 
+type result struct {
+	paths               []path
+	lc                  int
+	alreadyMatchContent bool
+}
+
 type xfg struct {
 	cli     *runner
 	options *options
@@ -41,9 +47,7 @@ type xfg struct {
 	gitignore    *ignore.GitIgnore
 	xfgignore    *ignore.GitIgnore
 
-	result             []path
-	resultLines        int
-	resultMatchContent bool
+	result result
 }
 
 func newX(cli *runner, o *options) *xfg {
@@ -271,8 +275,8 @@ func (x *xfg) postMatchPath(fPath string, fInfo fs.DirEntry) (err error) {
 		matchedPath.path = matchedPath.path + string(filepath.Separator)
 	}
 
-	x.result = append(x.result, matchedPath)
-	x.resultLines = x.resultLines + len(matchedPath.contents) + 1
+	x.result.paths = append(x.result.paths, matchedPath)
+	x.result.lc = x.result.lc + len(matchedPath.contents) + 1
 
 	return nil
 }
@@ -348,7 +352,7 @@ func (x *xfg) scanContent(scanner *bufio.Scanner, fPath string) ([]line, error) 
 	}
 
 	if x.options.Quiet && len(gf.matchedContents) > 0 {
-		x.resultMatchContent = true
+		x.result.alreadyMatchContent = true
 	}
 
 	return gf.matchedContents, nil
@@ -425,8 +429,8 @@ func (x *xfg) processContentLine(gf *scanFile) {
 }
 
 func (x *xfg) hasMatchedAny() bool {
-	if (len(x.options.SearchGrep) == 0 && len(x.result) > 0) ||
-		(len(x.options.SearchGrep) > 0 && len(x.result) > 0 && x.resultMatchContent) {
+	if (len(x.options.SearchGrep) == 0 && len(x.result.paths) > 0) ||
+		(len(x.options.SearchGrep) > 0 && len(x.result.paths) > 0 && x.result.alreadyMatchContent) {
 		return true // already match
 	}
 
