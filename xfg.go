@@ -8,10 +8,12 @@ import (
 	"path/filepath"
 	"regexp"
 	"strings"
+	"sync"
 
 	"github.com/bayashi/colorpalette"
 	"github.com/fatih/color"
 	ignore "github.com/sabhiram/go-gitignore"
+	"golang.org/x/sync/errgroup"
 )
 
 type line struct {
@@ -27,6 +29,7 @@ type path struct {
 }
 
 type result struct {
+	mu                  sync.RWMutex
 	paths               []path
 	lc                  int
 	alreadyMatchContent bool
@@ -89,6 +92,7 @@ func (x *xfg) search() error {
 		return fmt.Errorf("preSearch() : %w", err)
 	}
 
+	eg := new(errgroup.Group)
 	walkErr := filepath.WalkDir(x.options.SearchStart, func(fPath string, fInfo fs.DirEntry, err error) error {
 		if err != nil {
 			return fmt.Errorf("WalkDir started from `%s` at `%s`: %w", x.options.SearchStart, fPath, err)
@@ -104,10 +108,19 @@ func (x *xfg) search() error {
 			return nil
 		}
 
-		return x.postMatchPath(fPath, fInfo)
+		eg.Go(func() error {
+			return x.postMatchPath(fPath, fInfo)
+		})
+
+		return nil
 	})
+
 	if walkErr != nil {
 		return fmt.Errorf("walkErr : %w", walkErr)
+	}
+
+	if err := eg.Wait(); err != nil {
+		return fmt.Errorf("postMatchPath : %w", err)
 	}
 
 	return nil
@@ -279,8 +292,10 @@ func (x *xfg) postMatchPath(fPath string, fInfo fs.DirEntry) (err error) {
 		matchedPath.path = matchedPath.path + string(filepath.Separator)
 	}
 
+	x.result.mu.Lock()
 	x.result.paths = append(x.result.paths, matchedPath)
 	x.result.lc = x.result.lc + len(matchedPath.contents) + 1
+	x.result.mu.Unlock()
 
 	return nil
 }
@@ -355,7 +370,7 @@ func (x *xfg) scanContent(scanner *bufio.Scanner, fPath string) ([]line, error) 
 		}
 	}
 
-	if x.options.Quiet && len(gf.matchedContents) > 0 {
+	if x.options.Quiet && !x.result.alreadyMatchContent && len(gf.matchedContents) > 0 {
 		x.result.alreadyMatchContent = true
 	}
 
@@ -433,6 +448,8 @@ func (x *xfg) processContentLine(gf *scanFile) {
 }
 
 func (x *xfg) hasMatchedAny() bool {
+	x.result.mu.RLock()
+	defer x.result.mu.RUnlock()
 	if (len(x.options.SearchGrep) == 0 && len(x.result.paths) > 0) ||
 		(len(x.options.SearchGrep) > 0 && len(x.result.paths) > 0 && x.result.alreadyMatchContent) {
 		return true // already match

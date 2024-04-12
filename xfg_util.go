@@ -7,6 +7,7 @@ import (
 	"os"
 	"path/filepath"
 	"regexp"
+	"runtime"
 	"strings"
 	"syscall"
 
@@ -16,6 +17,17 @@ import (
 	ignore "github.com/sabhiram/go-gitignore"
 	"golang.org/x/term"
 )
+
+func procs() int {
+	cpu := runtime.NumCPU()
+	if cpu == 1 {
+		cpu = 2
+	}
+
+	runtime.GOMAXPROCS(cpu)
+
+	return cpu
+}
 
 func defaultOptions() *options {
 	return &options{
