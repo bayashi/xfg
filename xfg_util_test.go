@@ -78,5 +78,5 @@ func TestValidateStartPath_Err(t *testing.T) {
 }
 
 func TestProcs(t *testing.T) {
-	a.Got(procs()>0).True(t)
+	a.Got(procs() > 0).True(t)
 }
