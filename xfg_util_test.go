@@ -22,7 +22,7 @@ func TestHomeDir(t *testing.T) {
 func TestReadRC(t *testing.T) {
 	rcFilePath := filepath.Join(t.TempDir(), "test.toml")
 	f, _ := os.Create(rcFilePath)
-	_, err := f.WriteString("relax = true")
+	_, err := f.WriteString("abs = true")
 	f.Close()
 
 	a.Got(err).NoError(t)
@@ -32,7 +32,7 @@ func TestReadRC(t *testing.T) {
 
 	o, err := readRC(fakeHomeDir)
 	a.Got(err).NoError(t)
-	a.Got(o.Relax).True(t)
+	a.Got(o.Abs).True(t)
 }
 
 func TestPrepareGitIgnore(t *testing.T) {

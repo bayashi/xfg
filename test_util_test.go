@@ -39,7 +39,6 @@ func expectedDefaultOptions() options {
 		ColorContent:     "red",
 		Ignore:           nil,
 		IgnoreCase:       false,
-		Relax:            false,
 		NoColor:          false,
 		Abs:              false,
 		ShowMatchCount:   false,

@@ -51,7 +51,7 @@ func (cli *runner) showResult(x *xfg) error {
 
 func (cli *runner) outputForTTY(x *xfg, lf string) error {
 	writer := bufio.NewWriter(cli.out)
-	for _, p := range x.result.paths {
+	for i, p := range x.result.paths {
 		if x.options.FilesWithMatches && p.info.IsDir() {
 			continue
 		}
@@ -64,9 +64,9 @@ func (cli *runner) outputForTTY(x *xfg, lf string) error {
 		if !x.options.ShowMatchCount && !x.options.FilesWithMatches {
 			if len(p.contents) > 0 {
 				cli.buildContentOutput(x, &out, p.contents, lf)
-			}
-			if x.options.Relax && len(p.contents) > 0 {
-				out = out + lf
+				if len(x.result.paths)-1 != i {
+					out = out + lf
+				}
 			}
 		}
 		if err := output(writer, out); err != nil {
