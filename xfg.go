@@ -370,7 +370,7 @@ func (x *xfg) scanContent(scanner *bufio.Scanner, fPath string) ([]line, error) 
 		}
 	}
 
-	if x.options.Quiet && len(gf.matchedContents) > 0 {
+	if x.options.Quiet && !x.result.alreadyMatchContent && len(gf.matchedContents) > 0 {
 		x.result.alreadyMatchContent = true
 	}
 
