@@ -21,6 +21,7 @@ type runner struct {
 	isTTY    bool
 	exitCode int
 	homeDir  string
+	procs    int
 }
 
 func main() {
@@ -28,6 +29,7 @@ func main() {
 		out:   os.Stdout,
 		err:   os.Stderr,
 		isTTY: isTTY(),
+		procs: procs(),
 	}
 	exitCode, message := cli.run()
 	if exitCode != exitOK {

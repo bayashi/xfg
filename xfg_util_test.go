@@ -76,3 +76,7 @@ func TestValidateStartPath_Err(t *testing.T) {
 	a.Got(err).NotNil(t)
 	a.Got(err.Error()).Expect("path `[^`]+` should point to a directory").Match(t)
 }
+
+func TestProcs(t *testing.T) {
+	a.Got(procs()>0).True(t)
+}
