@@ -48,7 +48,7 @@ func (cli *runner) showResult(x *xfg) error {
 
 func (cli *runner) outputForTTY(x *xfg, lf string) error {
 	writer := bufio.NewWriter(cli.out)
-	for _, p := range x.result {
+	for _, p := range x.result.paths {
 		if x.options.FilesWithMatches && p.info.IsDir() {
 			continue
 		}
@@ -97,7 +97,7 @@ func (x *xfg) needToShowGroupSeparator(blc int32, lc int32) bool {
 
 func (cli *runner) outputForNonTTY(x *xfg, lf string) error {
 	writer := bufio.NewWriter(cli.out)
-	for _, p := range x.result {
+	for _, p := range x.result.paths {
 		out := ""
 		if len(p.contents) > 0 && !x.options.FilesWithMatches {
 			for _, l := range p.contents {
