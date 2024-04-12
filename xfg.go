@@ -98,7 +98,13 @@ func (x *xfg) search() error {
 			return nil // already match. skip after all
 		}
 
-		return x.walker(fPath, fInfo)
+		if isSkippable, sErr := x.isSkippable(fPath, fInfo); sErr != nil {
+			return sErr
+		} else if isSkippable {
+			return nil
+		}
+
+		return x.postMatchPath(fPath, fInfo)
 	})
 	if walkErr != nil {
 		return fmt.Errorf("walkErr : %w", walkErr)
@@ -163,22 +169,20 @@ func (x *xfg) prepareRe() error {
 	return nil
 }
 
-func (x *xfg) walker(fPath string, fInfo fs.DirEntry) error {
+func (x *xfg) isSkippable(fPath string, fInfo fs.DirEntry) (bool, error) {
 	if x.isIgnorePath(fPath) {
-		return nil // skip by --ignore option
+		return true, nil
 	}
 
 	if !x.options.SearchAll && (fInfo.IsDir() && fInfo.Name() == ".git") {
-		return filepath.SkipDir // not search for .git directory
+		return true, filepath.SkipDir // not search for .git directory
 	}
 
 	if x.canSkip(fPath, fInfo) {
-		return nil // skip
+		return true, nil
 	}
 
-	x.postMatchPath(fPath, fInfo)
-
-	return nil
+	return false, nil
 }
 
 func (x *xfg) isIgnorePath(fPath string) bool {
