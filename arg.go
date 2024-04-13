@@ -53,6 +53,7 @@ type options struct {
 	Quiet            bool `toml:"quiet"`
 	FilesWithMatches bool `toml:"files-with-matches"`
 	Null             bool `toml:"null"`
+	Stats            bool `toml:"stats"`
 
 	ContextLines uint32 `toml:"context"`
 
@@ -117,6 +118,7 @@ func (cli *runner) parseArgs(d *options) *options {
 
 	flag.BoolVarP(&o.NoPager, "no-pager", "", d.NoPager, "Do not invoke with the Pager")
 	flag.BoolVarP(&o.Quiet, "quiet", "q", d.Quiet, "Do not write anything to standard output. Exit immediately with zero status if any match is found")
+	flag.BoolVarP(&o.Stats, "stats", "", d.Stats, "Print runtime stats after searching result")
 
 	var flagHelp bool
 	var flagVersion bool
