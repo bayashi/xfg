@@ -24,7 +24,8 @@ func TestMain_OK(t *testing.T) {
 func TestRun_OK(t *testing.T) {
 	var outOutput bytes.Buffer
 	cli := &runner{
-		out: &outOutput,
+		out:   &outOutput,
+		stats: newStats(1),
 	}
 	resetFlag()
 	stubExit()
@@ -608,6 +609,7 @@ func TestXfg_OK(t *testing.T) {
 			cli := &runner{
 				out:   &o,
 				isTTY: true,
+				stats: newStats(1),
 			}
 
 			tt.opt.NoPager = true
@@ -660,6 +662,7 @@ func TestNonTTY(t *testing.T) {
 			cli := &runner{
 				out:   &o,
 				isTTY: false,
+				stats: newStats(1),
 			}
 
 			exitCode, msg := cli.run()

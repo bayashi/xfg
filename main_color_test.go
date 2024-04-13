@@ -84,6 +84,7 @@ func TestHighlight(t *testing.T) {
 			cli := &runner{
 				out:   &o,
 				isTTY: true,
+				stats: newStats(1),
 			}
 
 			tt.opt.NoPager = true

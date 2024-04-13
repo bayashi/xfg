@@ -99,8 +99,15 @@ func (x *xfg) search() error {
 		return fmt.Errorf("preSearch() : %w", err)
 	}
 
+	if x.options.Stats {
+		x.result.mu.Lock()
+		x.cli.stats.mark("preSearch")
+		x.result.mu.Unlock()
+	}
+
 	eg := new(errgroup.Group)
 	walkErr := filepath.WalkDir(x.options.SearchStart, func(fPath string, fInfo fs.DirEntry, err error) error {
+		x.cli.stats.count.paths++
 		if err != nil {
 			return fmt.Errorf("WalkDir started from `%s` at `%s`: %w", x.options.SearchStart, fPath, err)
 		}
@@ -114,6 +121,8 @@ func (x *xfg) search() error {
 		} else if isSkippable {
 			return nil
 		}
+
+		x.cli.stats.count.matched++
 
 		eg.Go(func() error {
 			return x.postMatchPath(fPath, fInfo)
@@ -309,6 +318,10 @@ func (x *xfg) postMatchPath(fPath string, fInfo fs.DirEntry) (err error) {
 }
 
 func (x *xfg) scanFile(fPath string) ([]line, error) {
+	x.result.mu.Lock()
+	x.cli.stats.count.grep++
+	x.result.mu.Unlock()
+
 	fh, err := os.Open(fPath)
 	if err != nil {
 		return nil, fmt.Errorf("path `%s` : %w", fPath, err)
