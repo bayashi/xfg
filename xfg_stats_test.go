@@ -13,5 +13,5 @@ func TestStats(t *testing.T) {
 	stats.mark("step2")
 	var o bytes.Buffer
 	stats.show(&o)
-	a.Got(o.String()).Expect(`\nstep1:\s+\w+\nstep2:\s+\w+\nprocs:\s+\d+\npaths:\s+0\nmatched:\s+0\ngrep:\s+0\n`).Match(t)
+	a.Got(o.String()).Expect(`\nstep1:\s+.+\nstep2:\s+.+\nprocs:\s+1\npaths:\s+0\nmatched:\s+0\ngrep:\s+0\n`).Match(t)
 }
