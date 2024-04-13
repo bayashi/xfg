@@ -121,6 +121,7 @@ These are treated as AND condition for each.
       --xfgignore-file string    .xfgignore file path if you have it except XDG base directory or HOME directory
       --no-pager                 Do not invoke with the Pager
   -q, --quiet                    Do not write anything to standard output. Exit immediately with zero status if any match is found
+      --stats                    Print runtime stats after searching result
   -h, --help                     Show help (This message) and exit
   -v, --version                  Show version and build command info and exit
 ```
