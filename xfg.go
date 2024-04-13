@@ -39,6 +39,7 @@ type xfg struct {
 	cli     *runner
 	options *options
 
+	pathBaseColor      string
 	pathHighlightColor *color.Color
 	pathHighlighter    []string
 	grepHighlightColor *color.Color
@@ -68,6 +69,12 @@ func newX(cli *runner, o *options) *xfg {
 
 func (x *xfg) setHighlighter() {
 	o := x.options
+	if o.ColorPathBase != "" && colorpalette.Exists(o.ColorPathBase) {
+		x.pathBaseColor = fmt.Sprintf("\x1b[%sm", colorpalette.GetCode(o.ColorPathBase))
+	} else {
+		x.pathBaseColor = fmt.Sprintf("\x1b[%sm", colorpalette.GetCode("yellow"))
+	}
+
 	if o.ColorPath != "" && colorpalette.Exists(o.ColorPath) {
 		x.pathHighlightColor = colorpalette.Get(o.ColorPath)
 	} else {
@@ -283,14 +290,15 @@ func (x *xfg) postMatchPath(fPath string, fInfo fs.DirEntry) (err error) {
 		fPath = absPath
 	}
 
-	matchedPath.path = fPath
-	if !x.options.NoColor {
-		matchedPath.path = x.highlightPath(fPath)
+	if fInfo.IsDir() {
+		fPath = fPath + string(filepath.Separator)
 	}
 
-	if fInfo.IsDir() {
-		matchedPath.path = matchedPath.path + string(filepath.Separator)
+	if !x.options.NoColor {
+		fPath = x.highlightPath(fPath)
 	}
+
+	matchedPath.path = fPath
 
 	x.result.mu.Lock()
 	x.result.paths = append(x.result.paths, matchedPath)
@@ -328,17 +336,18 @@ func (x *xfg) scanFile(fPath string) ([]line, error) {
 }
 
 func (x *xfg) highlightPath(fPath string) string {
+	fPath = x.pathBaseColor + fPath
 	if x.options.IgnoreCase {
 		for _, spr := range x.searchPathRe {
-			fPath = spr.ReplaceAllString(fPath, x.pathHighlightColor.Sprintf("$1"))
+			fPath = spr.ReplaceAllString(fPath, x.pathHighlightColor.Sprintf("$1")+x.pathBaseColor)
 		}
 	} else {
 		for i, sp := range x.options.SearchPath {
-			fPath = strings.ReplaceAll(fPath, sp, x.pathHighlighter[i])
+			fPath = strings.ReplaceAll(fPath, sp, x.pathHighlighter[i]+x.pathBaseColor)
 		}
 	}
 
-	return fPath
+	return fPath + "\x1b[0m"
 }
 
 type scanFile struct {

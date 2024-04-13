@@ -32,6 +32,7 @@ type options struct {
 
 	GroupSeparator string `toml:"gourp-separator"`
 	Indent         string `toml:"indent"`
+	ColorPathBase  string `toml:"color-path-base"`
 	ColorPath      string `toml:"color-path"`
 	ColorContent   string `toml:"color-conetnt"`
 	XfgIgnoreFile  string `toml:"xfgignore-file"`
@@ -102,6 +103,7 @@ func (cli *runner) parseArgs(d *options) *options {
 	flag.BoolVarP(&o.Null, "null", "0", d.Null, "Separate the filenames with \\0, rather than \\n")
 
 	flag.BoolVarP(&o.NoColor, "no-color", "", d.NoColor, "Disable colors for an output")
+	flag.StringVarP(&o.ColorPathBase, "color-path-base", "", d.ColorPathBase, "Color name for a path")
 	flag.StringVarP(&o.ColorPath, "color-path", "", d.ColorPath, "Color name to highlight keywords in a path")
 	flag.StringVarP(&o.ColorContent, "color-content", "", d.ColorContent, "Color name to highlight keywords in a content line")
 
