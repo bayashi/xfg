@@ -104,7 +104,6 @@ These are treated as AND condition for each.
       --skip-xfgignore           Search files and directories even if a path matches a line of .xfgignore
       --search-all               Search all files and directories except specific ignoring files and directories
       --ignore stringArray       Ignore path to pick up even with '--search-all'
-      --relax                    Insert blank space between contents for relaxing view
       --abs                      Show absolute paths
   -c, --count                    Show a count of matching lines instead of contents
   -m, --max-count uint32         Stop reading a file after NUM matching lines
@@ -112,6 +111,7 @@ These are treated as AND condition for each.
   -l, --files-with-matches       Only print the names of matching files
   -0, --null                     Separate the filenames with \0, rather than \n
       --no-color                 Disable colors for an output
+      --color-path-base string   Color name for a path (default "yellow")
       --color-path string        Color name to highlight keywords in a path (default "cyan")
       --color-content string     Color name to highlight keywords in a content line (default "red")
       --group-separator string   Print this string instead of '--' between groups of lines (default "--")

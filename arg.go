@@ -32,6 +32,7 @@ type options struct {
 
 	GroupSeparator string `toml:"gourp-separator"`
 	Indent         string `toml:"indent"`
+	ColorPathBase  string `toml:"color-path-base"`
 	ColorPath      string `toml:"color-path"`
 	ColorContent   string `toml:"color-conetnt"`
 	XfgIgnoreFile  string `toml:"xfgignore-file"`
@@ -39,7 +40,6 @@ type options struct {
 	Ignore []string `toml:"ignore"`
 
 	IgnoreCase       bool `toml:"ignore-case"`
-	Relax            bool `toml:"relax"`
 	NoColor          bool `toml:"no-color"`
 	Abs              bool `toml:"abs"`
 	ShowMatchCount   bool `toml:"count"`
@@ -95,7 +95,6 @@ func (cli *runner) parseArgs(d *options) *options {
 	flag.BoolVarP(&o.SearchAll, "search-all", "", d.SearchAll, "Search all files and directories except specific ignoring files and directories")
 	flag.StringArrayVarP(&o.Ignore, "ignore", "", d.Ignore, "Ignore path to pick up even with '--search-all'")
 
-	flag.BoolVarP(&o.Relax, "relax", "", d.Relax, "Insert blank space between contents for relaxing view")
 	flag.BoolVarP(&o.Abs, "abs", "", d.Abs, "Show absolute paths")
 	flag.BoolVarP(&o.ShowMatchCount, "count", "c", d.ShowMatchCount, "Show a count of matching lines instead of contents")
 	flag.Uint32VarP(&o.MaxMatchCount, "max-count", "m", d.MaxMatchCount, "Stop reading a file after NUM matching lines")
@@ -104,6 +103,7 @@ func (cli *runner) parseArgs(d *options) *options {
 	flag.BoolVarP(&o.Null, "null", "0", d.Null, "Separate the filenames with \\0, rather than \\n")
 
 	flag.BoolVarP(&o.NoColor, "no-color", "", d.NoColor, "Disable colors for an output")
+	flag.StringVarP(&o.ColorPathBase, "color-path-base", "", d.ColorPathBase, "Color name for a path")
 	flag.StringVarP(&o.ColorPath, "color-path", "", d.ColorPath, "Color name to highlight keywords in a path")
 	flag.StringVarP(&o.ColorContent, "color-content", "", d.ColorContent, "Color name to highlight keywords in a content line")
 

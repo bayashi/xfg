@@ -82,7 +82,6 @@ func TestXfg_OK(t *testing.T) {
 				SearchGrep:       []string{"package"},
 				onlyMatchContent: true,
 				Indent:           defaultIndent,
-				Relax:            true,
 			},
 			expect: here.Doc(`
                 testdata/service-a/main.go
@@ -96,7 +95,6 @@ func TestXfg_OK(t *testing.T) {
                 
                 testdata/service-h/main.go
                  1: package h
-                
 			`),
 			expectExitCode: exitOK,
 		},

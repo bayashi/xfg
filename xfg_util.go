@@ -34,6 +34,7 @@ func defaultOptions() *options {
 		SearchStart:    ".",
 		Indent:         defaultIndent,
 		GroupSeparator: defaultGroupSeparator,
+		ColorPathBase:  "yellow",
 		ColorPath:      "cyan",
 		ColorContent:   "red",
 	}

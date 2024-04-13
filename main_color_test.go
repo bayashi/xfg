@@ -21,16 +21,16 @@ func TestHighlight(t *testing.T) {
 			opt: &options{
 				SearchPath: []string{"service-b"},
 			},
-			expect: "testdata/\x1b[96mservice-b\x1b[0m/\n" +
-				"testdata/\x1b[96mservice-b\x1b[0m/main.go\n",
+			expect: "\x1b[93mtestdata/\x1b[96mservice-b\x1b[0m\x1b[93m/\x1b[0m\n" +
+				"\x1b[93mtestdata/\x1b[96mservice-b\x1b[0m\x1b[93m/main.go\x1b[0m\n",
 		},
 		"service-b color green": {
 			opt: &options{
 				SearchPath: []string{"service-b"},
 				ColorPath:  "green",
 			},
-			expect: "testdata/\x1b[92mservice-b\x1b[0m/\n" +
-				"testdata/\x1b[92mservice-b\x1b[0m/main.go\n",
+			expect: "\x1b[93mtestdata/\x1b[92mservice-b\x1b[0m\x1b[93m/\x1b[0m\n" +
+				"\x1b[93mtestdata/\x1b[92mservice-b\x1b[0m\x1b[93m/main.go\x1b[0m\n",
 		},
 		"service-b grep": {
 			opt: &options{
@@ -38,8 +38,8 @@ func TestHighlight(t *testing.T) {
 				SearchGrep: []string{"func"},
 				Indent:     defaultIndent,
 			},
-			expect: "testdata/\x1b[96mservice-b\x1b[0m/\n" +
-				"testdata/\x1b[96mservice-b\x1b[0m/main.go\n" +
+			expect: "\x1b[93mtestdata/\x1b[96mservice-b\x1b[0m\x1b[93m/\x1b[0m\n" +
+				"\x1b[93mtestdata/\x1b[96mservice-b\x1b[0m\x1b[93m/main.go\x1b[0m\n" +
 				" \x1b[91m3\x1b[0m: \x1b[91mfunc\x1b[0m main() {\n",
 		},
 		"service-b grep green": {
@@ -49,16 +49,16 @@ func TestHighlight(t *testing.T) {
 				Indent:       defaultIndent,
 				ColorContent: "green",
 			},
-			expect: "testdata/\x1b[96mservice-b\x1b[0m/\n" +
-				"testdata/\x1b[96mservice-b\x1b[0m/main.go\n" +
+			expect: "\x1b[93mtestdata/\x1b[96mservice-b\x1b[0m\x1b[93m/\x1b[0m\n" +
+				"\x1b[93mtestdata/\x1b[96mservice-b\x1b[0m\x1b[93m/main.go\x1b[0m\n" +
 				" \x1b[92m3\x1b[0m: \x1b[92mfunc\x1b[0m main() {\n",
 		},
 		"serv ice-b": {
 			opt: &options{
 				SearchPath: []string{"ser", "ice-b"},
 			},
-			expect: "testdata/\x1b[96mser\x1b[0mv\x1b[96mice-b\x1b[0m/\n" +
-				"testdata/\x1b[96mser\x1b[0mv\x1b[96mice-b\x1b[0m/main.go\n",
+			expect: "\x1b[93mtestdata/\x1b[96mser\x1b[0m\x1b[93mv\x1b[96mice-b\x1b[0m\x1b[93m/\x1b[0m\n" +
+				"\x1b[93mtestdata/\x1b[96mser\x1b[0m\x1b[93mv\x1b[96mice-b\x1b[0m\x1b[93m/main.go\x1b[0m\n",
 		},
 		"service-b grep multiple keywords": {
 			opt: &options{
@@ -66,9 +66,17 @@ func TestHighlight(t *testing.T) {
 				SearchGrep: []string{"func", "main"},
 				Indent:     defaultIndent,
 			},
-			expect: "testdata/\x1b[96mservice-b\x1b[0m/\n" +
-				"testdata/\x1b[96mservice-b\x1b[0m/main.go\n" +
+			expect: "\x1b[93mtestdata/\x1b[96mservice-b\x1b[0m\x1b[93m/\x1b[0m\n" +
+				"\x1b[93mtestdata/\x1b[96mservice-b\x1b[0m\x1b[93m/main.go\x1b[0m\n" +
 				" \x1b[91m3\x1b[0m: \x1b[91mfunc\x1b[0m \x1b[91mmain\x1b[0m() {\n",
+		},
+		"service-b path base color red": {
+			opt: &options{
+				SearchPath:    []string{"service-b"},
+				ColorPathBase: "red",
+			},
+			expect: "\x1b[91mtestdata/\x1b[96mservice-b\x1b[0m\x1b[91m/\x1b[0m\n" +
+				"\x1b[91mtestdata/\x1b[96mservice-b\x1b[0m\x1b[91m/main.go\x1b[0m\n",
 		},
 	} {
 		t.Run(tname, func(t *testing.T) {
