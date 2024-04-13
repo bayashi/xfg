@@ -70,10 +70,6 @@ func (cli *runner) run() (int, string) {
 		return exitErr, fmt.Sprintf("on xfg() : %s", err)
 	}
 
-	if o.Stats {
-		cli.stats.show(cli.out)
-	}
-
 	return exitCode, ""
 }
 
@@ -84,7 +80,7 @@ func (cli *runner) xfg(o *options) (int, error) {
 		return exitErr, fmt.Errorf("search() : %w", err)
 	}
 
-	x.cli.stats.mark("search")
+	cli.stats.mark("search")
 
 	pagerCloser, err := cli.pager(o.NoPager, x.result.lc)
 	if err != nil {
@@ -94,13 +90,17 @@ func (cli *runner) xfg(o *options) (int, error) {
 		defer pagerCloser()
 	}
 
-	x.cli.stats.mark("pager")
+	cli.stats.mark("pager")
 
 	if err := cli.showResult(x); err != nil {
 		return exitErr, fmt.Errorf("showResult() : %w", err)
 	}
 
-	x.cli.stats.mark("showResult")
+	cli.stats.mark("showResult")
+
+	if x.options.Stats {
+		cli.stats.show(cli.out)
+	}
 
 	return cli.exitCode, nil
 }
