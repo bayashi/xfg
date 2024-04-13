@@ -35,6 +35,7 @@ func expectedDefaultOptions() options {
 		SearchStart:      ".",
 		GroupSeparator:   "--",
 		Indent:           " ",
+		ColorPathBase:    "yellow",
 		ColorPath:        "cyan",
 		ColorContent:     "red",
 		Ignore:           nil,
