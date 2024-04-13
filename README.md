@@ -130,7 +130,6 @@ These are treated as AND condition for each.
 You can use default options by `.xfgrc` file. It's TOML file even without `.toml` extention, anyway.
 
 ```
-relax = true
 color-path = "blue"
 ```
 
