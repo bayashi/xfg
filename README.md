@@ -60,7 +60,19 @@ service-b/main.go
   4:    bar := 34
 ```
 
-You can use multiple keywords to match for `--path` and `--grep`
+Note that the second argument and subsequent arguments are keywords for grep
+
+```sh
+$ xfg service-b bar baz
+```
+
+Above command is equivalent:
+
+```sh
+$xfg --path service-b --grep bar --grep baz
+```
+
+You can use multiple keywords to match for both `--path` and `--grep` like below
 
 ```
 $ xfg --path foo --path bar --grep baz --grep qux

@@ -152,8 +152,8 @@ func (o *options) targetPathFromArgs() {
 		o.SearchPath = append(o.SearchPath, flag.Args()[0])
 	}
 
-	if len(flag.Args()) == 2 && flag.Args()[1] != "" {
-		o.SearchGrep = append(o.SearchGrep, flag.Args()[1])
+	if len(flag.Args()) > 1 {
+		o.SearchGrep = append(o.SearchGrep, flag.Args()[1:]...)
 	}
 }
 
