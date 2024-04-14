@@ -7,11 +7,10 @@
 Find paths anyway, then search for contents also, naturally.
 
 * Recursive search
-* Search paths and contents by multiple keywords
+* Search both paths and contents by multiple keywords
 * Ignores hidden files and directories
-* Ignores patterns from your `.gitignore`
-    * Ignores patterns from your `.xfgignore` if you set it
-* Uses colors to highlight
+* Respect your `.gitignore`
+    * Possible to use specific `.xfgignore` also
 
 ## Usage of `xfg` command
 
