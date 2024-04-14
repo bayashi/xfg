@@ -13,6 +13,8 @@ import (
 	"os/exec"
 	"os/signal"
 	"syscall"
+
+	"github.com/bayashi/xfg/xfgutil"
 )
 
 const (
@@ -25,7 +27,7 @@ func (cli *runner) pager(noPager bool, result int) (func(), error) {
 		return nil, nil
 	}
 
-	rows, err := getTermWindowRows(int(syscall.Stdout))
+	rows, err := xfgutil.GetTermWindowRows(int(syscall.Stdout))
 	if err != nil {
 		return nil, err
 	}

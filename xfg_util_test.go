@@ -8,17 +8,6 @@ import (
 	a "github.com/bayashi/actually"
 )
 
-func TestIsTTY(t *testing.T) {
-	// testing envs are non-TTY, comomnly. Local and Github Actions are non-TTY.
-	a.Got(isTTY()).False(t)
-}
-
-func TestHomeDir(t *testing.T) {
-	homeDir, err := homeDir()
-	a.Got(err).NoError(t)
-	a.Got(homeDir).Expect("").NotSame(t)
-}
-
 func TestReadRC(t *testing.T) {
 	rcFilePath := filepath.Join(t.TempDir(), "test.toml")
 	f, _ := os.Create(rcFilePath)
@@ -75,8 +64,4 @@ func TestValidateStartPath_Err(t *testing.T) {
 	err = validateStartPath(tempFilePath)
 	a.Got(err).NotNil(t)
 	a.Got(err.Error()).Expect("path `[^`]+` should point to a directory").Match(t)
-}
-
-func TestProcs(t *testing.T) {
-	a.Got(procs() > 0).True(t)
 }
