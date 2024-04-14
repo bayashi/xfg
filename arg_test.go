@@ -130,6 +130,14 @@ func TestArgs(t *testing.T) {
 				o.onlyMatchContent = true
 			},
 		},
+		"path and multiple grep args": {
+			args: []string{"foo", "bar", "baz"},
+			prepareExpect: func(o *options) {
+				o.SearchPath = []string{"foo"}
+				o.SearchGrep = []string{"bar", "baz"}
+				o.onlyMatchContent = true
+			},
+		},
 	} {
 		t.Run(tname, func(t *testing.T) {
 			resetFlag()
