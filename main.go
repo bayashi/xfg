@@ -4,6 +4,8 @@ import (
 	"fmt"
 	"io"
 	"os"
+
+	"github.com/bayashi/xfg/xfgstats"
 )
 
 const (
@@ -22,7 +24,7 @@ type runner struct {
 	exitCode int
 	homeDir  string
 	procs    int
-	stats    *stats
+	stats    *xfgstats.Stats
 }
 
 func main() {
@@ -32,7 +34,7 @@ func main() {
 		err:   os.Stderr,
 		isTTY: isTTY(),
 		procs: procs,
-		stats: newStats(procs),
+		stats: xfgstats.New(procs),
 	}
 	exitCode, message := cli.run()
 
@@ -49,21 +51,21 @@ func (cli *runner) run() (int, string) {
 	}
 	cli.homeDir = homeDir
 
-	cli.stats.mark("homeDir")
+	cli.stats.Mark("homeDir")
 
 	defaultOpt, err := readRC(cli.homeDir)
 	if err != nil {
 		return exitErr, fmt.Sprintf("on reading home directory : %s", err)
 	}
 
-	cli.stats.mark("readRC")
+	cli.stats.Mark("readRC")
 
 	o := cli.parseArgs(defaultOpt)
 	if !cli.isTTY {
 		o.NoColor = true // Turn off color
 	}
 
-	cli.stats.mark("parseArgs")
+	cli.stats.Mark("parseArgs")
 
 	exitCode, err := cli.xfg(o)
 	if err != nil {
@@ -80,7 +82,7 @@ func (cli *runner) xfg(o *options) (int, error) {
 		return exitErr, fmt.Errorf("search() : %w", err)
 	}
 
-	cli.stats.mark("search")
+	cli.stats.Mark("search")
 
 	pagerCloser, err := cli.pager(o.NoPager, x.result.lc)
 	if err != nil {
@@ -90,16 +92,16 @@ func (cli *runner) xfg(o *options) (int, error) {
 		defer pagerCloser()
 	}
 
-	cli.stats.mark("pager")
+	cli.stats.Mark("pager")
 
 	if err := cli.showResult(x); err != nil {
 		return exitErr, fmt.Errorf("showResult() : %w", err)
 	}
 
-	cli.stats.mark("showResult")
+	cli.stats.Mark("showResult")
 
 	if x.options.Stats {
-		cli.stats.show(cli.out)
+		cli.stats.Show(cli.out)
 	}
 
 	return cli.exitCode, nil

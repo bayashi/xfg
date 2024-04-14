@@ -8,6 +8,7 @@ import (
 
 	here "github.com/MakeNowJust/heredoc/v2"
 	a "github.com/bayashi/actually"
+	"github.com/bayashi/xfg/xfgstats"
 )
 
 const noMatchKeyword = "#NotMatch:4770&4cd-fe9cf87_29706c1@8ab965d!$% ;-P"
@@ -25,7 +26,7 @@ func TestRun_OK(t *testing.T) {
 	var outOutput bytes.Buffer
 	cli := &runner{
 		out:   &outOutput,
-		stats: newStats(1),
+		stats: xfgstats.New(1),
 	}
 	resetFlag()
 	stubExit()
@@ -609,7 +610,7 @@ func TestXfg_OK(t *testing.T) {
 			cli := &runner{
 				out:   &o,
 				isTTY: true,
-				stats: newStats(1),
+				stats: xfgstats.New(1),
 			}
 
 			tt.opt.NoPager = true
@@ -662,7 +663,7 @@ func TestNonTTY(t *testing.T) {
 			cli := &runner{
 				out:   &o,
 				isTTY: false,
-				stats: newStats(1),
+				stats: xfgstats.New(1),
 			}
 
 			exitCode, msg := cli.run()

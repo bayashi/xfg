@@ -5,6 +5,7 @@ import (
 	"testing"
 
 	a "github.com/bayashi/actually"
+	"github.com/bayashi/xfg/xfgstats"
 	c "github.com/fatih/color"
 )
 
@@ -84,7 +85,7 @@ func TestHighlight(t *testing.T) {
 			cli := &runner{
 				out:   &o,
 				isTTY: true,
-				stats: newStats(1),
+				stats: xfgstats.New(1),
 			}
 
 			tt.opt.NoPager = true

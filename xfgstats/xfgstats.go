@@ -1,10 +1,12 @@
-package main
+package xfgstats
 
 import (
 	"bufio"
 	"fmt"
 	"io"
 	"time"
+
+	"github.com/bayashi/xfg/xfgutil"
 )
 
 type lap struct {
@@ -18,21 +20,21 @@ type count struct {
 	grep    int
 }
 
-type stats struct {
+type Stats struct {
 	procs int
 	start time.Time
 	lap   []lap
 	count count
 }
 
-func newStats(procs int) *stats {
-	return &stats{
+func New(procs int) *Stats {
+	return &Stats{
 		procs: procs,
 		start: time.Now(),
 	}
 }
 
-func (s *stats) mark(label string) {
+func (s *Stats) Mark(label string) {
 	s.lap = append(s.lap, lap{
 		label: label,
 		t:     time.Since(s.start),
@@ -40,7 +42,7 @@ func (s *stats) mark(label string) {
 	s.start = time.Now()
 }
 
-func (s *stats) show(out io.Writer) {
+func (s *Stats) Show(out io.Writer) {
 	result := "\n"
 	for _, l := range s.lap {
 		result = result + fmt.Sprintf("%s: %s\n", l.label, l.t.String())
@@ -49,5 +51,17 @@ func (s *stats) show(out io.Writer) {
 	result = result + fmt.Sprintf("procs: %d\n", s.procs)
 	result = result + fmt.Sprintf("paths: %d\nmatched: %d\ngrep: %d\n", s.count.paths, s.count.matched, s.count.grep)
 
-	output(bufio.NewWriter(out), result)
+	xfgutil.Output(bufio.NewWriter(out), result)
+}
+
+func (s *Stats) IncrPaths() {
+	s.count.paths++
+}
+
+func (s *Stats) IncrMatched() {
+	s.count.matched++
+}
+
+func (s *Stats) IncrGrep() {
+	s.count.grep++
 }

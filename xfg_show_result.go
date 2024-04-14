@@ -4,18 +4,9 @@ import (
 	"bufio"
 	"fmt"
 	"sort"
+
+	"github.com/bayashi/xfg/xfgutil"
 )
-
-func output(writer *bufio.Writer, out string) error {
-	if _, err := fmt.Fprint(writer, out); err != nil {
-		return err
-	}
-	if err := writer.Flush(); err != nil {
-		return err
-	}
-
-	return nil
-}
 
 func (cli *runner) showResult(x *xfg) error {
 	if x.options.Quiet {
@@ -69,7 +60,7 @@ func (cli *runner) outputForTTY(x *xfg, lf string) error {
 				}
 			}
 		}
-		if err := output(writer, out); err != nil {
+		if err := xfgutil.Output(writer, out); err != nil {
 			return err
 		}
 	}
@@ -114,7 +105,7 @@ func (cli *runner) outputForNonTTY(x *xfg, lf string) error {
 			}
 		}
 
-		if err := output(writer, out); err != nil {
+		if err := xfgutil.Output(writer, out); err != nil {
 			return err
 		}
 	}
