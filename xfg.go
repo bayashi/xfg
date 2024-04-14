@@ -253,13 +253,13 @@ func (x *xfg) canSkip(fPath string, fInfo fs.DirEntry) bool {
 	}
 
 	if x.options.SearchOnlyName {
-		return x.canSkipPath(fInfo.Name())
+		return x.notMatchPath(fInfo.Name())
 	}
 
-	return x.canSkipPath(fPath)
+	return x.notMatchPath(fPath)
 }
 
-func (x *xfg) canSkipPath(fPath string) bool {
+func (x *xfg) notMatchPath(fPath string) bool {
 	if x.options.IgnoreCase {
 		for _, spr := range x.searchPathRe {
 			if !isMatchRegexp(fPath, spr) {
