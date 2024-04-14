@@ -604,6 +604,39 @@ func TestXfg_OK(t *testing.T) {
 			`),
 			expectExitCode: exitOK,
 		},
+		"service-b --search-only-name": {
+			opt: &options{
+				SearchPath:     []string{"a.dat"},
+				SearchOnlyName: true,
+			},
+			expect: here.Doc(`
+                testdata/service-a/a.dat
+			`),
+			expectExitCode: exitOK,
+		},
+		"service-b --search-only-name service-b": {
+			opt: &options{
+				SearchPath:     []string{"service-b"},
+				SearchOnlyName: true,
+			},
+			expect: here.Doc(`
+                testdata/service-b/
+			`),
+			expectExitCode: exitOK,
+		},
+		"--search-only-name main.go": {
+			opt: &options{
+				SearchPath:     []string{"main.go"},
+				SearchOnlyName: true,
+			},
+			expect: here.Doc(`
+                testdata/service-a/main.go
+                testdata/service-b/main.go
+                testdata/service-c/main.go
+                testdata/service-h/main.go
+			`),
+			expectExitCode: exitOK,
+		},
 	} {
 		t.Run(tname, func(t *testing.T) {
 			var o bytes.Buffer

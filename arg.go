@@ -54,6 +54,7 @@ type options struct {
 	FilesWithMatches bool `toml:"files-with-matches"`
 	Null             bool `toml:"null"`
 	Stats            bool `toml:"stats"`
+	SearchOnlyName   bool `toml:"search-only-name"`
 
 	ContextLines uint32 `toml:"context"`
 
@@ -95,6 +96,7 @@ func (cli *runner) parseArgs(d *options) *options {
 	flag.BoolVarP(&o.SkipXfgIgnore, "skip-xfgignore", "", d.SkipXfgIgnore, "Search files and directories even if a path matches a line of .xfgignore")
 	flag.BoolVarP(&o.SearchAll, "search-all", "", d.SearchAll, "Search all files and directories except specific ignoring files and directories")
 	flag.StringArrayVarP(&o.Ignore, "ignore", "", d.Ignore, "Ignore path to pick up even with '--search-all'")
+	flag.BoolVarP(&o.SearchOnlyName, "search-only-name", "f", d.SearchOnlyName, "Search to only name instead whole path string")
 
 	flag.BoolVarP(&o.Abs, "abs", "", d.Abs, "Show absolute paths")
 	flag.BoolVarP(&o.ShowMatchCount, "count", "c", d.ShowMatchCount, "Show a count of matching lines instead of contents")
