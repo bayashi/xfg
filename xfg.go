@@ -197,11 +197,7 @@ func (x *xfg) prepareRe() error {
 }
 
 func (x *xfg) isSkippable(fPath string, fInfo fs.DirEntry) (bool, error) {
-	if x.options.SearchOnlyName {
-		if x.isIgnorePath(fInfo.Name()) {
-			return true, nil
-		}
-	} else if x.isIgnorePath(fPath) {
+	if x.isIgnorePath(fPath) {
 		return true, nil
 	}
 
