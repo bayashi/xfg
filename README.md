@@ -121,6 +121,7 @@ These keywords are treated as AND condition for each.
       --skip-xfgignore           Search files and directories even if a path matches a line of .xfgignore
       --search-all               Search all files and directories except specific ignoring files and directories
       --ignore stringArray       Ignore path to pick up even with '--search-all'
+  -f, --search-only-name         Search to only name instead whole path string
       --abs                      Show absolute paths
   -c, --count                    Show a count of matching lines instead of contents
   -m, --max-count uint32         Stop reading a file after NUM matching lines
