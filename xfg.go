@@ -236,7 +236,7 @@ func (x *xfg) isIgnorePath(fPath string) bool {
 
 func (x *xfg) canSkip(fPath string, fInfo fs.DirEntry) bool {
 	if !x.options.SearchAll {
-		if canSkipStuff(fInfo) {
+		if canSkipFiles(fInfo) {
 			return true // not pick .gitkeep file
 		} else if !x.options.Hidden && strings.HasPrefix(fInfo.Name(), ".") {
 			return true // skip dot-file/dir
