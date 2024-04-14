@@ -100,9 +100,7 @@ func (x *xfg) search() error {
 	}
 
 	if x.options.Stats {
-		x.result.mu.Lock()
 		x.cli.stats.Mark("preSearch")
-		x.result.mu.Unlock()
 	}
 
 	eg := new(errgroup.Group)
