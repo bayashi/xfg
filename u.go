@@ -7,27 +7,13 @@ import (
 	"os"
 	"path/filepath"
 	"regexp"
-	"runtime"
 	"strings"
 	"syscall"
 
 	"github.com/BurntSushi/toml"
 	"github.com/adrg/xdg"
-	"github.com/mattn/go-isatty"
 	ignore "github.com/sabhiram/go-gitignore"
-	"golang.org/x/term"
 )
-
-func procs() int {
-	cpu := runtime.NumCPU()
-	if cpu == 1 {
-		cpu = 2
-	}
-
-	runtime.GOMAXPROCS(cpu)
-
-	return cpu
-}
 
 func defaultOptions() *options {
 	return &options{
@@ -38,20 +24,6 @@ func defaultOptions() *options {
 		ColorPath:      "cyan",
 		ColorContent:   "red",
 	}
-}
-
-func isTTY() bool {
-	fd := os.Stdout.Fd()
-	return isatty.IsTerminal(fd) || isatty.IsCygwinTerminal(fd)
-}
-
-func homeDir() (string, error) {
-	homeDir, err := os.UserHomeDir()
-	if err != nil {
-		return "", err
-	}
-
-	return homeDir, nil
 }
 
 const XFG_RC_ENV_KEY = "XFG_RC_FILE_PATH"
@@ -166,15 +138,6 @@ func isMatchRegexp(target string, re *regexp.Regexp) bool {
 	}
 
 	return re.MatchString(target)
-}
-
-func getTermWindowRows(fd int) (int, error) {
-	_, rows, err := term.GetSize(fd)
-	if err != nil {
-		return 0, err
-	}
-
-	return rows, nil
 }
 
 func canSkipStuff(fInfo fs.DirEntry) bool {

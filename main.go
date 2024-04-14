@@ -6,6 +6,7 @@ import (
 	"os"
 
 	"github.com/bayashi/xfg/xfgstats"
+	"github.com/bayashi/xfg/xfgutil"
 )
 
 const (
@@ -28,11 +29,11 @@ type runner struct {
 }
 
 func main() {
-	procs := procs()
+	procs := xfgutil.Procs()
 	cli := &runner{
 		out:   os.Stdout,
 		err:   os.Stderr,
-		isTTY: isTTY(),
+		isTTY: xfgutil.IsTTY(),
 		procs: procs,
 		stats: xfgstats.New(procs),
 	}
@@ -45,7 +46,7 @@ func main() {
 }
 
 func (cli *runner) run() (int, string) {
-	homeDir, err := homeDir()
+	homeDir, err := xfgutil.HomeDir()
 	if err != nil {
 		return exitErr, fmt.Sprintf("on detecting home directory : %s", err)
 	}
