@@ -26,3 +26,6 @@ require (
 	golang.org/x/sync v0.7.0
 	golang.org/x/sys v0.19.0 // indirect
 )
+
+replace github.com/bayashi/xfg/xfgutil => ./xfgutil
+replace github.com/bayashi/xfg/xfgstats => ./xfgstats
