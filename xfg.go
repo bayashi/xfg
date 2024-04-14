@@ -197,6 +197,10 @@ func (x *xfg) prepareRe() error {
 }
 
 func (x *xfg) isSkippable(fPath string, fInfo fs.DirEntry) (bool, error) {
+	if fInfo.IsDir() && x.options.onlyMatchContent {
+		return true, nil // not pick up
+	}
+
 	if x.isIgnorePath(fPath) {
 		return true, nil
 	}
@@ -246,10 +250,6 @@ func (x *xfg) canSkip(fPath string, fInfo fs.DirEntry) bool {
 		if x.xfgignore != nil && x.xfgignore.MatchesPath(fPath) {
 			return true // skip a file by .xfgignore
 		}
-	}
-
-	if fInfo.IsDir() && x.options.onlyMatchContent {
-		return true // not pick up
 	}
 
 	if x.options.SearchOnlyName {
