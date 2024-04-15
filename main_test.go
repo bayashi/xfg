@@ -331,6 +331,7 @@ func TestXfg_OK(t *testing.T) {
 			expect: here.Doc(`
                 testdata/service-g/
                 testdata/service-g/.svn/
+                testdata/service-g/.svn/.gitkeep
                 testdata/service-g/node_modules/
                 testdata/service-g/node_modules/.gitkeep
                 testdata/service-g/service-g.min.css
