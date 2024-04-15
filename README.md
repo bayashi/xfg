@@ -154,6 +154,10 @@ You can use default options by `.xfgrc` file. It's TOML file even without `.toml
 
 ```
 color-path = "blue"
+ignore = [
+    ".vscode",
+    ".idea",
+]
 ```
 
 `.xfgrc` file should be in [XDG Base Directory](https://specifications.freedesktop.org/basedir-spec/basedir-spec-latest.html) or HOME directory. Or, you can specify a file path by ENV key: `XFG_RC_FILE_PATH` as you like.
