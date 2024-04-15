@@ -205,15 +205,30 @@ func (x *xfg) isSkippable(fPath string, fInfo fs.DirEntry) (bool, error) {
 		return true, nil
 	}
 
-	if !x.options.SearchAll && canSkipDirs(fInfo) {
-		return true, filepath.SkipDir // not search for directory
+	if !x.options.SearchAll {
+		if canSkipDirs(fInfo) {
+			return true, filepath.SkipDir // not search for .git directory
+		}
+
+		if canSkipFiles(fInfo) {
+			return true, nil // not pick .gitkeep file
+		} else if !x.options.Hidden && strings.HasPrefix(fInfo.Name(), ".") {
+			return true, nil // skip dot-file/dir
+		}
+
+		if x.gitignore != nil && x.gitignore.MatchesPath(fPath) {
+			return true, nil // skip a file by .gitignore
+		}
+		if x.xfgignore != nil && x.xfgignore.MatchesPath(fPath) {
+			return true, nil // skip a file by .xfgignore
+		}
 	}
 
-	if x.canSkip(fPath, fInfo) {
-		return true, nil
+	if x.options.SearchOnlyName {
+		return x.canSkipPath(fInfo.Name()), nil
 	}
 
-	return false, nil
+	return x.canSkipPath(fPath), nil
 }
 
 func (x *xfg) isIgnorePath(fPath string) bool {
@@ -234,32 +249,7 @@ func (x *xfg) isIgnorePath(fPath string) bool {
 	return false
 }
 
-func (x *xfg) canSkip(fPath string, fInfo fs.DirEntry) bool {
-	if !x.options.SearchAll {
-		if canSkipFiles(fInfo) {
-			return true // not pick .gitkeep file
-		} else if !x.options.Hidden && strings.HasPrefix(fInfo.Name(), ".") {
-			return true // skip dot-file/dir
-		}
-	}
-
-	if !x.options.SearchAll {
-		if x.gitignore != nil && x.gitignore.MatchesPath(fPath) {
-			return true // skip a file by .gitignore
-		}
-		if x.xfgignore != nil && x.xfgignore.MatchesPath(fPath) {
-			return true // skip a file by .xfgignore
-		}
-	}
-
-	if x.options.SearchOnlyName {
-		return x.notMatchPath(fInfo.Name())
-	}
-
-	return x.notMatchPath(fPath)
-}
-
-func (x *xfg) notMatchPath(fPath string) bool {
+func (x *xfg) canSkipPath(fPath string) bool {
 	if x.options.IgnoreCase {
 		for _, spr := range x.searchPathRe {
 			if !isMatchRegexp(fPath, spr) {

@@ -92,11 +92,16 @@ These keywords are treated as AND condition for each.
 
 ### Ignore rules
 
-* Files and directories whose names start with a dot are ignored by default
-    * Use `--hidden` option to search for hidden-files/directories
-        * Still ignore `.git` and `.gitkeep`
 * Ignored `*.min.js` or `*.min.css` files by default
 * Ignored `.git`, `.svn`, `node_modules` or `vendor` directories and files in them by default
+* Files and directories whose names start with a dot are ignored by default
+    * Use `-.` or `--hidden` option to search for hidden-files/directories
+        * Still ignore `.git`, `.gitkeep`, `node_modules`, `vendor`, `.gitkeep`, `*.min.js` and `*.mmin.css`
+* `-a` or `--search-all` option enables to search for all files and directories
+    * You can ignore specific files and directories with `--ignore` option
+
+### .gitignore file
+
 * Support .gitignore file to ignore files and directories by default
     * Read `.gitignore` file from starting directory to search or HOME directory.
     * Use `--skip-gitignore` option to avoid reading `.gitignore` file.
@@ -104,8 +109,6 @@ These keywords are treated as AND condition for each.
     * `.xfgignore` file should be located in [XDG Base Directory](https://specifications.freedesktop.org/basedir-spec/basedir-spec-latest.html) or HOME directory
     * You can specify `.xfgignore` file path by `--xfgignore-file` option
     * Use `--skip-xfgignore` option to avoid reading `.xfgignore` file
-* Pick up all files and directories to search with `--search-all` option
-    * You can ignore specific files and directories with `--ignore` option
 
 ## Options
 
@@ -120,7 +123,7 @@ These keywords are treated as AND condition for each.
   -., --hidden                   Enable to search hidden files
       --skip-gitignore           Search files and directories even if a path matches a line of .gitignore
       --skip-xfgignore           Search files and directories even if a path matches a line of .xfgignore
-      --search-all               Search all files and directories except specific ignoring files and directories
+  -a, --search-all               Search all files and directories except specific ignoring files and directories
       --ignore stringArray       Ignore path to pick up even with '--search-all'
   -f, --search-only-name         Search to only name instead whole path string
       --abs                      Show absolute paths
@@ -151,6 +154,10 @@ You can use default options by `.xfgrc` file. It's TOML file even without `.toml
 
 ```
 color-path = "blue"
+ignore = [
+    ".vscode",
+    ".idea",
+]
 ```
 
 `.xfgrc` file should be in [XDG Base Directory](https://specifications.freedesktop.org/basedir-spec/basedir-spec-latest.html) or HOME directory. Or, you can specify a file path by ENV key: `XFG_RC_FILE_PATH` as you like.
