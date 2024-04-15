@@ -323,13 +323,14 @@ func TestXfg_OK(t *testing.T) {
 			`),
 			expectExitCode: exitOK,
 		},
-		"pick *min.js with --search-all option": {
+		"pick *min.js etc with --search-all option": {
 			opt: &options{
 				SearchPath: []string{"service-g"},
 				SearchAll:  true,
 			},
 			expect: here.Doc(`
                 testdata/service-g/
+                testdata/service-g/.svn/
                 testdata/service-g/node_modules/
                 testdata/service-g/node_modules/.gitkeep
                 testdata/service-g/service-g.min.css
