@@ -205,8 +205,8 @@ func (x *xfg) isSkippable(fPath string, fInfo fs.DirEntry) (bool, error) {
 		return true, nil
 	}
 
-	if !x.options.SearchAll && (fInfo.IsDir() && fInfo.Name() == ".git") {
-		return true, filepath.SkipDir // not search for .git directory
+	if !x.options.SearchAll && canSkipDirs(fInfo) {
+		return true, filepath.SkipDir // not search for directory
 	}
 
 	if x.canSkip(fPath, fInfo) {

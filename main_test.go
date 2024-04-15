@@ -281,7 +281,7 @@ func TestXfg_OK(t *testing.T) {
 			`),
 			expectExitCode: exitOK,
 		},
-		"ignore *min.js by default": {
+		"ignore files and directories by default": {
 			opt: &options{
 				SearchPath: []string{"service-g"},
 			},
@@ -330,7 +330,12 @@ func TestXfg_OK(t *testing.T) {
 			},
 			expect: here.Doc(`
                 testdata/service-g/
+                testdata/service-g/node_modules/
+                testdata/service-g/node_modules/.gitkeep
+                testdata/service-g/service-g.min.css
                 testdata/service-g/service-g.min.js
+                testdata/service-g/vendor/
+                testdata/service-g/vendor/.gitkeep
 			`),
 			expectExitCode: exitOK,
 		},
