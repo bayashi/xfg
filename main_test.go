@@ -337,7 +337,6 @@ func TestXfg_OK(t *testing.T) {
                 testdata/service-g/service-g.min.css
                 testdata/service-g/service-g.min.js
                 testdata/service-g/vendor/
-                testdata/service-g/vendor/.gitkeep
 			`),
 			expectExitCode: exitOK,
 		},
