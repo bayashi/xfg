@@ -146,7 +146,7 @@ func canSkipFiles(fInfo fs.DirEntry) bool {
 }
 
 func canSkipDirs(fInfo fs.DirEntry) bool {
-	return fInfo.IsDir() && (fInfo.Name() == ".git" ||
+	return fInfo.IsDir() && (fInfo.Name() == ".git" || fInfo.Name() == ".svn" ||
 		fInfo.Name() == "node_modules" ||
 		fInfo.Name() == "vendor")
 }

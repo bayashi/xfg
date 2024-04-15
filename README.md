@@ -95,7 +95,8 @@ These keywords are treated as AND condition for each.
 * Files and directories whose names start with a dot are ignored by default
     * Use `--hidden` option to search for hidden-files/directories
         * Still ignore `.git` and `.gitkeep`
-* Ignored `*.min.js` file by default
+* Ignored `*.min.js` or `*.min.css` files by default
+* Ignored `.git`, `.svn`, `node_modules` or `vendor` directories and files in them by default
 * Support .gitignore file to ignore files and directories by default
     * Read `.gitignore` file from starting directory to search or HOME directory.
     * Use `--skip-gitignore` option to avoid reading `.gitignore` file.
