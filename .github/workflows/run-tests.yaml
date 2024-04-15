@@ -48,6 +48,7 @@ jobs:
         run: |
             mkdir -p testdata/service-f/ignorez
             mkdir -p testdata/service-i/ignorex
+            mkdir -p testdata/service-g/vendor
 
       - name: Test with the Go CLI
         shell: 'script -q -e -c "bash {0}"'
@@ -83,6 +84,7 @@ jobs:
         run: |
             mkdir -p testdata/service-f/ignorez
             mkdir -p testdata/service-i/ignorex
+            mkdir -p testdata/service-g/vendor
 
       - name: Test with the Go CLI
         run: go test ./... -race -shuffle=on -timeout=3m -cover -v

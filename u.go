@@ -140,6 +140,13 @@ func isMatchRegexp(target string, re *regexp.Regexp) bool {
 	return re.MatchString(target)
 }
 
-func canSkipStuff(fInfo fs.DirEntry) bool {
-	return !fInfo.IsDir() && (fInfo.Name() == ".gitkeep" || strings.HasSuffix(fInfo.Name(), ".min.js"))
+func canSkipFiles(fInfo fs.DirEntry) bool {
+	return !fInfo.IsDir() && (fInfo.Name() == ".gitkeep" ||
+		strings.HasSuffix(fInfo.Name(), ".min.js") || strings.HasSuffix(fInfo.Name(), ".min.css"))
+}
+
+func canSkipDirs(fInfo fs.DirEntry) bool {
+	return fInfo.IsDir() && (fInfo.Name() == ".git" || fInfo.Name() == ".svn" ||
+		fInfo.Name() == "node_modules" ||
+		fInfo.Name() == "vendor")
 }

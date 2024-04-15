@@ -205,8 +205,8 @@ func (x *xfg) isSkippable(fPath string, fInfo fs.DirEntry) (bool, error) {
 		return true, nil
 	}
 
-	if !x.options.SearchAll && (fInfo.IsDir() && fInfo.Name() == ".git") {
-		return true, filepath.SkipDir // not search for .git directory
+	if !x.options.SearchAll && canSkipDirs(fInfo) {
+		return true, filepath.SkipDir // not search for directory
 	}
 
 	if x.canSkip(fPath, fInfo) {
@@ -236,7 +236,7 @@ func (x *xfg) isIgnorePath(fPath string) bool {
 
 func (x *xfg) canSkip(fPath string, fInfo fs.DirEntry) bool {
 	if !x.options.SearchAll {
-		if canSkipStuff(fInfo) {
+		if canSkipFiles(fInfo) {
 			return true // not pick .gitkeep file
 		} else if !x.options.Hidden && strings.HasPrefix(fInfo.Name(), ".") {
 			return true // skip dot-file/dir
@@ -253,13 +253,13 @@ func (x *xfg) canSkip(fPath string, fInfo fs.DirEntry) bool {
 	}
 
 	if x.options.SearchOnlyName {
-		return x.canSkipPath(fInfo.Name())
+		return x.notMatchPath(fInfo.Name())
 	}
 
-	return x.canSkipPath(fPath)
+	return x.notMatchPath(fPath)
 }
 
-func (x *xfg) canSkipPath(fPath string) bool {
+func (x *xfg) notMatchPath(fPath string) bool {
 	if x.options.IgnoreCase {
 		for _, spr := range x.searchPathRe {
 			if !isMatchRegexp(fPath, spr) {
