@@ -49,6 +49,7 @@ type options struct {
 	SkipGitIgnore    bool `toml:"skip-gitignore"`
 	SkipXfgIgnore    bool `toml:"skip-xfgignore"`
 	SearchAll        bool `toml:"search-all"`
+	Unrestricted     bool `toml:"unrestricted"`
 	NoPager          bool `toml:"no-pager"`
 	Quiet            bool `toml:"quiet"`
 	FilesWithMatches bool `toml:"files-with-matches"`
@@ -95,6 +96,7 @@ func (cli *runner) parseArgs(d *options) *options {
 	flag.BoolVarP(&o.SkipGitIgnore, "skip-gitignore", "", d.SkipGitIgnore, "Search files and directories even if a path matches a line of .gitignore")
 	flag.BoolVarP(&o.SkipXfgIgnore, "skip-xfgignore", "", d.SkipXfgIgnore, "Search files and directories even if a path matches a line of .xfgignore")
 	flag.BoolVarP(&o.SearchAll, "search-all", "a", d.SearchAll, "Search all files and directories except specific ignoring files and directories")
+	flag.BoolVarP(&o.Unrestricted, "unrestricted", "u", d.Unrestricted, "The alias of --search-all")
 	flag.StringArrayVarP(&o.Ignore, "ignore", "", d.Ignore, "Ignore path to pick up even with '--search-all'")
 	flag.BoolVarP(&o.SearchOnlyName, "search-only-name", "f", d.SearchOnlyName, "Search to only name instead whole path string")
 
@@ -189,6 +191,12 @@ func (o *options) prepareContextLines(isTTY bool) {
 	}
 
 	o.withBeforeContextLines = o.ContextLines > 0 || o.BeforeContextLines > 0
+}
+
+func (o *options) prepareAliases() {
+	if o.Unrestricted {
+		o.SearchAll = true
+	}
 }
 
 func versionDetails() string {
