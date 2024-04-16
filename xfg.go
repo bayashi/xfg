@@ -55,6 +55,7 @@ type xfg struct {
 }
 
 func newX(cli *runner, o *options) *xfg {
+	o.prepareAliases()
 	o.prepareContextLines(cli.isTTY)
 
 	x := &xfg{

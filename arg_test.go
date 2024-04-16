@@ -155,3 +155,11 @@ func TestArgs(t *testing.T) {
 		})
 	}
 }
+
+func TestPrepareAliases(t *testing.T) {
+	o := &options{
+		Unrestricted: true,
+	}
+	o.prepareAliases()
+	a.Got(o.SearchAll).True(t)
+}
