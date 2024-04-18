@@ -643,6 +643,16 @@ func TestXfg_OK(t *testing.T) {
 			`),
 			expectExitCode: exitOK,
 		},
+		"service-(b|c)": {
+			opt: &options{
+				SearchPathRe: []string{"service-(b|c)$"},
+			},
+			expect: here.Doc(`
+                testdata/service-b/
+                testdata/service-c/
+			`),
+			expectExitCode: exitOK,
+		},
 	} {
 		t.Run(tname, func(t *testing.T) {
 			var o bytes.Buffer

@@ -113,39 +113,41 @@ These keywords are treated as AND condition for each.
 ## Options
 
 ```
-  -p, --path stringArray         A string to find paths
-  -g, --grep stringArray         A string to search for contents
-  -s, --start string             A location to start searching (default ".")
-  -i, --ignore-case              Ignore case distinctions to search. Also affects keywords of ignore option
-  -C, --context uint32           Show several lines before and after the matched one
-  -A, --after-context uint32     Show several lines after the matched one. Override context option
-  -B, --before-context uint32    Show several lines before the matched one. Override context option
-  -., --hidden                   Enable to search hidden files
-      --skip-gitignore           Search files and directories even if a path matches a line of .gitignore
-      --skip-xfgignore           Search files and directories even if a path matches a line of .xfgignore
-  -a, --search-all               Search all files and directories except specific ignoring files and directories
-      --ignore stringArray       Ignore path to pick up even with '--search-all'
-  -f, --search-only-name         Search to only name instead whole path string
-      --abs                      Show absolute paths
-  -c, --count                    Show a count of matching lines instead of contents
-  -m, --max-count uint32         Stop reading a file after NUM matching lines
-      --max-columns uint32       Do not print lines longer than this limit
-  -l, --files-with-matches       Only print the names of matching files
-  -0, --null                     Separate the filenames with \0, rather than \n
-      --no-color                 Disable colors for an output
-      --color-path-base string   Color name for a path (default "yellow")
-      --color-path string        Color name to highlight keywords in a path (default "cyan")
-      --color-content string     Color name to highlight keywords in a content line (default "red")
-      --group-separator string   Print this string instead of '--' between groups of lines (default "--")
-      --no-group-separator       Do not print a separator between groups of lines
-      --indent string            Indent string for the top of each line (default " ")
-      --no-indent                Do not print an indent string
-      --xfgignore-file string    .xfgignore file path if you have it except XDG base directory or HOME directory
-      --no-pager                 Do not invoke with the Pager
-  -q, --quiet                    Do not write anything to standard output. Exit immediately with zero status if any match is found
-      --stats                    Print runtime stats after searching result
-  -h, --help                     Show help (This message) and exit
-  -v, --version                  Show version and build command info and exit
+  -p, --path stringArray          A string to find paths
+  -g, --grep stringArray          A string to search for contents
+  -s, --start string              A location to start searching (default ".")
+  -i, --ignore-case               Ignore case distinctions to search. Also affects keywords of ignore option
+  -P, --path-regexp stringArray   A string to find paths by regular expressions (RE2)
+  -C, --context uint32            Show several lines before and after the matched one
+  -A, --after-context uint32      Show several lines after the matched one. Override context option
+  -B, --before-context uint32     Show several lines before the matched one. Override context option
+  -., --hidden                    Enable to search hidden files
+      --skip-gitignore            Search files and directories even if a path matches a line of .gitignore
+      --skip-xfgignore            Search files and directories even if a path matches a line of .xfgignore
+  -a, --search-all                Search all files and directories except specific ignoring files and directories
+  -u, --unrestricted              The alias of --search-all
+      --ignore stringArray        Ignore path to pick up even with '--search-all'
+  -f, --search-only-name          Search to only name instead whole path string
+      --abs                       Show absolute paths
+  -c, --count                     Show a count of matching lines instead of contents
+  -m, --max-count uint32          Stop reading a file after NUM matching lines
+      --max-columns uint32        Do not print lines longer than this limit
+  -l, --files-with-matches        Only print the names of matching files
+  -0, --null                      Separate the filenames with \0, rather than \n
+      --no-color                  Disable colors for an output
+      --color-path-base string    Color name for a path (default "yellow")
+      --color-path string         Color name to highlight keywords in a path (default "cyan")
+      --color-content string      Color name to highlight keywords in a content line (default "red")
+      --group-separator string    Print this string instead of '--' between groups of lines (default "--")
+      --no-group-separator        Do not print a separator between groups of lines
+      --indent string             Indent string for the top of each line (default " ")
+      --no-indent                 Do not print an indent string
+      --xfgignore-file string     .xfgignore file path if you have it except XDG base directory or HOME directory
+      --no-pager                  Do not invoke with the Pager
+  -q, --quiet                     Do not write anything to standard output. Exit immediately with zero status if any match is found
+      --stats                     Print runtime stats after searching result
+  -h, --help                      Show help (This message) and exit
+  -v, --version                   Show version and build command info and exit
 ```
 
 ## Default Options
@@ -165,6 +167,10 @@ ignore = [
 ```
 export XFG_RC_FILE_PATH="/path/to/your_rc_file.toml"
 ```
+
+## Highlight limitation
+
+The `xfg` adds colors for highlight keywords for paths. However, if you use (`-P`, `--path-regexp`) option and (`-p`, `--path`) option at the same time, and when both conditions are matching with same peace of string, then the ONLY (`-P`, `--path-regexp`) condition can highlight string so far. This limitation is same as grep contents condition.
 
 ## Installation
 

@@ -45,11 +45,12 @@ type xfg struct {
 	grepHighlightColor *color.Color
 	grepHighlighter    []string
 
-	searchPathi []*regexp.Regexp
-	searchGrepi []*regexp.Regexp
-	ignoreRe    []*regexp.Regexp
-	gitignore   *ignore.GitIgnore
-	xfgignore   *ignore.GitIgnore
+	searchPathi  []*regexp.Regexp
+	searchGrepi  []*regexp.Regexp
+	searchPathRe []*regexp.Regexp
+	ignoreRe     []*regexp.Regexp
+	gitignore    *ignore.GitIgnore
+	xfgignore    *ignore.GitIgnore
 
 	result result
 }
@@ -162,6 +163,16 @@ func (x *xfg) preSearch() error {
 		}
 	}
 
+	if len(x.options.SearchPathRe) > 0 {
+		for _, re := range x.options.SearchPathRe {
+			compiledRe, err := regexp.Compile("(" + re + ")")
+			if err != nil {
+				return err
+			}
+			x.searchPathRe = append(x.searchPathRe, compiledRe)
+		}
+	}
+
 	return nil
 }
 
@@ -265,6 +276,14 @@ func (x *xfg) canSkipPath(fPath string) bool {
 		}
 	}
 
+	if len(x.searchPathRe) > 0 {
+		for _, re := range x.searchPathRe {
+			if !isMatchRegexp(fPath, re) {
+				return true // OK, skip
+			}
+		}
+	}
+
 	return false // match all, cannot skip
 }
 
@@ -342,7 +361,12 @@ func (x *xfg) scanFile(fPath string) ([]line, error) {
 }
 
 func (x *xfg) highlightPath(fPath string) string {
-	fPath = x.pathBaseColor + fPath
+	if len(x.searchPathRe) > 0 {
+		for _, re := range x.searchPathRe {
+			fPath = re.ReplaceAllString(fPath, x.pathHighlightColor.Sprintf("$1")+x.pathBaseColor)
+		}
+	}
+
 	if x.options.IgnoreCase {
 		for _, spr := range x.searchPathi {
 			fPath = spr.ReplaceAllString(fPath, x.pathHighlightColor.Sprintf("$1")+x.pathBaseColor)
@@ -353,7 +377,7 @@ func (x *xfg) highlightPath(fPath string) string {
 		}
 	}
 
-	return fPath + "\x1b[0m"
+	return x.pathBaseColor + fPath + "\x1b[0m"
 }
 
 type scanFile struct {
