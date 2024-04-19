@@ -199,7 +199,7 @@ func (x *xfg) prepareRe() error {
 
 func (x *xfg) isSkippable(fPath string, fInfo fs.DirEntry) (bool, error) {
 	if !x.options.SearchAll {
-		if canSkipDirs(fInfo) || (fInfo.IsDir() && !x.options.Hidden && strings.HasPrefix(fInfo.Name(), ".")) {
+		if isDefaultSkipDir(fInfo) || (fInfo.IsDir() && !x.options.Hidden && strings.HasPrefix(fInfo.Name(), ".")) {
 			return true, filepath.SkipDir // skip all stuff in this dir
 		}
 	}
@@ -213,7 +213,7 @@ func (x *xfg) isSkippable(fPath string, fInfo fs.DirEntry) (bool, error) {
 	}
 
 	if !x.options.SearchAll {
-		if canSkipFiles(fInfo) || (!fInfo.IsDir() && !x.options.Hidden && strings.HasPrefix(fInfo.Name(), ".")) {
+		if isDefaultSkipFile(fInfo) || (!fInfo.IsDir() && !x.options.Hidden && strings.HasPrefix(fInfo.Name(), ".")) {
 			return true, nil // skip
 		}
 
