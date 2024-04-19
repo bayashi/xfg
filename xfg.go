@@ -209,23 +209,23 @@ func (x *xfg) prepareRe() error {
 }
 
 func (x *xfg) isSkippable(fPath string, fInfo fs.DirEntry) (bool, error) {
+	if !x.options.SearchAll {
+		if isDefaultSkipDir(fInfo) || (fInfo.IsDir() && !x.options.Hidden && strings.HasPrefix(fInfo.Name(), ".")) {
+			return true, filepath.SkipDir // skip all stuff in this dir
+		}
+	}
+
 	if fInfo.IsDir() && x.options.onlyMatchContent {
-		return true, nil // not pick up
+		return true, nil // Just not pick up only this dir path. It will be searched files and directories in this dir.
 	}
 
 	if x.isIgnorePath(fPath) {
-		return true, nil
+		return true, nil // skip
 	}
 
 	if !x.options.SearchAll {
-		if canSkipDirs(fInfo) {
-			return true, filepath.SkipDir // not search for .git directory
-		}
-
-		if canSkipFiles(fInfo) {
-			return true, nil // not pick .gitkeep file
-		} else if !x.options.Hidden && strings.HasPrefix(fInfo.Name(), ".") {
-			return true, nil // skip dot-file/dir
+		if isDefaultSkipFile(fInfo) || (!fInfo.IsDir() && !x.options.Hidden && strings.HasPrefix(fInfo.Name(), ".")) {
+			return true, nil // skip
 		}
 
 		if x.gitignore != nil && x.gitignore.MatchesPath(fPath) {
