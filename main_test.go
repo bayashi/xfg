@@ -643,6 +643,15 @@ func TestXfg_OK(t *testing.T) {
 			`),
 			expectExitCode: exitOK,
 		},
+		"ignore files and directories with onlyMatchContent by default": {
+			opt: &options{
+				SearchPath:       []string{"service-j"},
+				SearchGrep:       []string{"foo"},
+				onlyMatchContent: true,
+			},
+			expect:         "", // skiped all
+			expectExitCode: exitOK,
+		},
 	} {
 		t.Run(tname, func(t *testing.T) {
 			var o bytes.Buffer
