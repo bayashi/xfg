@@ -106,6 +106,7 @@ func (x *xfg) search() error {
 	}
 
 	eg := new(errgroup.Group)
+	isFirstDir := true
 	walkErr := filepath.WalkDir(x.options.SearchStart, func(fPath string, fInfo fs.DirEntry, err error) error {
 		x.cli.stats.IncrPaths()
 		if err != nil {
@@ -116,10 +117,15 @@ func (x *xfg) search() error {
 			return nil // already match. skip after all
 		}
 
-		if isSkippable, sErr := x.isSkippable(fPath, fInfo); sErr != nil {
-			return sErr
-		} else if isSkippable {
-			return nil
+		if !isFirstDir {
+			if isSkippable, sErr := x.isSkippable(fPath, fInfo); sErr != nil {
+				return sErr
+			} else if isSkippable {
+				return nil
+			}
+		} else {
+			isFirstDir = false
+			return nil // not pick up start dir path, anyway
 		}
 
 		x.cli.stats.IncrMatched()
@@ -209,8 +215,12 @@ func (x *xfg) prepareRe() error {
 }
 
 func (x *xfg) isSkippable(fPath string, fInfo fs.DirEntry) (bool, error) {
+	if x.options.SearchStart == fInfo.Name() {
+		return true, nil
+	}
+
 	if !x.options.SearchAll {
-		if isDefaultSkipDir(fInfo) || (fInfo.IsDir() && !x.options.Hidden && strings.HasPrefix(fInfo.Name(), ".")) {
+		if isDefaultSkipDir(fInfo) {
 			return true, filepath.SkipDir // skip all stuff in this dir
 		}
 	}
