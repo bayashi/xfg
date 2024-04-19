@@ -31,6 +31,7 @@ type options struct {
 	SearchStart string   `toml:"start"`
 
 	SearchPathRe []string `toml:"path-regexp"`
+	SearchGrepRe []string `toml:"grep-regexp"`
 
 	GroupSeparator string `toml:"gourp-separator"`
 	Indent         string `toml:"indent"`
@@ -91,6 +92,7 @@ func (cli *runner) parseArgs(d *options) *options {
 	flag.BoolVarP(&o.IgnoreCase, "ignore-case", "i", d.IgnoreCase, "Ignore case distinctions to search. Also affects keywords of ignore option")
 
 	flag.StringArrayVarP(&o.SearchPathRe, "path-regexp", "P", d.SearchPathRe, "A string to find paths by regular expressions (RE2)")
+	flag.StringArrayVarP(&o.SearchGrepRe, "grep-regexp", "G", d.SearchGrepRe, "A string to grep contents by regular expressions (RE2)")
 
 	flag.Uint32VarP(&o.ContextLines, "context", "C", d.ContextLines, "Show several lines before and after the matched one")
 	flag.Uint32VarP(&o.AfterContextLines, "after-context", "A", d.AfterContextLines, "Show several lines after the matched one. Override context option")
@@ -144,11 +146,11 @@ func (cli *runner) parseArgs(d *options) *options {
 
 	o.targetPathFromArgs()
 
-	if len(o.SearchPath) == 0 && len(o.SearchGrep) == 0 && len(o.SearchPathRe) == 0 {
+	if len(o.SearchPath) == 0 && len(o.SearchGrep) == 0 && len(o.SearchPathRe) == 0 && len(o.SearchGrepRe) == 0 {
 		cli.putHelp(errNeedToSetPathOrGrep)
 	}
 
-	if len(o.SearchGrep) > 0 {
+	if len(o.SearchGrep) > 0 || len(o.SearchGrepRe) > 0 {
 		o.onlyMatchContent = true
 	}
 

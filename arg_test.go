@@ -144,6 +144,13 @@ func TestArgs(t *testing.T) {
 				o.SearchPathRe = []string{"fo."}
 			},
 		},
+		"only grep regexp arg": {
+			args: []string{"-G", "fo."},
+			prepareExpect: func(o *options) {
+				o.SearchGrepRe = []string{"fo."}
+				o.onlyMatchContent = true
+			},
+		},
 	} {
 		t.Run(tname, func(t *testing.T) {
 			resetFlag()

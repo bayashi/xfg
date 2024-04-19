@@ -652,13 +652,27 @@ func TestXfg_OK(t *testing.T) {
 			expect:         "", // skiped all
 			expectExitCode: exitOK,
 		},
-		"service-(b|c)": {
+		"search path service-(b|c)": {
 			opt: &options{
 				SearchPathRe: []string{"service-(b|c)$"},
 			},
 			expect: here.Doc(`
                 testdata/service-b/
                 testdata/service-c/
+			`),
+			expectExitCode: exitOK,
+		},
+		"search contents by regexp": {
+			opt: &options{
+				SearchGrepRe:     []string{"ba(r|z) := \\d+$"},
+				onlyMatchContent: true,
+			},
+			expect: here.Doc(`
+                testdata/service-b/main.go
+                4: 	bar := 34
+                
+                testdata/service-c/main.go
+                4: 	baz := 56
 			`),
 			expectExitCode: exitOK,
 		},

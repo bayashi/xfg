@@ -48,6 +48,7 @@ type xfg struct {
 	searchPathi  []*regexp.Regexp
 	searchGrepi  []*regexp.Regexp
 	searchPathRe []*regexp.Regexp
+	searchGrepRe []*regexp.Regexp
 	ignoreRe     []*regexp.Regexp
 	gitignore    *ignore.GitIgnore
 	xfgignore    *ignore.GitIgnore
@@ -179,6 +180,16 @@ func (x *xfg) preSearch() error {
 		}
 	}
 
+	if len(x.options.SearchGrepRe) > 0 {
+		for _, re := range x.options.SearchGrepRe {
+			compiledRe, err := regexp.Compile("(" + re + ")")
+			if err != nil {
+				return err
+			}
+			x.searchGrepRe = append(x.searchGrepRe, compiledRe)
+		}
+	}
+
 	return nil
 }
 
@@ -272,13 +283,13 @@ func (x *xfg) isIgnorePath(fPath string) bool {
 }
 
 func (x *xfg) canSkipPath(fPath string) bool {
-	if x.options.IgnoreCase {
+	if x.options.IgnoreCase && len(x.searchPathi) > 0 {
 		for _, spr := range x.searchPathi {
 			if !isMatchRegexp(fPath, spr) {
 				return true // OK, skip
 			}
 		}
-	} else {
+	} else if len(x.options.SearchPath) > 0 {
 		for _, sp := range x.options.SearchPath {
 			if !isMatch(fPath, sp) {
 				return true // OK, skip
@@ -302,7 +313,7 @@ func (x *xfg) postMatchPath(fPath string, fInfo fs.DirEntry) (err error) {
 		info: fInfo,
 	}
 
-	if len(x.options.SearchGrep) > 0 && isRegularFile(fInfo) {
+	if (len(x.options.SearchGrep) > 0 || len(x.searchGrepRe) > 0) && isRegularFile(fInfo) {
 		matchedPath.contents, err = x.scanFile(fPath)
 		if err != nil {
 			return fmt.Errorf("scanFile() : %w", err)
@@ -427,15 +438,25 @@ func (x *xfg) scanContent(scanner *bufio.Scanner, fPath string) ([]line, error) 
 }
 
 func (x *xfg) isMatchLine(line string) bool {
-	if x.options.IgnoreCase {
+	if x.options.IgnoreCase && len(x.searchGrepi) > 0 {
 		for _, sgr := range x.searchGrepi {
 			if !isMatchRegexp(line, sgr) {
 				return false
 			}
 		}
 	} else {
-		for _, sg := range x.options.SearchGrep {
-			if !isMatch(line, sg) {
+		if len(x.options.SearchGrep) > 0 {
+			for _, sg := range x.options.SearchGrep {
+				if !isMatch(line, sg) {
+					return false
+				}
+			}
+		}
+	}
+
+	if len(x.searchGrepRe) > 0 {
+		for _, re := range x.searchGrepRe {
+			if !isMatchRegexp(line, re) {
 				return false
 			}
 		}
@@ -445,6 +466,12 @@ func (x *xfg) isMatchLine(line string) bool {
 }
 
 func (x *xfg) highlightLine(gf *scanFile) {
+	if len(x.searchGrepRe) > 0 {
+		for _, re := range x.searchGrepRe {
+			gf.l = re.ReplaceAllString(gf.l, x.grepHighlightColor.Sprintf("$1"))
+		}
+	}
+
 	if x.options.IgnoreCase {
 		for _, sgr := range x.searchGrepi {
 			gf.l = sgr.ReplaceAllString(gf.l, x.grepHighlightColor.Sprintf("$1"))
