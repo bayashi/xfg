@@ -4,6 +4,7 @@ import (
 	"bufio"
 	"fmt"
 	"os"
+	"regexp"
 	"runtime"
 
 	"github.com/mattn/go-isatty"
@@ -53,4 +54,30 @@ func Output(writer *bufio.Writer, out string) error {
 	}
 
 	return nil
+}
+
+func CompileRegexps(regexps []string) ([]*regexp.Regexp, error) {
+	compiledRegexps := make([]*regexp.Regexp, 0, len(regexps))
+	for _, re := range regexps {
+		compiledRe, err := regexp.Compile("(" + re + ")")
+		if err != nil {
+			return nil, err
+		}
+		compiledRegexps = append(compiledRegexps, compiledRe)
+	}
+
+	return compiledRegexps, nil
+}
+
+func CompileRegexpsIgnoreCase(regexps []string) ([]*regexp.Regexp, error) {
+	compiledRegexps := make([]*regexp.Regexp, 0, len(regexps))
+	for _, re := range regexps {
+		compiledRe, err := regexp.Compile("(?i)" + regexp.QuoteMeta(re))
+		if err != nil {
+			return nil, err
+		}
+		compiledRegexps = append(compiledRegexps, compiledRe)
+	}
+
+	return compiledRegexps, nil
 }

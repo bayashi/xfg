@@ -16,6 +16,7 @@ import (
 	"golang.org/x/sync/errgroup"
 
 	"github.com/bayashi/xfg/xfglangxt"
+	"github.com/bayashi/xfg/xfgutil"
 )
 
 type line struct {
@@ -189,22 +190,18 @@ func (x *xfg) preSearch() error {
 	}
 
 	if len(x.options.SearchPathRe) > 0 {
-		for _, re := range x.options.SearchPathRe {
-			compiledRe, err := regexp.Compile("(" + re + ")")
-			if err != nil {
-				return err
-			}
-			x.searchPathRe = append(x.searchPathRe, compiledRe)
+		if searchPathRe, err := xfgutil.CompileRegexps(x.options.SearchPathRe); err != nil {
+			return err
+		} else {
+			x.searchPathRe = searchPathRe
 		}
 	}
 
 	if len(x.options.SearchGrepRe) > 0 {
-		for _, re := range x.options.SearchGrepRe {
-			compiledRe, err := regexp.Compile("(" + re + ")")
-			if err != nil {
-				return err
-			}
-			x.searchGrepRe = append(x.searchGrepRe, compiledRe)
+		if searchGrepRe, err := xfgutil.CompileRegexps(x.options.SearchGrepRe); err != nil {
+			return err
+		} else {
+			x.searchGrepRe = searchGrepRe
 		}
 	}
 
@@ -212,31 +209,25 @@ func (x *xfg) preSearch() error {
 }
 
 func (x *xfg) prepareRe() error {
-	for _, sp := range x.options.SearchPath {
-		searchPathi, err := regexp.Compile("(?i)(" + regexp.QuoteMeta(sp) + ")")
-		if err != nil {
-			return err
-		}
-		x.searchPathi = append(x.searchPathi, searchPathi)
+	if searchPathi, err := xfgutil.CompileRegexpsIgnoreCase(x.options.SearchPath); err != nil {
+		return err
+	} else {
+		x.searchPathi = searchPathi
 	}
 
 	if len(x.options.SearchGrep) > 0 {
-		for _, sg := range x.options.SearchGrep {
-			searchGrepi, err := regexp.Compile("(?i)(" + regexp.QuoteMeta(sg) + ")")
-			if err != nil {
-				return err
-			}
-			x.searchGrepi = append(x.searchGrepi, searchGrepi)
+		if searchGrepi, err := xfgutil.CompileRegexpsIgnoreCase(x.options.SearchGrep); err != nil {
+			return err
+		} else {
+			x.searchGrepi = searchGrepi
 		}
 	}
 
 	if len(x.options.Ignore) > 0 {
-		for _, i := range x.options.Ignore {
-			ignoreRe, err := regexp.Compile(`(?i)` + regexp.QuoteMeta(i))
-			if err != nil {
-				return err
-			}
-			x.ignoreRe = append(x.ignoreRe, ignoreRe)
+		if ignoreRe, err := xfgutil.CompileRegexpsIgnoreCase(x.options.Ignore); err != nil {
+			return err
+		} else {
+			x.ignoreRe = ignoreRe
 		}
 	}
 
