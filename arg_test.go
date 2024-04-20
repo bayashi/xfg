@@ -251,6 +251,5 @@ func TestShowLangList(t *testing.T) {
 	a.Got(o).Expect(&e).Same(t)
 	a.Got(stubCalled).True(t)
 	a.Got(stubCode).Expect(exitOK).Same(t)
-	// The output has help message also. So, use HasPrefix() to confirm strings
-	a.Got(strings.HasPrefix(errOutput.String(), expect)).True(t)
+	a.Got(errOutput.String()).Expect(expect).Same(t)
 }

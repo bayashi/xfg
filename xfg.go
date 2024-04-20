@@ -16,6 +16,7 @@ import (
 	"golang.org/x/sync/errgroup"
 
 	"github.com/bayashi/xfg/xfglangxt"
+	"github.com/bayashi/xfg/xfgutil"
 )
 
 type line struct {
@@ -61,6 +62,7 @@ type xfg struct {
 func newX(cli *runner, o *options) *xfg {
 	o.prepareAliases()
 	o.prepareContextLines(cli.isTTY)
+	o.SearchStart = filepath.Clean(o.SearchStart)
 
 	x := &xfg{
 		cli:     cli,
@@ -110,46 +112,14 @@ func (x *xfg) search() error {
 
 	eg := new(errgroup.Group)
 	isFirstDir := true
-	walkErr := filepath.WalkDir(x.options.SearchStart, func(fPath string, fInfo fs.DirEntry, err error) error {
-		x.cli.stats.IncrPaths()
-		if err != nil {
-			return fmt.Errorf("WalkDir started from `%s` at `%s`: %w", x.options.SearchStart, fPath, err)
-		}
-
-		if x.options.Quiet && x.hasMatchedAny() {
-			return nil // already match. skip after all
-		}
-
-		if !isFirstDir {
-			if !x.options.SearchAll && len(x.options.Ext) > 0 && !x.isMatchExt(fInfo, x.options.Ext) {
-				return nil
-			}
-
-			if !x.options.SearchAll && len(x.options.Lang) > 0 && !x.isLangFile(fInfo) {
-				return nil
-			}
-
-			if isSkippable, sErr := x.isSkippable(fPath, fInfo); sErr != nil {
-				return sErr
-			} else if isSkippable {
-				return nil
-			}
-		} else {
+	if err := filepath.WalkDir(x.options.SearchStart, func(fPath string, fInfo fs.DirEntry, err error) error {
+		if isFirstDir {
 			isFirstDir = false
 			return nil // not pick up start dir path, anyway
 		}
-
-		x.cli.stats.IncrMatched()
-
-		eg.Go(func() error {
-			return x.postMatchPath(fPath, fInfo)
-		})
-
-		return nil
-	})
-
-	if walkErr != nil {
-		return fmt.Errorf("walkErr : %w", walkErr)
+		return x.walker(fPath, fInfo, err, eg)
+	}); err != nil {
+		return fmt.Errorf("walkErr : %w", err)
 	}
 
 	if err := eg.Wait(); err != nil {
@@ -159,18 +129,44 @@ func (x *xfg) search() error {
 	return nil
 }
 
+func (x *xfg) walker(fPath string, fInfo fs.DirEntry, err error, eg *errgroup.Group) error {
+	x.cli.stats.IncrPaths()
+
+	if err != nil {
+		return fmt.Errorf("WalkDir started from `%s` at `%s`: %w", x.options.SearchStart, fPath, err)
+	}
+
+	if x.options.Quiet && x.hasMatchedAny() {
+		return nil // already match. skip after all
+	}
+
+	if !x.options.SearchAll && len(x.options.Ext) > 0 && !x.isMatchExt(fInfo, x.options.Ext) {
+		return nil
+	}
+
+	if !x.options.SearchAll && len(x.options.Lang) > 0 && !x.isLangFile(fInfo) {
+		return nil
+	}
+
+	if isSkippable, sErr := x.isSkippable(fPath, fInfo); sErr != nil {
+		return sErr
+	} else if isSkippable {
+		return nil
+	}
+
+	x.cli.stats.IncrMatched()
+
+	eg.Go(func() error {
+		return x.postMatchPath(fPath, fInfo)
+	})
+
+	return nil
+}
+
 func (x *xfg) preSearch() error {
-	if err := validateStartPath(x.options.SearchStart); err != nil {
+	if err := validateOptions(x.options); err != nil {
 		return err
 	}
-
-	if len(x.options.Lang) > 0 {
-		if err := validateLanguageCondition(x.options.Lang); err != nil {
-			return err
-		}
-	}
-
-	x.options.SearchStart = filepath.Clean(x.options.SearchStart)
 
 	if !x.options.SkipGitIgnore {
 		x.gitignore = prepareGitIgnore(x.cli.homeDir, x.options.SearchStart)
@@ -187,22 +183,32 @@ func (x *xfg) preSearch() error {
 	}
 
 	if len(x.options.SearchPathRe) > 0 {
-		for _, re := range x.options.SearchPathRe {
-			compiledRe, err := regexp.Compile("(" + re + ")")
-			if err != nil {
-				return err
-			}
-			x.searchPathRe = append(x.searchPathRe, compiledRe)
+		if searchPathRe, err := xfgutil.CompileRegexps(x.options.SearchPathRe); err != nil {
+			return err
+		} else {
+			x.searchPathRe = searchPathRe
 		}
 	}
 
 	if len(x.options.SearchGrepRe) > 0 {
-		for _, re := range x.options.SearchGrepRe {
-			compiledRe, err := regexp.Compile("(" + re + ")")
-			if err != nil {
-				return err
-			}
-			x.searchGrepRe = append(x.searchGrepRe, compiledRe)
+		if searchGrepRe, err := xfgutil.CompileRegexps(x.options.SearchGrepRe); err != nil {
+			return err
+		} else {
+			x.searchGrepRe = searchGrepRe
+		}
+	}
+
+	return nil
+}
+
+func validateOptions(o *options) error {
+	if err := validateStartPath(o.SearchStart); err != nil {
+		return err
+	}
+
+	if len(o.Lang) > 0 {
+		if err := validateLanguageCondition(o.Lang); err != nil {
+			return err
 		}
 	}
 
@@ -210,31 +216,25 @@ func (x *xfg) preSearch() error {
 }
 
 func (x *xfg) prepareRe() error {
-	for _, sp := range x.options.SearchPath {
-		searchPathi, err := regexp.Compile("(?i)(" + regexp.QuoteMeta(sp) + ")")
-		if err != nil {
-			return err
-		}
-		x.searchPathi = append(x.searchPathi, searchPathi)
+	if searchPathi, err := xfgutil.CompileRegexpsIgnoreCase(x.options.SearchPath); err != nil {
+		return err
+	} else {
+		x.searchPathi = searchPathi
 	}
 
 	if len(x.options.SearchGrep) > 0 {
-		for _, sg := range x.options.SearchGrep {
-			searchGrepi, err := regexp.Compile("(?i)(" + regexp.QuoteMeta(sg) + ")")
-			if err != nil {
-				return err
-			}
-			x.searchGrepi = append(x.searchGrepi, searchGrepi)
+		if searchGrepi, err := xfgutil.CompileRegexpsIgnoreCase(x.options.SearchGrep); err != nil {
+			return err
+		} else {
+			x.searchGrepi = searchGrepi
 		}
 	}
 
 	if len(x.options.Ignore) > 0 {
-		for _, i := range x.options.Ignore {
-			ignoreRe, err := regexp.Compile(`(?i)` + regexp.QuoteMeta(i))
-			if err != nil {
-				return err
-			}
-			x.ignoreRe = append(x.ignoreRe, ignoreRe)
+		if ignoreRe, err := xfgutil.CompileRegexpsIgnoreCase(x.options.Ignore); err != nil {
+			return err
+		} else {
+			x.ignoreRe = ignoreRe
 		}
 	}
 
@@ -265,10 +265,6 @@ func (x *xfg) isLangFile(fInfo fs.DirEntry) bool {
 }
 
 func (x *xfg) isSkippable(fPath string, fInfo fs.DirEntry) (bool, error) {
-	if x.options.SearchStart == fInfo.Name() {
-		return true, nil
-	}
-
 	if !x.options.SearchAll {
 		if isDefaultSkipDir(fInfo) {
 			return true, filepath.SkipDir // skip all stuff in this dir
@@ -284,23 +280,25 @@ func (x *xfg) isSkippable(fPath string, fInfo fs.DirEntry) (bool, error) {
 	}
 
 	if !x.options.SearchAll {
-		if isDefaultSkipFile(fInfo) || (!fInfo.IsDir() && !x.options.Hidden && strings.HasPrefix(fInfo.Name(), ".")) {
+		if isDefaultSkipFile(fInfo) ||
+			(!fInfo.IsDir() && !x.options.Hidden && strings.HasPrefix(fInfo.Name(), ".")) ||
+			x.isSkippableByIgnoreFile(fPath) {
 			return true, nil // skip
 		}
-
-		if x.gitignore != nil && x.gitignore.MatchesPath(fPath) {
-			return true, nil // skip a file by .gitignore
-		}
-		if x.xfgignore != nil && x.xfgignore.MatchesPath(fPath) {
-			return true, nil // skip a file by .xfgignore
-		}
 	}
 
-	if x.options.SearchOnlyName {
-		return x.canSkipPath(fInfo.Name()), nil
+	return x.canSkipPath(fPath, fInfo), nil
+}
+
+func (x *xfg) isSkippableByIgnoreFile(fPath string) bool {
+	if x.gitignore != nil && x.gitignore.MatchesPath(fPath) {
+		return true // skip a file by .gitignore
+	}
+	if x.xfgignore != nil && x.xfgignore.MatchesPath(fPath) {
+		return true // skip a file by .xfgignore
 	}
 
-	return x.canSkipPath(fPath), nil
+	return false
 }
 
 func (x *xfg) isIgnorePath(fPath string) bool {
@@ -321,7 +319,15 @@ func (x *xfg) isIgnorePath(fPath string) bool {
 	return false
 }
 
-func (x *xfg) canSkipPath(fPath string) bool {
+func (x *xfg) canSkipPath(fPath string, fInfo fs.DirEntry) bool {
+	if x.options.SearchOnlyName {
+		return x._canSkipPath(fInfo.Name())
+	}
+
+	return x._canSkipPath(fPath)
+}
+
+func (x *xfg) _canSkipPath(fPath string) bool {
 	if x.options.IgnoreCase && len(x.searchPathi) > 0 {
 		for _, spr := range x.searchPathi {
 			if !isMatchRegexp(fPath, spr) {
