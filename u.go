@@ -115,7 +115,7 @@ func isRegularFile(fInfo fs.DirEntry) bool {
 func validateStartPath(startPath string) error {
 	d, err := os.Stat(startPath)
 	if err != nil {
-		return fmt.Errorf("wrong path `%s` : %w", startPath, err)
+		return err
 	}
 
 	if !d.IsDir() {

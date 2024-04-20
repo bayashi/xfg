@@ -68,6 +68,10 @@ func (cli *runner) run() (int, string) {
 
 	cli.stats.Mark("parseArgs")
 
+	if err := o.validateOptions(); err != nil {
+		return exitErr, err.Error()
+	}
+
 	exitCode, err := cli.xfg(o)
 	if err != nil {
 		return exitErr, fmt.Sprintf("on xfg() : %s", err)
