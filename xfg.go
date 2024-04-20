@@ -62,6 +62,7 @@ type xfg struct {
 func newX(cli *runner, o *options) *xfg {
 	o.prepareAliases()
 	o.prepareContextLines(cli.isTTY)
+	o.SearchStart = filepath.Clean(o.SearchStart)
 
 	x := &xfg{
 		cli:     cli,
@@ -172,8 +173,6 @@ func (x *xfg) preSearch() error {
 			return err
 		}
 	}
-
-	x.options.SearchStart = filepath.Clean(x.options.SearchStart)
 
 	if !x.options.SkipGitIgnore {
 		x.gitignore = prepareGitIgnore(x.cli.homeDir, x.options.SearchStart)
