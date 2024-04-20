@@ -11,22 +11,11 @@ Find paths anyway, then search for contents also, naturally.
 * Ignores hidden files and directories
 * Respect your `.gitignore`
     * Possible to use specific `.xfgignore` also
+* Support `.xfgrc` file for your default options
 
 ## Usage of `xfg` command
 
-For example, there are directories and files like below:
-
-```
-.
-├── service-a
-│   └── main.go
-├── service-b
-│   └── main.go
-└── service-c
-    └── main.go
-```
-
-Search for directories and files that include `service-b` in those path.
+Search for files and directories that include `service-b` in those path.
 
 ```sh
 $ xfg service-b
@@ -38,6 +27,8 @@ Specific:
 $ xfg --path service-b
 ```
 
+By default, start searching from current directory. You can specify `--start` option for where to start.
+
 Output:
 
 ```
@@ -46,7 +37,7 @@ service-b
 service-b/main.go
 ```
 
-Search for directories and files that match the `service-b` in those path and extract content that matches the `bar`.
+Search for files and directories that match the `service-b` in those path and extract content that matches the `bar`.
 
 ```sh
 $ xfg service-b bar
@@ -69,6 +60,10 @@ Note that the second argument and subsequent arguments are tereated as keywords 
 
 ```sh
 $ xfg service-b bar baz
+        |        |   |
+        |        |   +--- To search for contents
+        |        +------- To search for contents
+        +---------------- To search for paths
 ```
 
 Above command is equivalent:
