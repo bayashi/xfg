@@ -236,6 +236,20 @@ func (o *options) prepareAliases() {
 	}
 }
 
+func (o *options) validateOptions() error {
+	if err := validateStartPath(o.SearchStart); err != nil {
+		return err
+	}
+
+	if len(o.Lang) > 0 {
+		if err := validateLanguageCondition(o.Lang); err != nil {
+			return err
+		}
+	}
+
+	return nil
+}
+
 func versionDetails() string {
 	goos := runtime.GOOS
 	goarch := runtime.GOARCH
