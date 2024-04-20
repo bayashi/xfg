@@ -129,6 +129,9 @@ These keywords are treated as AND condition for each.
   -u, --unrestricted              The alias of --search-all
       --ignore stringArray        Ignore path to pick up even with '--search-all'
   -f, --search-only-name          Search to only name instead whole path string
+      --ext stringArray           Only search files matching file extension
+      --lang stringArray          Only search files matching language. --type-list prints all support languages
+      --lang-list                 Show all supported file extensions for each language
       --abs                       Show absolute paths
   -c, --count                     Show a count of matching lines instead of contents
   -m, --max-count uint32          Stop reading a file after NUM matching lines
@@ -172,6 +175,8 @@ export XFG_RC_FILE_PATH="/path/to/your_rc_file.toml"
 ## Highlight limitation
 
 The `xfg` adds colors for highlight keywords for paths. However, if you use (`-P`, `--path-regexp`) option and (`-p`, `--path`) option at the same time, and when both conditions are matching with same peace of string, then the ONLY (`-P`, `--path-regexp`) condition can highlight string so far. This limitation is same as grep contents condition.
+
+Not yet highlighted extentions by `--lang` or `--ext` options even if it's matched.
 
 ## Installation
 

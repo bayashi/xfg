@@ -5,7 +5,10 @@ import (
 	"os"
 	"runtime"
 	"runtime/debug"
+	"sort"
+	"strings"
 
+	"github.com/bayashi/xfg/xfglangxt"
 	flag "github.com/spf13/pflag"
 )
 
@@ -41,6 +44,9 @@ type options struct {
 	XfgIgnoreFile  string `toml:"xfgignore-file"`
 
 	Ignore []string `toml:"ignore"`
+
+	Lang []string `toml:"lang"`
+	Ext  []string `toml:"ext"`
 
 	IgnoreCase       bool `toml:"ignore-case"`
 	NoColor          bool `toml:"no-color"`
@@ -106,6 +112,11 @@ func (cli *runner) parseArgs(d *options) *options {
 	flag.StringArrayVarP(&o.Ignore, "ignore", "", d.Ignore, "Ignore path to pick up even with '--search-all'")
 	flag.BoolVarP(&o.SearchOnlyName, "search-only-name", "f", d.SearchOnlyName, "Search to only name instead whole path string")
 
+	flag.StringArrayVarP(&o.Ext, "ext", "", d.Ext, "Only search files matching file extension")
+	flag.StringArrayVarP(&o.Lang, "lang", "", d.Lang, "Only search files matching language. --type-list prints all support languages")
+	var flagLangList bool
+	flag.BoolVarP(&flagLangList, "lang-list", "", false, "Show all supported file extensions for each language")
+
 	flag.BoolVarP(&o.Abs, "abs", "", d.Abs, "Show absolute paths")
 	flag.BoolVarP(&o.ShowMatchCount, "count", "c", d.ShowMatchCount, "Show a count of matching lines instead of contents")
 	flag.Uint32VarP(&o.MaxMatchCount, "max-count", "m", d.MaxMatchCount, "Stop reading a file after NUM matching lines")
@@ -142,11 +153,15 @@ func (cli *runner) parseArgs(d *options) *options {
 	} else if flagVersion {
 		cli.putErr(versionDetails())
 		funcExit(exitOK)
+	} else if flagLangList {
+		cli.putErr(showLangList())
+		funcExit(exitOK)
 	}
 
 	o.targetPathFromArgs()
 
-	if len(o.SearchPath) == 0 && len(o.SearchGrep) == 0 && len(o.SearchPathRe) == 0 && len(o.SearchGrepRe) == 0 {
+	if len(o.SearchPath) == 0 && len(o.SearchGrep) == 0 && len(o.SearchPathRe) == 0 && len(o.SearchGrepRe) == 0 &&
+		len(o.Lang) == 0 && len(o.Ext) == 0 {
 		cli.putHelp(errNeedToSetPathOrGrep)
 	}
 
@@ -155,6 +170,22 @@ func (cli *runner) parseArgs(d *options) *options {
 	}
 
 	return o
+}
+
+func showLangList() string {
+	m := xfglangxt.List()
+	languages := make([]string, 0, len(m))
+	for k := range m {
+		languages = append(languages, k)
+	}
+	sort.Strings(languages)
+
+	out := ""
+	for _, lang := range languages {
+		out = out + lang + ": " + strings.Join(m[lang], ", ") + "\n"
+	}
+
+	return out
 }
 
 func (o *options) targetPathFromArgs() {
