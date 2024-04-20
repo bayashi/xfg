@@ -298,11 +298,7 @@ func (x *xfg) isSkippable(fPath string, fInfo fs.DirEntry) (bool, error) {
 		}
 	}
 
-	if x.options.SearchOnlyName {
-		return x.canSkipPath(fInfo.Name()), nil
-	}
-
-	return x.canSkipPath(fPath), nil
+	return x.canSkipPath(fPath, fInfo), nil
 }
 
 func (x *xfg) isIgnorePath(fPath string) bool {
@@ -323,7 +319,15 @@ func (x *xfg) isIgnorePath(fPath string) bool {
 	return false
 }
 
-func (x *xfg) canSkipPath(fPath string) bool {
+func (x *xfg) canSkipPath(fPath string, fInfo fs.DirEntry) bool {
+	if x.options.SearchOnlyName {
+		return x._canSkipPath(fInfo.Name())
+	}
+
+	return x._canSkipPath(fPath)
+}
+
+func (x *xfg) _canSkipPath(fPath string) bool {
 	if x.options.IgnoreCase && len(x.searchPathi) > 0 {
 		for _, spr := range x.searchPathi {
 			if !isMatchRegexp(fPath, spr) {
