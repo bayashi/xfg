@@ -290,15 +290,23 @@ func (x *xfg) isSkippable(fPath string, fInfo fs.DirEntry) (bool, error) {
 			return true, nil // skip
 		}
 
-		if x.gitignore != nil && x.gitignore.MatchesPath(fPath) {
-			return true, nil // skip a file by .gitignore
-		}
-		if x.xfgignore != nil && x.xfgignore.MatchesPath(fPath) {
-			return true, nil // skip a file by .xfgignore
+		if x.isSkippableByIgnoreFile(fPath) {
+			return true, nil // skip
 		}
 	}
 
 	return x.canSkipPath(fPath, fInfo), nil
+}
+
+func (x *xfg) isSkippableByIgnoreFile(fPath string) bool {
+	if x.gitignore != nil && x.gitignore.MatchesPath(fPath) {
+		return true // skip a file by .gitignore
+	}
+	if x.xfgignore != nil && x.xfgignore.MatchesPath(fPath) {
+		return true // skip a file by .xfgignore
+	}
+
+	return false
 }
 
 func (x *xfg) isIgnorePath(fPath string) bool {
