@@ -156,17 +156,17 @@ func (cli *runner) parseArgs(d *options) *options {
 	} else if flagLangList {
 		cli.putErr(showLangList())
 		funcExit(exitOK)
-	}
+	} else {
+		o.targetPathFromArgs()
 
-	o.targetPathFromArgs()
+		if len(o.SearchPath) == 0 && len(o.SearchGrep) == 0 && len(o.SearchPathRe) == 0 && len(o.SearchGrepRe) == 0 &&
+			len(o.Lang) == 0 && len(o.Ext) == 0 {
+			cli.putHelp(errNeedToSetPathOrGrep)
+		}
 
-	if len(o.SearchPath) == 0 && len(o.SearchGrep) == 0 && len(o.SearchPathRe) == 0 && len(o.SearchGrepRe) == 0 &&
-		len(o.Lang) == 0 && len(o.Ext) == 0 {
-		cli.putHelp(errNeedToSetPathOrGrep)
-	}
-
-	if len(o.SearchGrep) > 0 || len(o.SearchGrepRe) > 0 {
-		o.onlyMatchContent = true
+		if len(o.SearchGrep) > 0 || len(o.SearchGrepRe) > 0 {
+			o.onlyMatchContent = true
+		}
 	}
 
 	return o
@@ -185,7 +185,7 @@ func showLangList() string {
 		out = out + lang + ": " + strings.Join(m[lang], ", ") + "\n"
 	}
 
-	return out
+	return strings.TrimRight(out, "\n")
 }
 
 func (o *options) targetPathFromArgs() {
