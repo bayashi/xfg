@@ -164,14 +164,8 @@ func (x *xfg) walker(fPath string, fInfo fs.DirEntry, err error, eg *errgroup.Gr
 }
 
 func (x *xfg) preSearch() error {
-	if err := validateStartPath(x.options.SearchStart); err != nil {
+	if err := validateOptions(x.options); err != nil {
 		return err
-	}
-
-	if len(x.options.Lang) > 0 {
-		if err := validateLanguageCondition(x.options.Lang); err != nil {
-			return err
-		}
 	}
 
 	if !x.options.SkipGitIgnore {
@@ -201,6 +195,20 @@ func (x *xfg) preSearch() error {
 			return err
 		} else {
 			x.searchGrepRe = searchGrepRe
+		}
+	}
+
+	return nil
+}
+
+func validateOptions(o *options) error {
+	if err := validateStartPath(o.SearchStart); err != nil {
+		return err
+	}
+
+	if len(o.Lang) > 0 {
+		if err := validateLanguageCondition(o.Lang); err != nil {
+			return err
 		}
 	}
 
