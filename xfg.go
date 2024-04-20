@@ -267,10 +267,6 @@ func (x *xfg) isLangFile(fInfo fs.DirEntry) bool {
 }
 
 func (x *xfg) isSkippable(fPath string, fInfo fs.DirEntry) (bool, error) {
-	if x.options.SearchStart == fInfo.Name() {
-		return true, nil
-	}
-
 	if !x.options.SearchAll {
 		if isDefaultSkipDir(fInfo) {
 			return true, filepath.SkipDir // skip all stuff in this dir
@@ -286,11 +282,9 @@ func (x *xfg) isSkippable(fPath string, fInfo fs.DirEntry) (bool, error) {
 	}
 
 	if !x.options.SearchAll {
-		if isDefaultSkipFile(fInfo) || (!fInfo.IsDir() && !x.options.Hidden && strings.HasPrefix(fInfo.Name(), ".")) {
-			return true, nil // skip
-		}
-
-		if x.isSkippableByIgnoreFile(fPath) {
+		if isDefaultSkipFile(fInfo) ||
+			(!fInfo.IsDir() && !x.options.Hidden && strings.HasPrefix(fInfo.Name(), ".")) ||
+			x.isSkippableByIgnoreFile(fPath) {
 			return true, nil // skip
 		}
 	}
