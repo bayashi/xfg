@@ -676,6 +676,57 @@ func TestXfg_OK(t *testing.T) {
 			`),
 			expectExitCode: exitOK,
 		},
+		"search only perl files": {
+			opt: &options{
+				Lang: []string{"perl"},
+			},
+			expect: here.Doc(`
+                testdata/service-k/bar.pl
+                testdata/service-m/foo.pm
+			`),
+			expectExitCode: exitOK,
+		},
+		"search path by keyword, and filter language": {
+			opt: &options{
+				SearchPath: []string{"bar"},
+				Lang:       []string{"perl"},
+			},
+			expect: here.Doc(`
+                testdata/service-k/bar.pl
+			`),
+			expectExitCode: exitOK,
+		},
+		"search path by keyword, and filter language, and grep contents": {
+			opt: &options{
+				SearchPath:       []string{"bar"},
+				Lang:             []string{"perl"},
+				SearchGrep:       []string{"exit"},
+				onlyMatchContent: true,
+			},
+			expect: here.Doc(`
+                testdata/service-k/bar.pl
+                3: exit 0;
+			`),
+			expectExitCode: exitOK,
+		},
+		"search path by extension": {
+			opt: &options{
+				Ext: []string{"pl"},
+			},
+			expect: here.Doc(`
+                testdata/service-k/bar.pl
+			`),
+			expectExitCode: exitOK,
+		},
+		"search path by extension with dot before extension name": {
+			opt: &options{
+				Ext: []string{".pl"},
+			},
+			expect: here.Doc(`
+                testdata/service-k/bar.pl
+			`),
+			expectExitCode: exitOK,
+		},
 	} {
 		t.Run(tname, func(t *testing.T) {
 			var o bytes.Buffer

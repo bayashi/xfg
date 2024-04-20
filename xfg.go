@@ -14,6 +14,8 @@ import (
 	"github.com/fatih/color"
 	ignore "github.com/sabhiram/go-gitignore"
 	"golang.org/x/sync/errgroup"
+
+	"github.com/bayashi/xfg/xfglangxt"
 )
 
 type line struct {
@@ -119,6 +121,14 @@ func (x *xfg) search() error {
 		}
 
 		if !isFirstDir {
+			if !x.options.SearchAll && len(x.options.Ext) > 0 && !x.isMatchExt(fInfo, x.options.Ext) {
+				return nil
+			}
+
+			if !x.options.SearchAll && len(x.options.Lang) > 0 && !x.isLangFile(fInfo) {
+				return nil
+			}
+
 			if isSkippable, sErr := x.isSkippable(fPath, fInfo); sErr != nil {
 				return sErr
 			} else if isSkippable {
@@ -152,6 +162,12 @@ func (x *xfg) search() error {
 func (x *xfg) preSearch() error {
 	if err := validateStartPath(x.options.SearchStart); err != nil {
 		return err
+	}
+
+	if len(x.options.Lang) > 0 {
+		if err := validateLanguageCondition(x.options.Lang); err != nil {
+			return err
+		}
 	}
 
 	x.options.SearchStart = filepath.Clean(x.options.SearchStart)
@@ -223,6 +239,29 @@ func (x *xfg) prepareRe() error {
 	}
 
 	return nil
+}
+
+func (x *xfg) isMatchExt(fInfo fs.DirEntry, extensions []string) bool {
+	for _, ext := range extensions {
+		if !strings.HasPrefix(ext, ".") {
+			ext = "." + ext
+		}
+		if strings.HasSuffix(fInfo.Name(), ext) {
+			return true
+		}
+	}
+
+	return false
+}
+
+func (x *xfg) isLangFile(fInfo fs.DirEntry) bool {
+	for _, l := range x.options.Lang {
+		if xfglangxt.IsLangFile(l, fInfo.Name()) {
+			return true
+		}
+	}
+
+	return false
 }
 
 func (x *xfg) isSkippable(fPath string, fInfo fs.DirEntry) (bool, error) {

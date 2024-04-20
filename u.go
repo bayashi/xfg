@@ -12,6 +12,7 @@ import (
 
 	"github.com/BurntSushi/toml"
 	"github.com/adrg/xdg"
+	"github.com/bayashi/xfg/xfglangxt"
 	ignore "github.com/sabhiram/go-gitignore"
 )
 
@@ -119,6 +120,16 @@ func validateStartPath(startPath string) error {
 
 	if !d.IsDir() {
 		return fmt.Errorf("path `%s` should point to a directory", startPath)
+	}
+
+	return nil
+}
+
+func validateLanguageCondition(lang []string) error {
+	for _, l := range lang {
+		if !xfglangxt.IsSupported(l) {
+			return fmt.Errorf("`%s` is not supported. --type-list prints all support languages", l)
+		}
 	}
 
 	return nil
