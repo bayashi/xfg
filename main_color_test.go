@@ -5,7 +5,7 @@ import (
 	"testing"
 
 	a "github.com/bayashi/actually"
-	"github.com/bayashi/xfg/xfgstats"
+	"github.com/bayashi/xfg/internal/xfgstats"
 	c "github.com/fatih/color"
 )
 

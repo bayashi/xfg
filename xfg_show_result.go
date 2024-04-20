@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"sort"
 
-	"github.com/bayashi/xfg/xfgutil"
+	"github.com/bayashi/xfg/internal/xfgutil"
 )
 
 func (cli *runner) showResult(x *xfg) error {

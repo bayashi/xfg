@@ -15,8 +15,8 @@ import (
 	ignore "github.com/sabhiram/go-gitignore"
 	"golang.org/x/sync/errgroup"
 
-	"github.com/bayashi/xfg/xfglangxt"
-	"github.com/bayashi/xfg/xfgutil"
+	"github.com/bayashi/xfg/internal/xfglangxt"
+	"github.com/bayashi/xfg/internal/xfgutil"
 )
 
 type line struct {

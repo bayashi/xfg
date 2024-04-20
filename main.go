@@ -5,8 +5,8 @@ import (
 	"io"
 	"os"
 
-	"github.com/bayashi/xfg/xfgstats"
-	"github.com/bayashi/xfg/xfgutil"
+	"github.com/bayashi/xfg/internal/xfgstats"
+	"github.com/bayashi/xfg/internal/xfgutil"
 )
 
 const (
