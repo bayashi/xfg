@@ -12,7 +12,7 @@ import (
 
 	"github.com/BurntSushi/toml"
 	"github.com/adrg/xdg"
-	"github.com/bayashi/xfg/xfglangxt"
+	"github.com/bayashi/xfg/internal/xfglangxt"
 	ignore "github.com/sabhiram/go-gitignore"
 )
 

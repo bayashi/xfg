@@ -8,7 +8,7 @@ import (
 
 	here "github.com/MakeNowJust/heredoc/v2"
 	a "github.com/bayashi/actually"
-	"github.com/bayashi/xfg/xfgstats"
+	"github.com/bayashi/xfg/internal/xfgstats"
 )
 
 const noMatchKeyword = "#NotMatch:4770&4cd-fe9cf87_29706c1@8ab965d!$% ;-P"

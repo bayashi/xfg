@@ -6,7 +6,7 @@ import (
 	"io"
 	"time"
 
-	"github.com/bayashi/xfg/xfgutil"
+	"github.com/bayashi/xfg/internal/xfgutil"
 )
 
 type lap struct {

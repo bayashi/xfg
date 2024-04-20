@@ -14,7 +14,7 @@ import (
 	"os/signal"
 	"syscall"
 
-	"github.com/bayashi/xfg/xfgutil"
+	"github.com/bayashi/xfg/internal/xfgutil"
 )
 
 const (
