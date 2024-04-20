@@ -53,7 +53,7 @@ func TestPrepareXfgIgnore(t *testing.T) {
 func TestValidateStartPath_Err(t *testing.T) {
 	err := validateStartPath(noMatchKeyword)
 	a.Got(err).NotNil(t)
-	a.Got(err.Error()).Expect(`^wrong path `).Match(t)
+	a.Got(err.Error()).Expect(`^stat `).Match(t)
 
 	tempDir := t.TempDir()
 	tempFilePath := filepath.Join(tempDir, "foo")
