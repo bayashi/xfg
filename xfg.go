@@ -110,51 +110,53 @@ func (x *xfg) search() error {
 
 	eg := new(errgroup.Group)
 	isFirstDir := true
-	walkErr := filepath.WalkDir(x.options.SearchStart, func(fPath string, fInfo fs.DirEntry, err error) error {
-		x.cli.stats.IncrPaths()
-		if err != nil {
-			return fmt.Errorf("WalkDir started from `%s` at `%s`: %w", x.options.SearchStart, fPath, err)
-		}
-
-		if x.options.Quiet && x.hasMatchedAny() {
-			return nil // already match. skip after all
-		}
-
-		if !isFirstDir {
-			if !x.options.SearchAll && len(x.options.Ext) > 0 && !x.isMatchExt(fInfo, x.options.Ext) {
-				return nil
-			}
-
-			if !x.options.SearchAll && len(x.options.Lang) > 0 && !x.isLangFile(fInfo) {
-				return nil
-			}
-
-			if isSkippable, sErr := x.isSkippable(fPath, fInfo); sErr != nil {
-				return sErr
-			} else if isSkippable {
-				return nil
-			}
-		} else {
+	if err := filepath.WalkDir(x.options.SearchStart, func(fPath string, fInfo fs.DirEntry, err error) error {
+		if isFirstDir {
 			isFirstDir = false
 			return nil // not pick up start dir path, anyway
 		}
-
-		x.cli.stats.IncrMatched()
-
-		eg.Go(func() error {
-			return x.postMatchPath(fPath, fInfo)
-		})
-
-		return nil
-	})
-
-	if walkErr != nil {
-		return fmt.Errorf("walkErr : %w", walkErr)
+		return x.walker(fPath, fInfo, err, eg)
+	}); err != nil {
+		return fmt.Errorf("walkErr : %w", err)
 	}
 
 	if err := eg.Wait(); err != nil {
 		return fmt.Errorf("postMatchPath : %w", err)
 	}
+
+	return nil
+}
+
+func (x *xfg) walker(fPath string, fInfo fs.DirEntry, err error, eg *errgroup.Group) error {
+	x.cli.stats.IncrPaths()
+
+	if err != nil {
+		return fmt.Errorf("WalkDir started from `%s` at `%s`: %w", x.options.SearchStart, fPath, err)
+	}
+
+	if x.options.Quiet && x.hasMatchedAny() {
+		return nil // already match. skip after all
+	}
+
+	if !x.options.SearchAll && len(x.options.Ext) > 0 && !x.isMatchExt(fInfo, x.options.Ext) {
+		return nil
+	}
+
+	if !x.options.SearchAll && len(x.options.Lang) > 0 && !x.isLangFile(fInfo) {
+		return nil
+	}
+
+	if isSkippable, sErr := x.isSkippable(fPath, fInfo); sErr != nil {
+		return sErr
+	} else if isSkippable {
+		return nil
+	}
+
+	x.cli.stats.IncrMatched()
+
+	eg.Go(func() error {
+		return x.postMatchPath(fPath, fInfo)
+	})
 
 	return nil
 }
