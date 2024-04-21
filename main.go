@@ -46,9 +46,22 @@ func main() {
 }
 
 func (cli *runner) run() (int, string) {
+	if o, err := cli.preXfg(); err != nil {
+		return exitErr, fmt.Sprintf("on preXfg() : %s", err)
+	} else {
+		exitCode, err := cli.xfg(o)
+		if err != nil {
+			return exitErr, fmt.Sprintf("on xfg() : %s", err)
+		}
+
+		return exitCode, ""
+	}
+}
+
+func (cli *runner) preXfg() (*options, error) {
 	homeDir, err := xfgutil.HomeDir()
 	if err != nil {
-		return exitErr, fmt.Sprintf("on detecting home directory : %s", err)
+		return nil, fmt.Errorf("on detecting home directory : %s", err)
 	}
 	cli.homeDir = homeDir
 
@@ -56,7 +69,7 @@ func (cli *runner) run() (int, string) {
 
 	defaultOpt, err := readRC(cli.homeDir)
 	if err != nil {
-		return exitErr, fmt.Sprintf("on reading home directory : %s", err)
+		return nil, fmt.Errorf("on reading home directory : %s", err)
 	}
 
 	cli.stats.Mark("readRC")
@@ -69,15 +82,10 @@ func (cli *runner) run() (int, string) {
 	cli.stats.Mark("parseArgs")
 
 	if err := o.validateOptions(); err != nil {
-		return exitErr, err.Error()
+		return nil, err
 	}
 
-	exitCode, err := cli.xfg(o)
-	if err != nil {
-		return exitErr, fmt.Sprintf("on xfg() : %s", err)
-	}
-
-	return exitCode, ""
+	return o, nil
 }
 
 func (cli *runner) xfg(o *options) (int, error) {
