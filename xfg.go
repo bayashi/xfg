@@ -34,7 +34,7 @@ type path struct {
 type result struct {
 	mu                  sync.RWMutex
 	paths               []path
-	lc                  int // matched line count
+	outputLC            int // Used on pager and stats
 	alreadyMatchContent bool
 }
 
@@ -371,7 +371,7 @@ func (x *xfg) postMatchPath(fPath string, fInfo fs.DirEntry) (err error) {
 
 	x.result.mu.Lock()
 	x.result.paths = append(x.result.paths, matchedPath)
-	x.result.lc = x.result.lc + len(matchedPath.contents) + 1
+	x.result.outputLC = x.result.outputLC + len(matchedPath.contents) + 1
 	x.result.mu.Unlock()
 
 	return nil
