@@ -8,10 +8,16 @@ Find paths anyway, then search for contents also, naturally.
 
 * Recursive search
 * Search both paths and contents by multiple keywords
+    * Possible to search by regexp also
 * Ignores hidden files and directories
 * Respect your `.gitignore`
     * Possible to use specific `.xfgignore` also
 * Support `.xfgrc` file for your default options
+* support to search specific language files by `--lang` option
+    * `--lang perl` will search for files which extentions are ".pl", ".pm", ".t", ".pod" or ".PL"
+    * `xfg --lang-list` to show all supported languages
+
+There are so many features. You can check all options in below "Help Options" section.
 
 ## Usage of `xfg` command
 
@@ -85,6 +91,24 @@ These keywords are treated as AND condition for each.
 * Not follow symbolic links
 * Skip binary files
 
+## Regexp search
+
+xfg can search for paths and contents by regexp.
+
+`-P` is to search for paths
+
+```sh
+$ xfg -P "service-[a-g]"
+```
+
+`-G` is to search for contents
+
+```sh
+$ xfg -G "X_[A-Z]+_[A-Z]+"
+```
+
+Regexp keywords you input respect word boundaries by default. You can use `--not-word-boundary` option to trun it off.
+
 ### Ignore rules
 
 * Ignored `*.min.js` or `*.min.css` files by default
@@ -105,7 +129,7 @@ These keywords are treated as AND condition for each.
     * You can specify `.xfgignore` file path by `--xfgignore-file` option
     * Use `--skip-xfgignore` option to avoid reading `.xfgignore` file
 
-## Options
+## Help Options
 
 ```
   -p, --path stringArray          A string to find paths
@@ -170,9 +194,11 @@ export XFG_RC_FILE_PATH="/path/to/your_rc_file.toml"
 
 ## Highlight limitation
 
-The `xfg` adds colors for highlight keywords for paths. However, if you use (`-P`, `--path-regexp`) option and (`-p`, `--path`) option at the same time, and when both conditions are matching with same peace of string, then the ONLY (`-P`, `--path-regexp`) condition can highlight string so far. This limitation is same as grep contents condition.
+xfg can highlight matched keywords in results. But the highlight feature is not perfect yet.
 
-Not yet highlighted extentions by `--lang` or `--ext` options even if it's matched.
+The `xfg` adds colors for highlight keywords for paths. However, if you use both (`-P`, `--path-regexp`) option and (`-p`, `--path`) option at the same time, and when both conditions are matching with same peace of string, then the ONLY (`-P`, `--path-regexp`) condition can highlight string so far. This limitation is same as grep contents condition. Regexp conditions are strong to be highlighted string than word match condition when both conditions matches with same pease of string.
+
+Moreover, not yet highlighted extentions by `--lang` or `--ext` options even if it's matched.
 
 ## Installation
 
