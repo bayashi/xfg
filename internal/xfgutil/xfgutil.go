@@ -56,10 +56,20 @@ func Output(writer *bufio.Writer, out string) error {
 	return nil
 }
 
-func CompileRegexps(regexps []string) ([]*regexp.Regexp, error) {
-	compiledRegexps := make([]*regexp.Regexp, 0, len(regexps))
+func CompileRegexps(regexps []string, wordBoundary bool) ([]*regexp.Regexp, error) {
+	reList := make([]string, 0, len(regexps))
 	for _, re := range regexps {
-		compiledRe, err := regexp.Compile("(" + re + ")")
+		if wordBoundary {
+			re = "\\b(" + re + ")\\b"
+		} else {
+			re = "(" + re + ")"
+		}
+		reList = append(reList, re)
+	}
+
+	compiledRegexps := make([]*regexp.Regexp, 0, len(reList))
+	for _, re := range reList {
+		compiledRe, err := regexp.Compile(re)
 		if err != nil {
 			return nil, err
 		}
