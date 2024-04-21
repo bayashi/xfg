@@ -20,6 +20,7 @@ type count struct {
 	scannedFile    int
 	pickedPaths    int
 	outputLC       int
+	scannedLC      int
 }
 
 type Stats struct {
@@ -74,4 +75,8 @@ func (s *Stats) SetPickedPaths(count int) {
 
 func (s *Stats) SetOutputLC(count int) {
 	s.count.outputLC = count
+}
+
+func (s *Stats) IncrScannedLC(count int) {
+	s.count.scannedLC = s.count.scannedLC + count
 }

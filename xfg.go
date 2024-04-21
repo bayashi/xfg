@@ -457,6 +457,10 @@ func (x *xfg) scanContent(scanner *bufio.Scanner, fPath string) ([]line, error) 
 		}
 	}
 
+	if x.options.Stats {
+		x.cli.stats.IncrScannedLC(int(gf.lc))
+	}
+
 	if x.options.Quiet && !x.result.alreadyMatchContent && len(gf.matchedContents) > 0 {
 		x.result.alreadyMatchContent = true
 	}
