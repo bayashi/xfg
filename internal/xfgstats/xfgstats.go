@@ -15,11 +15,11 @@ type lap struct {
 }
 
 type count struct {
-	paths        int
-	matched      int
-	grep         int
-	matchedPaths int
-	matchedLC    int
+	walkedPaths    int
+	walkedContents int
+	scannedFile    int
+	pickedPaths    int
+	totalLC        int
 }
 
 type Stats struct {
@@ -50,28 +50,28 @@ func (s *Stats) Show(out io.Writer) {
 		result = result + fmt.Sprintf(" %s: %s\n", l.label, l.t.String())
 	}
 	result = result + fmt.Sprintf("[Env]\n procs: %d\n", s.procs)
-	result = result + fmt.Sprintf("[Walk]\n paths: %d\n matched: %d\n grep: %d\n", s.count.paths, s.count.matched, s.count.grep)
-	result = result + fmt.Sprintf("[Result]\n paths: %d\n lc: %d\n", s.count.matchedPaths, s.count.matchedLC)
+	result = result + fmt.Sprintf("[Walk]\n paths: %d\n matched: %d\n grep: %d\n", s.count.walkedPaths, s.count.walkedContents, s.count.scannedFile)
+	result = result + fmt.Sprintf("[Result]\n paths: %d\n lc: %d\n", s.count.pickedPaths, s.count.totalLC)
 
 	xfgutil.Output(bufio.NewWriter(out), result)
 }
 
-func (s *Stats) IncrPaths() {
-	s.count.paths++
+func (s *Stats) IncrWalkedPaths() {
+	s.count.walkedPaths++
 }
 
-func (s *Stats) IncrMatched() {
-	s.count.matched++
+func (s *Stats) IncrWalkedContents() {
+	s.count.walkedContents++
 }
 
-func (s *Stats) IncrGrep() {
-	s.count.grep++
+func (s *Stats) IncrScannedFile() {
+	s.count.scannedFile++
 }
 
-func (s *Stats) SetMatchedPaths(count int) {
-	s.count.matchedPaths = count
+func (s *Stats) SetPickedPaths(count int) {
+	s.count.pickedPaths = count
 }
 
-func (s *Stats) SetMatchedLC(count int) {
-	s.count.matchedLC = count
+func (s *Stats) SetTotalLC(count int) {
+	s.count.totalLC = count
 }

@@ -113,8 +113,8 @@ func (cli *runner) xfg(o *options) (int, error) {
 
 	cli.stats.Mark("showResult")
 
-	cli.stats.SetMatchedPaths(len(x.result.paths))
-	cli.stats.SetMatchedLC(x.result.lc)
+	cli.stats.SetPickedPaths(len(x.result.paths))
+	cli.stats.SetTotalLC(x.result.lc)
 
 	if x.options.Stats {
 		cli.stats.Show(cli.out)

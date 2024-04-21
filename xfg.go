@@ -130,7 +130,7 @@ func (x *xfg) search() error {
 }
 
 func (x *xfg) walker(fPath string, fInfo fs.DirEntry, err error, eg *errgroup.Group) error {
-	x.cli.stats.IncrPaths()
+	x.cli.stats.IncrWalkedPaths()
 
 	if err != nil {
 		return fmt.Errorf("WalkDir started from `%s` at `%s`: %w", x.options.SearchStart, fPath, err)
@@ -154,7 +154,7 @@ func (x *xfg) walker(fPath string, fInfo fs.DirEntry, err error, eg *errgroup.Gr
 		return nil
 	}
 
-	x.cli.stats.IncrMatched()
+	x.cli.stats.IncrWalkedContents()
 
 	eg.Go(func() error {
 		return x.postMatchPath(fPath, fInfo)
@@ -379,7 +379,7 @@ func (x *xfg) postMatchPath(fPath string, fInfo fs.DirEntry) (err error) {
 
 func (x *xfg) scanFile(fPath string) ([]line, error) {
 	x.result.mu.Lock()
-	x.cli.stats.IncrGrep()
+	x.cli.stats.IncrScannedFile()
 	x.result.mu.Unlock()
 
 	fh, err := os.Open(fPath)
