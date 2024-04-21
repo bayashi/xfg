@@ -735,6 +735,17 @@ func TestXfg_OK(t *testing.T) {
 			expect:         "",
 			expectExitCode: exitOK,
 		},
+		"match words as word boundary regexp by default": {
+			opt: &options{
+				SearchGrepRe:     []string{"boundary"},
+				onlyMatchContent: true,
+			},
+			expect: here.Doc(`
+                testdata/service-n/foo.txt
+                1: word boundary test line
+			`),
+			expectExitCode: exitOK,
+		},
 		"just match line as not word boundary regexp": {
 			opt: &options{
 				SearchGrepRe:     []string{"bound"},
