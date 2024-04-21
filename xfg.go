@@ -179,7 +179,7 @@ func (x *xfg) preSearch() error {
 	}
 
 	if len(x.options.SearchPathRe) > 0 {
-		if searchPathRe, err := xfgutil.CompileRegexps(x.options.SearchPathRe); err != nil {
+		if searchPathRe, err := xfgutil.CompileRegexps(x.options.SearchPathRe, !x.options.NotWordBoundary); err != nil {
 			return err
 		} else {
 			x.searchPathRe = searchPathRe
@@ -187,7 +187,7 @@ func (x *xfg) preSearch() error {
 	}
 
 	if len(x.options.SearchGrepRe) > 0 {
-		if searchGrepRe, err := xfgutil.CompileRegexps(x.options.SearchGrepRe); err != nil {
+		if searchGrepRe, err := xfgutil.CompileRegexps(x.options.SearchGrepRe, !x.options.NotWordBoundary); err != nil {
 			return err
 		} else {
 			x.searchGrepRe = searchGrepRe
