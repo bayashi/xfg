@@ -20,7 +20,7 @@ import (
 )
 
 type line struct {
-	lc      int32
+	lc      int32 // line number
 	content string
 	matched bool
 }
@@ -34,7 +34,7 @@ type path struct {
 type result struct {
 	mu                  sync.RWMutex
 	paths               []path
-	lc                  int
+	lc                  int // matched line count
 	alreadyMatchContent bool
 }
 
