@@ -378,9 +378,9 @@ func (x *xfg) postMatchPath(fPath string, fInfo fs.DirEntry) (err error) {
 }
 
 func (x *xfg) scanFile(fPath string) ([]line, error) {
-	x.result.mu.Lock()
+	x.cli.stats.Lock()
 	x.cli.stats.IncrScannedFile()
-	x.result.mu.Unlock()
+	x.cli.stats.Unlock()
 
 	fh, err := os.Open(fPath)
 	if err != nil {
@@ -458,7 +458,9 @@ func (x *xfg) scanContent(scanner *bufio.Scanner, fPath string) ([]line, error) 
 	}
 
 	if x.options.Stats {
+		x.cli.stats.Lock()
 		x.cli.stats.IncrScannedLC(int(gf.lc))
+		x.cli.stats.Unlock()
 	}
 
 	if x.options.Quiet && !x.result.alreadyMatchContent && len(gf.matchedContents) > 0 {

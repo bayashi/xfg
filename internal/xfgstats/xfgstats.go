@@ -4,6 +4,7 @@ import (
 	"bufio"
 	"fmt"
 	"io"
+	"sync"
 	"time"
 
 	"github.com/bayashi/xfg/internal/xfgutil"
@@ -24,6 +25,7 @@ type count struct {
 }
 
 type Stats struct {
+	mu    sync.RWMutex
 	procs int
 	start time.Time
 	lap   []lap
@@ -35,6 +37,14 @@ func New(procs int) *Stats {
 		procs: procs,
 		start: time.Now(),
 	}
+}
+
+func (s *Stats) Lock() {
+	s.mu.Lock()
+}
+
+func (s *Stats) Unlock() {
+	s.mu.Unlock()
 }
 
 func (s *Stats) Mark(label string) {
