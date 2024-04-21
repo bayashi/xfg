@@ -19,7 +19,7 @@ type count struct {
 	walkedContents int
 	scannedFile    int
 	pickedPaths    int
-	totalLC        int
+	outputLC       int
 }
 
 type Stats struct {
@@ -51,7 +51,7 @@ func (s *Stats) Show(out io.Writer) {
 	}
 	result = result + fmt.Sprintf("[Env]\n procs: %d\n", s.procs)
 	result = result + fmt.Sprintf("[Walk]\n paths: %d\n matched: %d\n grep: %d\n", s.count.walkedPaths, s.count.walkedContents, s.count.scannedFile)
-	result = result + fmt.Sprintf("[Result]\n paths: %d\n lc: %d\n", s.count.pickedPaths, s.count.totalLC)
+	result = result + fmt.Sprintf("[Result]\n paths: %d\n lc: %d\n", s.count.pickedPaths, s.count.outputLC)
 
 	xfgutil.Output(bufio.NewWriter(out), result)
 }
@@ -72,6 +72,6 @@ func (s *Stats) SetPickedPaths(count int) {
 	s.count.pickedPaths = count
 }
 
-func (s *Stats) SetTotalLC(count int) {
-	s.count.totalLC = count
+func (s *Stats) SetOutputLC(count int) {
+	s.count.outputLC = count
 }
