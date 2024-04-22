@@ -20,7 +20,7 @@ import (
 )
 
 type line struct {
-	lc      int32
+	lc      int32 // line number
 	content string
 	matched bool
 }
@@ -34,7 +34,7 @@ type path struct {
 type result struct {
 	mu                  sync.RWMutex
 	paths               []path
-	lc                  int
+	outputLC            int // Used on pager and stats
 	alreadyMatchContent bool
 }
 
@@ -130,7 +130,7 @@ func (x *xfg) search() error {
 }
 
 func (x *xfg) walker(fPath string, fInfo fs.DirEntry, err error, eg *errgroup.Group) error {
-	x.cli.stats.IncrPaths()
+	x.cli.stats.IncrWalkedPaths()
 
 	if err != nil {
 		return fmt.Errorf("WalkDir started from `%s` at `%s`: %w", x.options.SearchStart, fPath, err)
@@ -154,7 +154,7 @@ func (x *xfg) walker(fPath string, fInfo fs.DirEntry, err error, eg *errgroup.Gr
 		return nil
 	}
 
-	x.cli.stats.IncrMatched()
+	x.cli.stats.IncrWalkedContents()
 
 	eg.Go(func() error {
 		return x.postMatchPath(fPath, fInfo)
@@ -371,16 +371,16 @@ func (x *xfg) postMatchPath(fPath string, fInfo fs.DirEntry) (err error) {
 
 	x.result.mu.Lock()
 	x.result.paths = append(x.result.paths, matchedPath)
-	x.result.lc = x.result.lc + len(matchedPath.contents) + 1
+	x.result.outputLC = x.result.outputLC + len(matchedPath.contents) + 1
 	x.result.mu.Unlock()
 
 	return nil
 }
 
 func (x *xfg) scanFile(fPath string) ([]line, error) {
-	x.result.mu.Lock()
-	x.cli.stats.IncrGrep()
-	x.result.mu.Unlock()
+	x.cli.stats.Lock()
+	x.cli.stats.IncrScannedFile()
+	x.cli.stats.Unlock()
 
 	fh, err := os.Open(fPath)
 	if err != nil {
@@ -455,6 +455,12 @@ func (x *xfg) scanContent(scanner *bufio.Scanner, fPath string) ([]line, error) 
 		if x.options.MaxMatchCount != 0 && int(x.options.MaxMatchCount) <= len(gf.matchedContents) {
 			break
 		}
+	}
+
+	if x.options.Stats {
+		x.cli.stats.Lock()
+		x.cli.stats.IncrScannedLC(int(gf.lc))
+		x.cli.stats.Unlock()
 	}
 
 	if x.options.Quiet && !x.result.alreadyMatchContent && len(gf.matchedContents) > 0 {

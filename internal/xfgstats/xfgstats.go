@@ -4,6 +4,7 @@ import (
 	"bufio"
 	"fmt"
 	"io"
+	"sync"
 	"time"
 
 	"github.com/bayashi/xfg/internal/xfgutil"
@@ -15,12 +16,16 @@ type lap struct {
 }
 
 type count struct {
-	paths   int
-	matched int
-	grep    int
+	walkedPaths    int
+	walkedContents int
+	scannedFile    int
+	pickedPaths    int
+	outputLC       int
+	scannedLC      int
 }
 
 type Stats struct {
+	mu    sync.RWMutex
 	procs int
 	start time.Time
 	lap   []lap
@@ -34,6 +39,14 @@ func New(procs int) *Stats {
 	}
 }
 
+func (s *Stats) Lock() {
+	s.mu.Lock()
+}
+
+func (s *Stats) Unlock() {
+	s.mu.Unlock()
+}
+
 func (s *Stats) Mark(label string) {
 	s.lap = append(s.lap, lap{
 		label: label,
@@ -43,25 +56,38 @@ func (s *Stats) Mark(label string) {
 }
 
 func (s *Stats) Show(out io.Writer) {
-	result := "\n"
+	result := "[Lap]\n"
 	for _, l := range s.lap {
-		result = result + fmt.Sprintf("%s: %s\n", l.label, l.t.String())
+		result = result + fmt.Sprintf(" %s: %s\n", l.label, l.t.String())
 	}
-
-	result = result + fmt.Sprintf("procs: %d\n", s.procs)
-	result = result + fmt.Sprintf("paths: %d\nmatched: %d\ngrep: %d\n", s.count.paths, s.count.matched, s.count.grep)
+	result = result + fmt.Sprintf("[Env]\n procs: %d\n", s.procs)
+	result = result + fmt.Sprintf("[Walk]\n paths: %d\n contents: %d\n", s.count.walkedPaths, s.count.walkedContents)
+	result = result + fmt.Sprintf("[Scanned]\n files: %d\n lines: %d\n", s.count.scannedFile, s.count.scannedLC)
+	result = result + fmt.Sprintf("[Result]\n picked paths: %d\n output lc: %d\n", s.count.pickedPaths, s.count.outputLC)
 
 	xfgutil.Output(bufio.NewWriter(out), result)
 }
 
-func (s *Stats) IncrPaths() {
-	s.count.paths++
+func (s *Stats) IncrWalkedPaths() {
+	s.count.walkedPaths++
 }
 
-func (s *Stats) IncrMatched() {
-	s.count.matched++
+func (s *Stats) IncrWalkedContents() {
+	s.count.walkedContents++
 }
 
-func (s *Stats) IncrGrep() {
-	s.count.grep++
+func (s *Stats) IncrScannedFile() {
+	s.count.scannedFile++
+}
+
+func (s *Stats) SetPickedPaths(count int) {
+	s.count.pickedPaths = count
+}
+
+func (s *Stats) SetOutputLC(count int) {
+	s.count.outputLC = count
+}
+
+func (s *Stats) IncrScannedLC(count int) {
+	s.count.scannedLC = s.count.scannedLC + count
 }
