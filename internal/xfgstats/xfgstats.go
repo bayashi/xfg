@@ -61,8 +61,9 @@ func (s *Stats) Show(out io.Writer) {
 		result = result + fmt.Sprintf(" %s: %s\n", l.label, l.t.String())
 	}
 	result = result + fmt.Sprintf("[Env]\n procs: %d\n", s.procs)
-	result = result + fmt.Sprintf("[Walk]\n paths: %d\n matched: %d\n grep: %d\n", s.count.walkedPaths, s.count.walkedContents, s.count.scannedFile)
-	result = result + fmt.Sprintf("[Result]\n paths: %d\n lc: %d\n", s.count.pickedPaths, s.count.outputLC)
+	result = result + fmt.Sprintf("[Walk]\n paths: %d\n contents: %d\n", s.count.walkedPaths, s.count.walkedContents)
+	result = result + fmt.Sprintf("[Scanned]\n files: %d\n lines: %d\n", s.count.scannedFile, s.count.scannedLC)
+	result = result + fmt.Sprintf("[Result]\n picked paths: %d\n output lc: %d\n", s.count.pickedPaths, s.count.outputLC)
 
 	xfgutil.Output(bufio.NewWriter(out), result)
 }
