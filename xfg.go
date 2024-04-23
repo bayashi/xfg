@@ -60,6 +60,7 @@ type xfg struct {
 }
 
 func newX(cli *runner, o *options) *xfg {
+	o.prepareFromENV()
 	o.prepareAliases()
 	o.prepareContextLines(cli.isTTY)
 	o.SearchStart = filepath.Clean(o.SearchStart)

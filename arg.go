@@ -232,6 +232,12 @@ func (o *options) prepareContextLines(isTTY bool) {
 	o.withBeforeContextLines = o.ContextLines > 0 || o.BeforeContextLines > 0
 }
 
+func (o *options) prepareFromENV() {
+	if os.Getenv("NO_COLOR") != "" {
+		o.NoColor = true
+	}
+}
+
 func (o *options) prepareAliases() {
 	if o.Unrestricted {
 		o.SearchAll = true
