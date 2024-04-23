@@ -99,3 +99,38 @@ func TestHighlight(t *testing.T) {
 		})
 	}
 }
+
+func TestNoColorByENV(t *testing.T) {
+	for tname, tt := range map[string]struct {
+		opt    *options
+		expect string
+	}{
+		"service-b": {
+			opt: &options{
+				SearchPath: []string{"service-b"},
+			},
+			expect: "testdata/service-b/\n" +
+				"testdata/service-b/main.go\n",
+		},
+	} {
+		t.Run(tname, func(t *testing.T) {
+			var o bytes.Buffer
+			cli := &runner{
+				out:   &o,
+				isTTY: true,
+				stats: xfgstats.New(1),
+			}
+
+			tt.opt.NoPager = true
+			tt.opt.SearchStart = "./testdata"
+
+			t.Setenv("NO_COLOR", "1")
+
+			cli.xfg(tt.opt)
+
+			tt.expect = windowsBK(tt.expect)
+
+			a.Got(o.String()).Expect(tt.expect).X().Debug("options", tt.opt).Same(t)
+		})
+	}
+}
