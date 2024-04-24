@@ -67,6 +67,8 @@ type options struct {
 	SearchOnlyName   bool `toml:"search-only-name"`
 	NotWordBoundary  bool `toml:"not-word-boundary"`
 
+	flagLangList bool
+
 	ContextLines uint32 `toml:"context"`
 
 	AfterContextLines  uint32 `toml:"after-context"`
@@ -84,14 +86,7 @@ type options struct {
 	onlyMatchContent bool
 }
 
-func (cli *runner) parseArgs(d *options) *options {
-	noArgs := len(os.Args) == 1
-
-	o := &options{}
-
-	flag.CommandLine.SetOutput(cli.err)
-	flag.CommandLine.SortFlags = false
-
+func (o *options) falgs(d *options) {
 	flag.StringArrayVarP(&o.SearchPath, "path", "p", d.SearchPath, "A string to find paths")
 	flag.StringArrayVarP(&o.SearchGrep, "grep", "g", d.SearchGrep, "A string to search for contents")
 	flag.StringVarP(&o.SearchStart, "start", "s", d.SearchStart, "A location to start searching")
@@ -116,8 +111,7 @@ func (cli *runner) parseArgs(d *options) *options {
 
 	flag.StringArrayVarP(&o.Ext, "ext", "", d.Ext, "Only search files matching file extension")
 	flag.StringArrayVarP(&o.Lang, "lang", "", d.Lang, "Only search files matching language. --type-list prints all support languages")
-	var flagLangList bool
-	flag.BoolVarP(&flagLangList, "lang-list", "", false, "Show all supported file extensions for each language")
+	flag.BoolVarP(&o.flagLangList, "lang-list", "", false, "Show all supported file extensions for each language")
 
 	flag.BoolVarP(&o.Abs, "abs", "", d.Abs, "Show absolute paths")
 	flag.BoolVarP(&o.ShowMatchCount, "count", "c", d.ShowMatchCount, "Show a count of matching lines instead of contents")
@@ -142,6 +136,16 @@ func (cli *runner) parseArgs(d *options) *options {
 	flag.BoolVarP(&o.NoPager, "no-pager", "", d.NoPager, "Do not invoke with the Pager")
 	flag.BoolVarP(&o.Quiet, "quiet", "q", d.Quiet, "Do not write anything to standard output. Exit immediately with zero status if any match is found")
 	flag.BoolVarP(&o.Stats, "stats", "", d.Stats, "Print runtime stats after searching result")
+}
+
+func (cli *runner) parseArgs(d *options) *options {
+	noArgs := len(os.Args) == 1
+
+	flag.CommandLine.SetOutput(cli.err)
+	flag.CommandLine.SortFlags = false
+
+	o := &options{}
+	o.falgs(d)
 
 	var flagHelp bool
 	var flagVersion bool
@@ -155,7 +159,7 @@ func (cli *runner) parseArgs(d *options) *options {
 	} else if flagVersion {
 		cli.putErr(versionDetails())
 		funcExit(exitOK)
-	} else if flagLangList {
+	} else if o.flagLangList {
 		cli.putErr(showLangList())
 		funcExit(exitOK)
 	} else {

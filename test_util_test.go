@@ -49,6 +49,7 @@ func expectedDefaultOptions() options {
 		Hidden:           false,
 		SkipGitIgnore:    false,
 		SearchAll:        false,
+		flagLangList:     false,
 		ContextLines:     0,
 		MaxMatchCount:    0,
 	}
