@@ -162,8 +162,7 @@ func (cli *runner) parseArgs(d *options) *options {
 	} else {
 		o.targetPathFromArgs()
 
-		if len(o.SearchPath) == 0 && len(o.SearchGrep) == 0 && len(o.SearchPathRe) == 0 && len(o.SearchGrepRe) == 0 &&
-			len(o.Lang) == 0 && len(o.Ext) == 0 {
+		if o.needToSetPathOrGrep() {
 			cli.putHelp(errNeedToSetPathOrGrep)
 		}
 
@@ -173,6 +172,11 @@ func (cli *runner) parseArgs(d *options) *options {
 	}
 
 	return o
+}
+
+func (o *options) needToSetPathOrGrep() bool {
+	return len(o.SearchPath) == 0 && len(o.SearchGrep) == 0 && len(o.SearchPathRe) == 0 && len(o.SearchGrepRe) == 0 &&
+		len(o.Lang) == 0 && len(o.Ext) == 0
 }
 
 func showLangList() string {
