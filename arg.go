@@ -141,17 +141,14 @@ func (o *options) falgs(d *options) {
 func (cli *runner) parseArgs(d *options) *options {
 	noArgs := len(os.Args) == 1
 
-	flag.CommandLine.SetOutput(cli.err)
-	flag.CommandLine.SortFlags = false
-
 	o := &options{}
 	o.falgs(d)
 
-	var flagHelp bool
-	var flagVersion bool
+	flag.CommandLine.SetOutput(cli.err)
+	flag.CommandLine.SortFlags = false
+	var flagHelp, flagVersion bool
 	flag.BoolVarP(&flagHelp, "help", "h", false, "Show help (This message) and exit")
 	flag.BoolVarP(&flagVersion, "version", "v", false, "Show version and build command info and exit")
-
 	flag.Parse()
 
 	if noArgs || flagHelp {
