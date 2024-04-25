@@ -2,6 +2,7 @@ package main
 
 import (
 	"bufio"
+	"errors"
 	"fmt"
 	"io/fs"
 	"os"
@@ -136,7 +137,11 @@ func (x *xfg) walker(fPath string, fInfo fs.DirEntry, err error, eg *errgroup.Gr
 	}
 
 	if err != nil {
-		return fmt.Errorf("WalkDir started from `%s` at `%s`: %w", x.options.SearchStart, fPath, err)
+		if errors.Is(err, fs.ErrPermission) {
+			x.cli.putErr(err)
+			return nil
+		}
+		return err
 	}
 
 	if x.options.Quiet && x.hasMatchedAny() {
@@ -391,6 +396,10 @@ func (x *xfg) scanFile(fPath string) ([]line, error) {
 
 	fh, err := os.Open(fPath)
 	if err != nil {
+		if errors.Is(err, fs.ErrPermission) {
+			x.cli.putErr(err)
+			return nil, nil
+		}
 		return nil, fmt.Errorf("path `%s` : %w", fPath, err)
 	}
 	defer fh.Close()
