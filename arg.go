@@ -237,8 +237,6 @@ func (o *options) prepareContextLines(isTTY bool) {
 	o.withBeforeContextLines = o.ContextLines > 0 || o.BeforeContextLines > 0
 }
 
-const XFG_NO_COLOR_ENV_KEY = "NO_COLOR"
-
 func (o *options) prepareFromENV() {
 	if os.Getenv(XFG_NO_COLOR_ENV_KEY) != "" {
 		o.NoColor = true

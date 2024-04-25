@@ -27,8 +27,6 @@ func defaultOptions() *options {
 	}
 }
 
-const XFG_RC_ENV_KEY = "XFG_RC_FILE_PATH"
-
 func readRC(homeDir string) (*options, error) {
 	o := defaultOptions()
 
