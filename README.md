@@ -89,7 +89,7 @@ These keywords are treated as AND condition for each.
 ## Notes
 
 * Not follow symbolic links
-* Skip binary files
+* Skip to scan binary files or not content files
 
 ## Regexp search
 
