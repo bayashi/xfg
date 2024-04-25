@@ -248,6 +248,7 @@ func TestShowLangList(t *testing.T) {
 	os.Args = []string{fakeCmd, "--lang-list"}
 	o := cli.parseArgs(defaultOptions())
 	e := expectedDefaultOptions()
+	e.flagLangList = true
 	a.Got(o).Expect(&e).Same(t)
 	a.Got(stubCalled).True(t)
 	a.Got(stubCode).Expect(exitOK).Same(t)

@@ -17,10 +17,7 @@ import (
 	"github.com/bayashi/xfg/internal/xfgutil"
 )
 
-const (
-	ENV_KEY_PAGER      = "PAGER"
-	ENV_VALUE_NO_PAGER = "NOPAGER"
-)
+const ()
 
 func (cli *runner) pager(noPager bool, result int) (func(), error) {
 	if !cli.isTTY || noPager {
@@ -70,15 +67,15 @@ func (cli *runner) pager(noPager bool, result int) (func(), error) {
 }
 
 func pagerPath(pagers ...string) (string, error) {
-	pager := os.Getenv(ENV_KEY_PAGER)
+	pager := os.Getenv(XFG_PAGER_ENV_KEY)
 	if pager != "" {
-		if pager == ENV_VALUE_NO_PAGER {
-			return "", nil
+		if pager == "NOPAGER" {
+			return "", nil // not use any pager
 		}
 
 		exe, err := exec.LookPath(pager)
 		if err != nil {
-			return "", fmt.Errorf("could not execute `%s` from ENV:%s: %w", pager, ENV_KEY_PAGER, err)
+			return "", fmt.Errorf("could not execute `%s` from ENV:%s: %w", pager, XFG_PAGER_ENV_KEY, err)
 		}
 		return exe, nil
 	}
