@@ -179,22 +179,6 @@ func (o *options) needToSetPathOrGrep() bool {
 		len(o.Lang) == 0 && len(o.Ext) == 0
 }
 
-func showLangList() string {
-	m := xfglangxt.List()
-	languages := make([]string, 0, len(m))
-	for k := range m {
-		languages = append(languages, k)
-	}
-	sort.Strings(languages)
-
-	out := ""
-	for _, lang := range languages {
-		out = out + lang + ": " + strings.Join(m[lang], ", ") + "\n"
-	}
-
-	return strings.TrimRight(out, "\n")
-}
-
 func (o *options) targetPathFromArgs() {
 	if len(flag.Args()) > 0 && flag.Args()[0] != "" {
 		o.SearchPath = append(o.SearchPath, flag.Args()[0])
@@ -261,6 +245,22 @@ func (o *options) validateOptions() error {
 	}
 
 	return nil
+}
+
+func showLangList() string {
+	m := xfglangxt.List()
+	languages := make([]string, 0, len(m))
+	for k := range m {
+		languages = append(languages, k)
+	}
+	sort.Strings(languages)
+
+	out := ""
+	for _, lang := range languages {
+		out = out + lang + ": " + strings.Join(m[lang], ", ") + "\n"
+	}
+
+	return strings.TrimRight(out, "\n")
 }
 
 func versionDetails() string {
