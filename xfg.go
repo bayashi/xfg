@@ -273,7 +273,7 @@ func (x *xfg) isSkippable(fPath string, fInfo fs.DirEntry) (bool, error) {
 
 	if !x.options.SearchAll {
 		if isDefaultSkipFile(fInfo) ||
-			(!fInfo.IsDir() && !x.options.Hidden && strings.HasPrefix(fInfo.Name(), ".")) ||
+			(!x.options.Hidden && strings.HasPrefix(fInfo.Name(), ".")) ||
 			x.isSkippableByIgnoreFile(fPath) {
 			return true, nil // skip
 		}

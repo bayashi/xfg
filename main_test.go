@@ -250,6 +250,27 @@ func TestXfg_OK(t *testing.T) {
 			`),
 			expectExitCode: exitOK,
 		},
+		"not pick dot-dir by default": {
+			opt: &options{
+				SearchPath: []string{"service-o"},
+				Hidden:     false, // default false
+			},
+			expect: here.Doc(`
+                testdata/service-o/
+			`),
+			expectExitCode: exitOK,
+		},
+		"pick dot-dir with --hidden option (.gitkeep file is ignored by default)": {
+			opt: &options{
+				SearchPath: []string{"service-o"},
+				Hidden:     true,
+			},
+			expect: here.Doc(`
+                testdata/service-o/
+                testdata/service-o/.dotdir/
+			`),
+			expectExitCode: exitOK,
+		},
 		"pick dotfile with --hidden option": {
 			opt: &options{
 				SearchPath: []string{"service-e"},
