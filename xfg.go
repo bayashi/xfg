@@ -258,7 +258,7 @@ func (x *xfg) isLangFile(fInfo fs.DirEntry) bool {
 
 func (x *xfg) isSkippable(fPath string, fInfo fs.DirEntry) (bool, error) {
 	if !x.options.SearchAll {
-		if isDefaultSkipDir(fInfo) {
+		if isDefaultSkipDir(fInfo) || (fInfo.IsDir() && !x.options.Hidden && strings.HasPrefix(fInfo.Name(), ".")) {
 			return true, filepath.SkipDir // skip all stuff in this dir
 		}
 	}
