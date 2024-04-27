@@ -10,29 +10,6 @@ import (
 	a "github.com/bayashi/actually"
 )
 
-// No args, then put help message
-func TestArgsNoArgs(t *testing.T) {
-	var errOutput bytes.Buffer
-	cli := &runner{
-		err: &errOutput,
-	}
-
-	resetFlag()
-	stubExit()
-	os.Args = []string{fakeCmd}
-	o := cli.parseArgs(&options{})
-
-	a.Got(o).Expect(&options{}).Same(t)
-
-	a.Got(stubCalled).True(t)
-	a.Got(stubCode).Expect(exitOK).Same(t)
-
-	a.Got(strings.HasPrefix(errOutput.String(), "Version ")).True(t)
-	a.Got(errOutput.String()).Expect(`\nUsage: `).Match(t)
-	a.Got(errOutput.String()).Expect(`\nOptions:\n`).Match(t)
-	a.Got(errOutput.String()).Expect(`-v,\s*--version`).Match(t)
-}
-
 func TestArgsHelp(t *testing.T) {
 	var errOutput bytes.Buffer
 	cli := &runner{
@@ -82,6 +59,12 @@ func TestArgs(t *testing.T) {
 		args          []string
 		prepareExpect func(o *options)
 	}{
+		"no args": {
+			args: nil,
+			prepareExpect: func(o *options) {
+				o.runWithNoArg = true
+			},
+		},
 		"only path arg": {
 			args: []string{"foo"},
 			prepareExpect: func(o *options) {
