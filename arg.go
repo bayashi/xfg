@@ -17,8 +17,6 @@ const (
 
 	XFG_RC_FILE string = ".xfgrc"
 
-	errNeedToSetPathOrGrep string = "Err: required a directory path `-p`, `--path` or grep keyword `-g`, `--grep`"
-
 	defaultGroupSeparator string = "--"
 	defaultIndent         string = " "
 )
