@@ -167,9 +167,7 @@ func (x *xfg) walkFile(fPath string, fInfo fs.DirEntry, eg *errgroup.Group) erro
 		return nil
 	}
 
-	if isSkippable, sErr := x.isSkippable(fPath, fInfo); sErr != nil {
-		return sErr
-	} else if isSkippable {
+	if x.isSkippable(fPath, fInfo) {
 		return nil
 	}
 
@@ -267,24 +265,24 @@ func (x *xfg) isLangFile(fInfo fs.DirEntry) bool {
 	return false
 }
 
-func (x *xfg) isSkippable(fPath string, fInfo fs.DirEntry) (bool, error) {
+func (x *xfg) isSkippable(fPath string, fInfo fs.DirEntry) bool {
 	if fInfo.IsDir() && x.options.onlyMatchContent {
-		return true, nil // Just not pick up only this dir path. It will be searched files and directories in this dir.
+		return true // Just not pick up only this dir path. It will be searched files and directories in this dir.
 	}
 
 	if x.isIgnorePath(fPath) {
-		return true, nil // skip
+		return true
 	}
 
 	if !x.options.SearchAll {
 		if isDefaultSkipFile(fInfo) ||
 			(!x.options.Hidden && strings.HasPrefix(fInfo.Name(), ".")) ||
 			x.isSkippableByIgnoreFile(fPath) {
-			return true, nil // skip
+			return true
 		}
 	}
 
-	return x.canSkipPath(fPath, fInfo), nil
+	return x.canSkipPath(fPath, fInfo)
 }
 
 func (x *xfg) isSkippableByIgnoreFile(fPath string) bool {
