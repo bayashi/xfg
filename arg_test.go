@@ -154,6 +154,7 @@ func TestArgs(t *testing.T) {
 }
 
 func TestPrepareAliases(t *testing.T) {
+	t.Parallel()
 	o := &options{
 		Unrestricted: true,
 	}

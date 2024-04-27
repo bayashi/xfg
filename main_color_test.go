@@ -14,6 +14,7 @@ func init() {
 }
 
 func TestHighlight(t *testing.T) {
+	t.Parallel()
 	for tname, tt := range map[string]struct {
 		opt    *options
 		expect string
@@ -80,7 +81,9 @@ func TestHighlight(t *testing.T) {
 				"\x1b[91mtestdata/\x1b[96mservice-b\x1b[0m\x1b[91m/main.go\x1b[0m\n",
 		},
 	} {
+		tt := tt
 		t.Run(tname, func(t *testing.T) {
+			t.Parallel()
 			var o bytes.Buffer
 			cli := &runner{
 				out:   &o,

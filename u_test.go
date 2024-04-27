@@ -25,6 +25,7 @@ func TestReadRC(t *testing.T) {
 }
 
 func TestPrepareGitIgnore(t *testing.T) {
+	t.Parallel()
 	tempDir := t.TempDir()
 	gitignoreFilePath := filepath.Join(tempDir, ".gitignore")
 	f, _ := os.Create(gitignoreFilePath)
@@ -37,6 +38,7 @@ func TestPrepareGitIgnore(t *testing.T) {
 }
 
 func TestPrepareXfgIgnore(t *testing.T) {
+	t.Parallel()
 	tempDir := t.TempDir()
 	xfgignoreFilePath := filepath.Join(tempDir, ".xfgignore")
 	f, err := os.Create(xfgignoreFilePath)
@@ -51,6 +53,7 @@ func TestPrepareXfgIgnore(t *testing.T) {
 }
 
 func TestValidateStartPath_Err(t *testing.T) {
+	t.Parallel()
 	err := validateStartPath(noMatchKeyword)
 	a.Got(err).NotNil(t)
 	// Linux or Mac: "stat PATH no such file or directory"
