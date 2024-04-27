@@ -14,6 +14,8 @@ archives:
         format: zip
 changelog:
   use: github
+  format: "{{.Message}}"
+  sort: desc
   filters:
     exclude:
     - Merge pull request
