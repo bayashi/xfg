@@ -38,6 +38,7 @@ func TestRun_OK(t *testing.T) {
 }
 
 func TestXfg_OK(t *testing.T) {
+	t.Parallel()
 	for tname, tt := range map[string]struct {
 		opt            *options
 		expect         string
@@ -781,7 +782,9 @@ func TestXfg_OK(t *testing.T) {
 			expectExitCode: exitOK,
 		},
 	} {
+		tt := tt
 		t.Run(tname, func(t *testing.T) {
+			t.Parallel()
 			var o bytes.Buffer
 			cli := &runner{
 				out:   &o,

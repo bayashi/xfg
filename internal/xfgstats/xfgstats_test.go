@@ -8,6 +8,7 @@ import (
 )
 
 func TestStats(t *testing.T) {
+	t.Parallel()
 	stats := New(1)
 	stats.Mark("step1")
 	stats.Mark("step2")
