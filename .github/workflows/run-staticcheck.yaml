@@ -10,7 +10,7 @@ on:
       - '**/*.md'
       - '**/.gitignore'
       - '.goreleaser.yaml'
-      - '**/releaser.yaml'
+      - '.github/workflows/releaser.yaml'
 
 jobs:
   build:
