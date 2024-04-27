@@ -159,12 +159,11 @@ func (x *xfg) walkFile(fPath string, fInfo fs.DirEntry, eg *errgroup.Group) erro
 		return nil // already match. skip after all
 	}
 
-	if !x.options.SearchAll && len(x.options.Ext) > 0 && !x.isMatchExt(fInfo, x.options.Ext) {
-		return nil
-	}
-
-	if !x.options.SearchAll && len(x.options.Lang) > 0 && !x.isLangFile(fInfo) {
-		return nil
+	if !x.options.SearchAll {
+		if (len(x.options.Ext) > 0 && !x.isMatchExt(fInfo, x.options.Ext)) ||
+			(len(x.options.Lang) > 0 && !x.isLangFile(fInfo)) {
+			return nil
+		}
 	}
 
 	if x.isSkippable(fPath, fInfo) {
