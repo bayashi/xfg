@@ -17,8 +17,6 @@ const (
 
 	XFG_RC_FILE string = ".xfgrc"
 
-	errNeedToSetPathOrGrep string = "Err: required a directory path `-p`, `--path` or grep keyword `-g`, `--grep`"
-
 	defaultGroupSeparator string = "--"
 	defaultIndent         string = " "
 )
@@ -83,6 +81,8 @@ type options struct {
 	withAfterContextLines    bool
 	withBeforeContextLines   bool
 
+	runWithNoArg bool
+
 	onlyMatchContent bool
 }
 
@@ -139,9 +139,8 @@ func (o *options) falgs(d *options) {
 }
 
 func (cli *runner) parseArgs(d *options) *options {
-	noArgs := len(os.Args) == 1
-
 	o := &options{}
+	o.runWithNoArg = len(os.Args) == 1
 	o.falgs(d)
 
 	flag.CommandLine.SetOutput(cli.err)
@@ -151,7 +150,7 @@ func (cli *runner) parseArgs(d *options) *options {
 	flag.BoolVarP(&flagVersion, "version", "v", false, "Show version and build command info and exit")
 	flag.Parse()
 
-	if noArgs || flagHelp {
+	if flagHelp {
 		cli.putHelp(fmt.Sprintf("Version %s", getVersion()))
 	} else if flagVersion {
 		cli.putErr(versionDetails())
@@ -161,22 +160,12 @@ func (cli *runner) parseArgs(d *options) *options {
 		funcExit(exitOK)
 	} else {
 		o.targetPathFromArgs()
-
-		if o.needToSetPathOrGrep() {
-			cli.putHelp(errNeedToSetPathOrGrep)
-		}
-
 		if len(o.SearchGrep) > 0 || len(o.SearchGrepRe) > 0 {
 			o.onlyMatchContent = true
 		}
 	}
 
 	return o
-}
-
-func (o *options) needToSetPathOrGrep() bool {
-	return len(o.SearchPath) == 0 && len(o.SearchGrep) == 0 && len(o.SearchPathRe) == 0 && len(o.SearchGrepRe) == 0 &&
-		len(o.Lang) == 0 && len(o.Ext) == 0
 }
 
 func (o *options) targetPathFromArgs() {

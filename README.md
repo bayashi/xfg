@@ -21,7 +21,13 @@ There are so many features. You can check all options in below "Help Options" se
 
 ## Usage of `xfg` command
 
-Search for files and directories that include `service-b` in those path.
+Just hit only `xfg`, then search for files and directories starting from current directory.
+
+```sh
+$ xfg
+```
+
+Below case, search for files and directories that include `service-b` in those paths.
 
 ```sh
 $ xfg service-b
@@ -33,17 +39,15 @@ Specific:
 $ xfg --path service-b
 ```
 
-By default, start searching from current directory. You can specify `--start` option for where to start.
+You can specify `--start` or `-s` option for where to start searching.
 
 Output:
 
 ```
-$ xfg service-b
-service-b
-service-b/main.go
+$ xfg service-b --start foo/bar
 ```
 
-Search for files and directories that match the `service-b` in those path and extract content that matches the `bar`.
+Search for files and directories that match the `service-b` in those paths, and extract contents that match the `bar`.
 
 ```sh
 $ xfg service-b bar
@@ -55,21 +59,15 @@ Specific:
 $ xfg --path service-b --grep bar
 ```
 
-Output:
-
-```
-service-b/main.go
-  4:    bar := 34
-```
-
-Note that the second argument and subsequent arguments are tereated as keywords to grep contents
+Note that the second argument and subsequent arguments are tereated as keywords to grep contents, like follow
 
 ```sh
-$ xfg service-b bar baz
-        |        |   |
-        |        |   +--- To search for contents
-        |        +------- To search for contents
-        +---------------- To search for paths
+       +--- Only 1st arg is to search for paths
+       |
+$ xfg service-b bar baz ...
+                 |   |
+                 |   +--- To search for contents
+                 +------- To search for contents
 ```
 
 Above command is equivalent:
