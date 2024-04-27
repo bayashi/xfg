@@ -113,17 +113,7 @@ func (x *xfg) search() error {
 	}
 
 	eg := new(errgroup.Group)
-	isFirstDir := true
-	if err := filepath.WalkDir(x.options.SearchStart, func(fPath string, fInfo fs.DirEntry, err error) error {
-		if isFirstDir {
-			isFirstDir = false
-			return nil // not pick up start dir path, anyway
-		}
-		return x.walker(fPath, fInfo, err, eg)
-	}); err != nil {
-		return fmt.Errorf("walkErr : %w", err)
-	}
-
+	x.walkDir(eg, x.options.SearchStart)
 	if err := eg.Wait(); err != nil {
 		return fmt.Errorf("postMatchPath : %w", err)
 	}
@@ -131,17 +121,38 @@ func (x *xfg) search() error {
 	return nil
 }
 
-func (x *xfg) walker(fPath string, fInfo fs.DirEntry, err error, eg *errgroup.Group) error {
+func (x *xfg) walkDir(eg *errgroup.Group, dirPath string) {
+	eg.Go(func() error {
+		stuff, err := os.ReadDir(dirPath)
+		if err != nil {
+			if errors.Is(err, fs.ErrPermission) {
+				x.cli.putErr(err)
+				return nil
+			}
+			return err
+		}
+
+		for _, s := range stuff {
+			if !x.options.SearchAll {
+				if isDefaultSkipDir(s) || (s.IsDir() && !x.options.Hidden && strings.HasPrefix(s.Name(), ".")) {
+					continue // skip all stuff in this dir
+				}
+			}
+			if s.IsDir() {
+				x.walkDir(eg, filepath.Join(dirPath, s.Name()))
+			}
+			if err := x.walkFile(filepath.Join(dirPath, s.Name()), s, eg); err != nil {
+				return err
+			}
+		}
+
+		return nil
+	})
+}
+
+func (x *xfg) walkFile(fPath string, fInfo fs.DirEntry, eg *errgroup.Group) error {
 	if x.options.Stats {
 		x.cli.stats.IncrWalkedPaths()
-	}
-
-	if err != nil {
-		if errors.Is(err, fs.ErrPermission) {
-			x.cli.putErr(err)
-			return nil
-		}
-		return err
 	}
 
 	if x.options.Quiet && x.hasMatchedAny() {
@@ -257,12 +268,6 @@ func (x *xfg) isLangFile(fInfo fs.DirEntry) bool {
 }
 
 func (x *xfg) isSkippable(fPath string, fInfo fs.DirEntry) (bool, error) {
-	if !x.options.SearchAll {
-		if isDefaultSkipDir(fInfo) || (fInfo.IsDir() && !x.options.Hidden && strings.HasPrefix(fInfo.Name(), ".")) {
-			return true, filepath.SkipDir // skip all stuff in this dir
-		}
-	}
-
 	if fInfo.IsDir() && x.options.onlyMatchContent {
 		return true, nil // Just not pick up only this dir path. It will be searched files and directories in this dir.
 	}
