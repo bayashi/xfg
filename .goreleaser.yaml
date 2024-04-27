@@ -13,8 +13,7 @@ archives:
       - goos: windows
         format: zip
 changelog:
-  use: github
-  format: "{{.Message}}"
+  use: github-native
   sort: desc
   filters:
     exclude:
