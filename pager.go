@@ -17,8 +17,6 @@ import (
 	"github.com/bayashi/xfg/internal/xfgutil"
 )
 
-const ()
-
 func (cli *runner) pager(noPager bool, result int) (func(), error) {
 	if !cli.isTTY || noPager {
 		return nil, nil
