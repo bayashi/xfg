@@ -6,6 +6,8 @@
 
 Find paths anyway, then search for contents also, naturally.
 
+![xfg example](https://github.com/bayashi/xfg/assets/42190/2e5c3381-c12f-412b-b01e-5cdaaa6c8752)
+
 * Recursive search
 * Search both paths and contents by multiple keywords
     * Possible to search by regexp also
