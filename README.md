@@ -21,7 +21,7 @@ Find paths anyway, then search for contents also, naturally.
 
 There are so many features. You can check all options in below "Help Options" section.
 
-## Usage of `xfg` command
+## Basic Usage of `xfg`
 
 Just hit only `xfg`, then search for files and directories starting from current directory.
 
@@ -176,7 +176,7 @@ Regexp keywords you input respect word boundaries by default. You can use `--not
 
 ## Default Options
 
-You can use default options by `.xfgrc` file. It's TOML file even without `.toml` extention, anyway.
+You can set default options in `.xfgrc` file. It's TOML file even without `.toml` extention, anyway.
 
 ```
 color-path = "blue"
