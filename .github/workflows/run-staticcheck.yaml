@@ -9,6 +9,8 @@ on:
     paths-ignore:
       - '**/*.md'
       - '**/.gitignore'
+      - '.goreleaser.yaml'
+      - '.github/workflows/releaser.yaml'
 
 jobs:
   build:
