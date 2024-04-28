@@ -82,7 +82,7 @@ func CompileRegexps(regexps []string, wordBoundary bool) ([]*regexp.Regexp, erro
 func CompileRegexpsIgnoreCase(regexps []string) ([]*regexp.Regexp, error) {
 	compiledRegexps := make([]*regexp.Regexp, 0, len(regexps))
 	for _, re := range regexps {
-		compiledRe, err := regexp.Compile("(?i)" + regexp.QuoteMeta(re))
+		compiledRe, err := regexp.Compile("(?i)(" + regexp.QuoteMeta(re) + ")")
 		if err != nil {
 			return nil, err
 		}

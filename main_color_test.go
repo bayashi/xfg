@@ -80,6 +80,14 @@ func TestHighlight(t *testing.T) {
 			expect: "\x1b[91mtestdata/\x1b[96mservice-b\x1b[0m\x1b[91m/\x1b[0m\n" +
 				"\x1b[91mtestdata/\x1b[96mservice-b\x1b[0m\x1b[91m/main.go\x1b[0m\n",
 		},
+		"service-b ignore case to match": {
+			opt: &options{
+				SearchPath: []string{"Service-B"},
+				IgnoreCase: true,
+			},
+			expect: "\x1b[93mtestdata/\x1b[96mservice-b\x1b[0m\x1b[93m/\x1b[0m\n" +
+				"\x1b[93mtestdata/\x1b[96mservice-b\x1b[0m\x1b[93m/main.go\x1b[0m\n",
+		},
 	} {
 		tt := tt
 		t.Run(tname, func(t *testing.T) {
