@@ -9,7 +9,14 @@ on:
     paths-ignore:
       - '**/*.md'
       - '**/.gitignore'
+      - '.goreleaser.yaml'
+      - '.github/workflows/releaser.yaml'
   pull_request:
+    paths-ignore:
+      - '**/*.md'
+      - '**/.gitignore'
+      - '.goreleaser.yaml'
+      - '.github/workflows/releaser.yaml'
 
 jobs:
   test-linux:
