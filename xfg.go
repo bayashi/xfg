@@ -103,7 +103,7 @@ func (x *xfg) setHighlighter() {
 	}
 }
 
-func (x *xfg) search() error {
+func (x *xfg) process() error {
 	if err := x.preSearch(); err != nil {
 		return fmt.Errorf("preSearch() : %w", err)
 	}
