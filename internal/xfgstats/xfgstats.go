@@ -93,6 +93,6 @@ func (s *Stats) IncrScannedLC(count int) {
 	s.count.scannedLC = s.count.scannedLC + count
 }
 
-func (s *Stats) AddPickedLC(i int) {
-	s.count.pickedLC = s.count.pickedLC + i
+func (s *Stats) AddPickedLC(count int) {
+	s.count.pickedLC = s.count.pickedLC + count
 }
