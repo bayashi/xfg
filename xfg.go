@@ -155,18 +155,7 @@ func (x *xfg) walkFile(fPath string, fInfo fs.DirEntry, eg *errgroup.Group) erro
 		x.cli.stats.IncrWalkedPaths()
 	}
 
-	if x.options.Quiet && x.hasMatchedAny() {
-		return nil // already match. skip after all
-	}
-
-	if !x.options.SearchAll {
-		if (len(x.options.Ext) > 0 && !x.isMatchExt(fInfo, x.options.Ext)) ||
-			(len(x.options.Lang) > 0 && !x.isLangFile(fInfo)) {
-			return nil
-		}
-	}
-
-	if x.isSkippable(fPath, fInfo) {
+	if x.isSkippablePath(fPath, fInfo) {
 		return nil
 	}
 
@@ -264,7 +253,18 @@ func (x *xfg) isLangFile(fInfo fs.DirEntry) bool {
 	return false
 }
 
-func (x *xfg) isSkippable(fPath string, fInfo fs.DirEntry) bool {
+func (x *xfg) isSkippablePath(fPath string, fInfo fs.DirEntry) bool {
+	if x.options.Quiet && x.hasMatchedAny() {
+		return true // already match. skip after all
+	}
+
+	if !x.options.SearchAll {
+		if (len(x.options.Ext) > 0 && !x.isMatchExt(fInfo, x.options.Ext)) ||
+			(len(x.options.Lang) > 0 && !x.isLangFile(fInfo)) {
+			return true
+		}
+	}
+
 	if fInfo.IsDir() && x.options.onlyMatchContent {
 		return true // Just not pick up only this dir path. It will be searched files and directories in this dir.
 	}
