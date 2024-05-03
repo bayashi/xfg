@@ -192,6 +192,21 @@ ignore = [
 export XFG_RC_FILE_PATH="/path/to/your_rc_file.toml"
 ```
 
+## File Type Search
+
+You can search for paths by file type charactor on `--type`, `-t` option.
+
+* **d**: directory
+* **l**: symlink
+* **x**: executable file
+* **e**: empty
+* **s**: socket
+* **p**: pipe
+* **b**: block-device
+* **c**: char-device
+
+For example, if you hit `xfg --type d`, then there are only directories.
+
 ## Highlight limitation
 
 xfg can highlight matched keywords in results. But the highlight feature is not perfect yet.
