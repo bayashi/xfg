@@ -139,7 +139,7 @@ func (x *xfg) walkDir(eg *errgroup.Group, dirPath string) {
 				}
 			}
 			if s.IsDir() {
-				x.walkDir(eg, filepath.Join(dirPath, s.Name()))
+				x.walkDir(eg, filepath.Join(dirPath, s.Name())) // recursively
 			}
 			if err := x.walkFile(filepath.Join(dirPath, s.Name()), s, eg); err != nil {
 				return err
