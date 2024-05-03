@@ -94,5 +94,7 @@ func (s *Stats) AddOutputLC(count int) {
 }
 
 func (s *Stats) AddPickedLC(count int) {
+	s.mu.Lock()
 	s.count.pickedLC = s.count.pickedLC + count
+	s.mu.Unlock()
 }
