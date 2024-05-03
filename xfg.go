@@ -104,12 +104,12 @@ func (x *xfg) setHighlighter() {
 }
 
 func (x *xfg) process() error {
-	if err := x.preSearch(); err != nil {
-		return fmt.Errorf("preSearch() : %w", err)
+	if err := x.preWalkDir(); err != nil {
+		return fmt.Errorf("preWalkDir() : %w", err)
 	}
 
 	if x.options.Stats {
-		x.cli.stats.Mark("preSearch")
+		x.cli.stats.Mark("preWalkDir")
 	}
 
 	eg := new(errgroup.Group)
@@ -181,7 +181,7 @@ func (x *xfg) walkFile(fPath string, fInfo fs.DirEntry, eg *errgroup.Group) erro
 	return nil
 }
 
-func (x *xfg) preSearch() error {
+func (x *xfg) preWalkDir() error {
 	if !x.options.SkipGitIgnore {
 		x.gitignore = prepareGitIgnore(x.cli.homeDir, x.options.SearchStart)
 	}
