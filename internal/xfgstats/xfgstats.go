@@ -85,8 +85,8 @@ func (s *Stats) SetPickedPaths(count int) {
 	s.count.pickedPaths = count
 }
 
-func (s *Stats) SetOutputLC(count int) {
-	s.count.outputLC = count
+func (s *Stats) AddOutputLC(count int) {
+	s.count.outputLC = s.count.outputLC + count
 }
 
 func (s *Stats) IncrScannedLC(count int) {

@@ -35,7 +35,7 @@ type path struct {
 type result struct {
 	mu                  sync.RWMutex
 	paths               []path
-	outputLC            int // Used on pager and stats
+	outputLC            int // Used on pager. Rough count. Not included group separators.
 	alreadyMatchContent bool
 }
 
