@@ -4,6 +4,7 @@ import (
 	"bufio"
 	"fmt"
 	"sort"
+	"strings"
 
 	"github.com/bayashi/xfg/internal/xfgutil"
 )
@@ -60,6 +61,11 @@ func (cli *runner) outputForTTY(x *xfg, lf string) error {
 				}
 			}
 		}
+
+		if x.options.Stats {
+			x.cli.stats.AddOutputLC(strings.Count(out, lf))
+		}
+
 		if err := xfgutil.Output(writer, out); err != nil {
 			return err
 		}
@@ -103,6 +109,10 @@ func (cli *runner) outputForNonTTY(x *xfg, lf string) error {
 			if !x.options.FilesWithMatches || !p.info.IsDir() {
 				out = out + fmt.Sprintf("%s%s", p.path, lf)
 			}
+		}
+
+		if x.options.Stats {
+			x.cli.stats.AddOutputLC(strings.Count(out, lf))
 		}
 
 		if err := xfgutil.Output(writer, out); err != nil {
