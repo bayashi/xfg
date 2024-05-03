@@ -91,11 +91,11 @@ func (cli *runner) preXfg() (*options, error) {
 func (cli *runner) xfg(o *options) (int, error) {
 	x := newX(cli, o)
 
-	if err := x.search(); err != nil {
-		return exitErr, fmt.Errorf("search() : %w", err)
+	if err := x.process(); err != nil {
+		return exitErr, fmt.Errorf("process() : %w", err)
 	}
 
-	cli.stats.Mark("search")
+	cli.stats.Mark("process")
 
 	pagerCloser, err := cli.pager(o.NoPager, x.result.outputLC)
 	if err != nil {

@@ -103,19 +103,19 @@ func (x *xfg) setHighlighter() {
 	}
 }
 
-func (x *xfg) search() error {
-	if err := x.preSearch(); err != nil {
-		return fmt.Errorf("preSearch() : %w", err)
+func (x *xfg) process() error {
+	if err := x.preWalkDir(); err != nil {
+		return fmt.Errorf("preWalkDir() : %w", err)
 	}
 
 	if x.options.Stats {
-		x.cli.stats.Mark("preSearch")
+		x.cli.stats.Mark("preWalkDir")
 	}
 
 	eg := new(errgroup.Group)
 	x.walkDir(eg, x.options.SearchStart)
 	if err := eg.Wait(); err != nil {
-		return fmt.Errorf("postMatchPath : %w", err)
+		return fmt.Errorf("walkDir Wait : %w", err)
 	}
 
 	return nil
@@ -139,7 +139,7 @@ func (x *xfg) walkDir(eg *errgroup.Group, dirPath string) {
 				}
 			}
 			if s.IsDir() {
-				x.walkDir(eg, filepath.Join(dirPath, s.Name()))
+				x.walkDir(eg, filepath.Join(dirPath, s.Name())) // recursively
 			}
 			if err := x.walkFile(filepath.Join(dirPath, s.Name()), s, eg); err != nil {
 				return err
@@ -155,18 +155,7 @@ func (x *xfg) walkFile(fPath string, fInfo fs.DirEntry, eg *errgroup.Group) erro
 		x.cli.stats.IncrWalkedPaths()
 	}
 
-	if x.options.Quiet && x.hasMatchedAny() {
-		return nil // already match. skip after all
-	}
-
-	if !x.options.SearchAll {
-		if (len(x.options.Ext) > 0 && !x.isMatchExt(fInfo, x.options.Ext)) ||
-			(len(x.options.Lang) > 0 && !x.isLangFile(fInfo)) {
-			return nil
-		}
-	}
-
-	if x.isSkippable(fPath, fInfo) {
+	if x.isSkippablePath(fPath, fInfo) {
 		return nil
 	}
 
@@ -181,7 +170,7 @@ func (x *xfg) walkFile(fPath string, fInfo fs.DirEntry, eg *errgroup.Group) erro
 	return nil
 }
 
-func (x *xfg) preSearch() error {
+func (x *xfg) preWalkDir() error {
 	if !x.options.SkipGitIgnore {
 		x.gitignore = prepareGitIgnore(x.cli.homeDir, x.options.SearchStart)
 	}
@@ -264,7 +253,18 @@ func (x *xfg) isLangFile(fInfo fs.DirEntry) bool {
 	return false
 }
 
-func (x *xfg) isSkippable(fPath string, fInfo fs.DirEntry) bool {
+func (x *xfg) isSkippablePath(fPath string, fInfo fs.DirEntry) bool {
+	if x.options.Quiet && x.hasMatchedAny() {
+		return true // already match. skip after all
+	}
+
+	if !x.options.SearchAll {
+		if (len(x.options.Ext) > 0 && !x.isMatchExt(fInfo, x.options.Ext)) ||
+			(len(x.options.Lang) > 0 && !x.isLangFile(fInfo)) {
+			return true
+		}
+	}
+
 	if fInfo.IsDir() && x.options.onlyMatchContent {
 		return true // Just not pick up only this dir path. It will be searched files and directories in this dir.
 	}
@@ -368,9 +368,7 @@ func (x *xfg) postMatchPath(fPath string, fInfo fs.DirEntry) (err error) {
 
 func (x *xfg) scanFile(fPath string) ([]line, error) {
 	if x.options.Stats {
-		x.cli.stats.Lock()
 		x.cli.stats.IncrScannedFile()
-		x.cli.stats.Unlock()
 	}
 
 	fh, err := os.Open(fPath)
@@ -481,9 +479,7 @@ func (x *xfg) scanContent(scanner *bufio.Scanner, fPath string) ([]line, error) 
 	}
 
 	if x.options.Stats {
-		x.cli.stats.Lock()
 		x.cli.stats.IncrScannedLC(int(gf.lc))
-		x.cli.stats.Unlock()
 	}
 
 	if x.options.Quiet && !x.result.alreadyMatchContent && len(gf.matchedContents) > 0 {
