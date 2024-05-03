@@ -51,7 +51,7 @@ func (cli *runner) outputForTTY(x *xfg, lf string) error {
 		if x.options.ShowMatchCount && !p.info.IsDir() {
 			out = out + fmt.Sprintf(":%d", len(p.contents))
 		}
-		out = out + "\n"
+		out = out + lf
 
 		if !x.options.ShowMatchCount && !x.options.FilesWithMatches {
 			if len(p.contents) > 0 {
