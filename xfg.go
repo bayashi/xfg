@@ -423,8 +423,11 @@ func (x *xfg) postScanFile(fPath string, fInfo fs.DirEntry, matchedPath path) er
 	x.result.mu.Lock()
 	x.result.paths = append(x.result.paths, matchedPath)
 	x.result.outputLC = x.result.outputLC + len(matchedPath.contents) + 1
-	x.cli.stats.AddPickedLC(len(matchedPath.contents))
 	x.result.mu.Unlock()
+
+	if x.options.Stats {
+		x.cli.stats.AddPickedLC(len(matchedPath.contents))
+	}
 
 	return nil
 }

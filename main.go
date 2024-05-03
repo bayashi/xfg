@@ -79,7 +79,9 @@ func (cli *runner) preXfg() (*options, error) {
 		o.NoColor = true // Turn off color
 	}
 
-	cli.stats.Mark("parseArgs")
+	if o.Stats {
+		cli.stats.Mark("parseArgs")
+	}
 
 	if err := o.validateOptions(); err != nil {
 		return nil, err
@@ -95,7 +97,9 @@ func (cli *runner) xfg(o *options) (int, error) {
 		return exitErr, fmt.Errorf("process() : %w", err)
 	}
 
-	cli.stats.Mark("process")
+	if x.options.Stats {
+		cli.stats.Mark("process")
+	}
 
 	pagerCloser, err := cli.pager(o.NoPager, x.result.outputLC)
 	if err != nil {
@@ -105,17 +109,18 @@ func (cli *runner) xfg(o *options) (int, error) {
 		defer pagerCloser()
 	}
 
-	cli.stats.Mark("pager")
+	if x.options.Stats {
+		cli.stats.Mark("pager")
+	}
 
 	if err := cli.showResult(x); err != nil {
 		return exitErr, fmt.Errorf("showResult() : %w", err)
 	}
 
-	cli.stats.Mark("showResult")
-
-	cli.stats.SetPickedPaths(len(x.result.paths))
-
 	if x.options.Stats {
+		cli.stats.Mark("showResult")
+		cli.stats.SetPickedPaths(len(x.result.paths))
+
 		cli.stats.Show(cli.out)
 	}
 
