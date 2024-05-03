@@ -363,31 +363,7 @@ func (x *xfg) postMatchPath(fPath string, fInfo fs.DirEntry) (err error) {
 		return nil // not pick up
 	}
 
-	if x.options.Abs {
-		absPath, err := filepath.Abs(fPath)
-		if err != nil {
-			return fmt.Errorf("failed to get abs path of `%s` : %w", fPath, err)
-		}
-		fPath = absPath
-	}
-
-	if fInfo.IsDir() {
-		fPath = fPath + string(filepath.Separator)
-	}
-
-	if !x.options.NoColor {
-		fPath = x.highlightPath(fPath)
-	}
-
-	matchedPath.path = fPath
-
-	x.result.mu.Lock()
-	x.result.paths = append(x.result.paths, matchedPath)
-	x.result.outputLC = x.result.outputLC + len(matchedPath.contents) + 1
-	x.cli.stats.AddPickedLC(len(matchedPath.contents))
-	x.result.mu.Unlock()
-
-	return nil
+	return x.postScanFile(fPath, fInfo, matchedPath)
 }
 
 func (x *xfg) scanFile(fPath string) ([]line, error) {
@@ -425,6 +401,34 @@ func (x *xfg) scanFile(fPath string) ([]line, error) {
 	}
 
 	return matchedContents, nil
+}
+
+func (x *xfg) postScanFile(fPath string, fInfo fs.DirEntry, matchedPath path) error {
+	if x.options.Abs {
+		absPath, err := filepath.Abs(fPath)
+		if err != nil {
+			return fmt.Errorf("failed to get abs path of `%s` : %w", fPath, err)
+		}
+		fPath = absPath
+	}
+
+	if fInfo.IsDir() {
+		fPath = fPath + string(filepath.Separator)
+	}
+
+	if !x.options.NoColor {
+		fPath = x.highlightPath(fPath)
+	}
+
+	matchedPath.path = fPath
+
+	x.result.mu.Lock()
+	x.result.paths = append(x.result.paths, matchedPath)
+	x.result.outputLC = x.result.outputLC + len(matchedPath.contents) + 1
+	x.cli.stats.AddPickedLC(len(matchedPath.contents))
+	x.result.mu.Unlock()
+
+	return nil
 }
 
 func (x *xfg) highlightPath(fPath string) string {
