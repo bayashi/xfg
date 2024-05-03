@@ -40,14 +40,6 @@ func New(procs int) *Stats {
 	}
 }
 
-func (s *Stats) Lock() {
-	s.mu.Lock()
-}
-
-func (s *Stats) Unlock() {
-	s.mu.Unlock()
-}
-
 func (s *Stats) Mark(label string) {
 	s.lap = append(s.lap, lap{
 		label: label,
@@ -70,15 +62,27 @@ func (s *Stats) Show(out io.Writer) {
 }
 
 func (s *Stats) IncrWalkedPaths() {
+	s.mu.Lock()
 	s.count.walkedPaths++
+	s.mu.Unlock()
 }
 
 func (s *Stats) IncrWalkedContents() {
+	s.mu.Lock()
 	s.count.walkedContents++
+	s.mu.Unlock()
 }
 
 func (s *Stats) IncrScannedFile() {
+	s.mu.Lock()
 	s.count.scannedFile++
+	s.mu.Unlock()
+}
+
+func (s *Stats) IncrScannedLC(count int) {
+	s.mu.Lock()
+	s.count.scannedLC = s.count.scannedLC + count
+	s.mu.Unlock()
 }
 
 func (s *Stats) SetPickedPaths(count int) {
@@ -87,10 +91,6 @@ func (s *Stats) SetPickedPaths(count int) {
 
 func (s *Stats) AddOutputLC(count int) {
 	s.count.outputLC = s.count.outputLC + count
-}
-
-func (s *Stats) IncrScannedLC(count int) {
-	s.count.scannedLC = s.count.scannedLC + count
 }
 
 func (s *Stats) AddPickedLC(count int) {
