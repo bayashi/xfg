@@ -115,7 +115,7 @@ func (x *xfg) process() error {
 	eg := new(errgroup.Group)
 	x.walkDir(eg, x.options.SearchStart)
 	if err := eg.Wait(); err != nil {
-		return fmt.Errorf("postMatchPath : %w", err)
+		return fmt.Errorf("walkDir Wait : %w", err)
 	}
 
 	return nil
