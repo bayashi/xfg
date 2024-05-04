@@ -154,7 +154,7 @@ func (cli *runner) parseArgs(d *options) *options {
 	flag.BoolVarP(&flagVersion, "version", "v", false, "Show version and build command info and exit")
 	flag.Parse()
 
-	if o.Type != "" && !o.validateType(o.Type) {
+	if o.Type != "" && !o.validateType() {
 		cli.putErr(fmt.Sprintf("wrong type `%s`. Supported: %s", o.Type, supportTypes))
 		funcExit(exitErr)
 	}
@@ -177,7 +177,7 @@ func (cli *runner) parseArgs(d *options) *options {
 	return o
 }
 
-func (o *options) validateType(typ string) bool {
+func (o *options) validateType() bool {
 	if len(o.Type) == 1 && strings.Contains("fdlxespbc", o.Type) {
 		return true // fine!
 	}
