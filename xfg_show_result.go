@@ -6,8 +6,76 @@ import (
 	"sort"
 	"strings"
 
+	"github.com/bayashi/colorpalette"
 	"github.com/bayashi/xfg/internal/xfgutil"
 )
+
+func (x *xfg) setHighlighter() {
+	o := x.options
+	if o.ColorPathBase != "" && colorpalette.Exists(o.ColorPathBase) {
+		x.pathBaseColor = fmt.Sprintf("\x1b[%sm", colorpalette.GetCode(o.ColorPathBase))
+	} else {
+		x.pathBaseColor = fmt.Sprintf("\x1b[%sm", colorpalette.GetCode("yellow"))
+	}
+
+	if o.ColorPath != "" && colorpalette.Exists(o.ColorPath) {
+		x.pathHighlightColor = colorpalette.Get(o.ColorPath)
+	} else {
+		x.pathHighlightColor = colorpalette.Get("cyan")
+	}
+	for _, sp := range o.SearchPath {
+		x.pathHighlighter = append(x.pathHighlighter, x.pathHighlightColor.Sprintf(sp))
+	}
+
+	if o.ColorContent != "" && colorpalette.Exists(o.ColorContent) {
+		x.grepHighlightColor = colorpalette.Get(o.ColorContent)
+	} else {
+		x.grepHighlightColor = colorpalette.Get("red")
+	}
+	for _, sg := range o.SearchGrep {
+		x.grepHighlighter = append(x.grepHighlighter, x.grepHighlightColor.Sprintf(sg))
+	}
+}
+
+func (x *xfg) highlightPath(fPath string) string {
+	if len(x.searchPathRe) > 0 {
+		for _, re := range x.searchPathRe {
+			fPath = re.ReplaceAllString(fPath, x.pathHighlightColor.Sprintf("$1")+x.pathBaseColor)
+		}
+	}
+
+	if x.options.IgnoreCase {
+		for _, spr := range x.searchPathi {
+			fPath = spr.ReplaceAllString(fPath, x.pathHighlightColor.Sprintf("$1")+x.pathBaseColor)
+		}
+	} else {
+		for i, sp := range x.options.SearchPath {
+			fPath = strings.ReplaceAll(fPath, sp, x.pathHighlighter[i]+x.pathBaseColor)
+		}
+	}
+
+	return x.pathBaseColor + fPath + "\x1b[0m"
+}
+
+func (x *xfg) highlightLine(line string) string {
+	if len(x.searchGrepRe) > 0 {
+		for _, re := range x.searchGrepRe {
+			line = re.ReplaceAllString(line, x.grepHighlightColor.Sprintf("$1"))
+		}
+	}
+
+	if x.options.IgnoreCase {
+		for _, sgr := range x.searchGrepi {
+			line = sgr.ReplaceAllString(line, x.grepHighlightColor.Sprintf("$1"))
+		}
+	} else {
+		for i, sg := range x.options.SearchGrep {
+			line = strings.ReplaceAll(line, sg, x.grepHighlighter[i])
+		}
+	}
+
+	return line
+}
 
 func (cli *runner) showResult(x *xfg) error {
 	if x.options.Quiet {
@@ -31,6 +99,9 @@ func (cli *runner) showResult(x *xfg) error {
 	sort.Slice(x.result.paths, func(i, j int) bool { return x.result.paths[i].path < x.result.paths[j].path })
 
 	if cli.isTTY {
+		if !x.options.NoColor {
+			x.setHighlighter()
+		}
 		cli.outputForTTY(x, lf)
 	} else {
 		cli.outputForNonTTY(x, lf)
@@ -48,6 +119,9 @@ func (cli *runner) outputForTTY(x *xfg, lf string) error {
 			continue
 		}
 		out := p.path
+		if !x.options.NoColor {
+			out = x.highlightPath(out)
+		}
 		if x.options.ShowMatchCount && !p.info.IsDir() {
 			out = out + fmt.Sprintf(":%d", len(p.contents))
 		}
@@ -83,6 +157,7 @@ func (cli *runner) buildContentOutput(x *xfg, out *string, contents []line, lf s
 		lc := fmt.Sprintf("%d", line.lc)
 		if !x.options.NoColor && line.matched {
 			lc = x.grepHighlightColor.Sprint(lc)
+			line.content = x.highlightLine(line.content)
 		}
 		*out = *out + fmt.Sprintf("%s%s: %s%s", x.options.Indent, lc, line.content, lf)
 		blc = line.lc
