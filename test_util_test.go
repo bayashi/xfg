@@ -55,8 +55,12 @@ func expectedDefaultOptions() options {
 	}
 }
 
+func isWindowsTestRunner() bool {
+	return os.Getenv("RUNNER_OS") == "Windows"
+}
+
 func windowsBK(src string) string {
-	if os.Getenv("RUNNER_OS") == "Windows" {
+	if isWindowsTestRunner() {
 		// BK: override path delimiter for Windows
 		src = strings.ReplaceAll(src, "/", "\\")
 	}

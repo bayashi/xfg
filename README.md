@@ -198,7 +198,7 @@ You can search for paths by file type charactor on `--type`, `-t` option.
 
 * **d**: `directory` just a directory
 * **l**: `symlink` symbolic link
-* **x**: `executable` executable file
+* **x**: `executable` executable file (NOT supported on Windows)
 * **e**: `empty` file size is 0. Or, a directory has nothing
 * **s**: `socket` socket file
 * **p**: `pipe` named pipe FIFO

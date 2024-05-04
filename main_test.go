@@ -43,6 +43,7 @@ func TestXfg_OK(t *testing.T) {
 		opt            *options
 		expect         string
 		expectExitCode int
+		skipWindows    bool
 	}{
 		"service-b": {
 			opt: &options{
@@ -810,6 +811,7 @@ func TestXfg_OK(t *testing.T) {
                 testdata/service-p/a.sh
 			`),
 			expectExitCode: exitOK,
+			skipWindows:    true, // Windows doesn't have executable permission
 		},
 		"--type e": {
 			opt: &options{
@@ -822,6 +824,10 @@ func TestXfg_OK(t *testing.T) {
 			expectExitCode: exitOK,
 		},
 	} {
+		if tt.skipWindows && isWindowsTestRunner() {
+			return
+		}
+
 		tt := tt
 		t.Run(tname, func(t *testing.T) {
 			t.Parallel()
