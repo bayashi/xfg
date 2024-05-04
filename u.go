@@ -111,6 +111,7 @@ func isRegularFile(fInfo fs.DirEntry) bool {
 }
 
 func validateStartPath(startPath string) error {
+	startPath = filepath.Clean(startPath)
 	d, err := os.Stat(startPath)
 	if err != nil {
 		return err
