@@ -90,6 +90,7 @@ These keywords are treated as AND condition for each.
 
 * Not follow symbolic links
 * Skip to scan binary files or not content files
+* Just testing only in Unicode ASCII yet
 
 ## Regexp search
 
