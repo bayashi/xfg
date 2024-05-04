@@ -70,7 +70,9 @@ func newX(cli *runner, o *options) *xfg {
 		options: o,
 	}
 
-	x.setHighlighter()
+	if !o.NoColor {
+		x.setHighlighter()
+	}
 
 	return x
 }
