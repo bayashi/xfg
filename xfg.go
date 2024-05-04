@@ -11,7 +11,6 @@ import (
 	"strings"
 	"sync"
 
-	"github.com/bayashi/colorpalette"
 	"github.com/fatih/color"
 	ignore "github.com/sabhiram/go-gitignore"
 	"golang.org/x/sync/errgroup"
@@ -70,36 +69,7 @@ func newX(cli *runner, o *options) *xfg {
 		options: o,
 	}
 
-	x.setHighlighter()
-
 	return x
-}
-
-func (x *xfg) setHighlighter() {
-	o := x.options
-	if o.ColorPathBase != "" && colorpalette.Exists(o.ColorPathBase) {
-		x.pathBaseColor = fmt.Sprintf("\x1b[%sm", colorpalette.GetCode(o.ColorPathBase))
-	} else {
-		x.pathBaseColor = fmt.Sprintf("\x1b[%sm", colorpalette.GetCode("yellow"))
-	}
-
-	if o.ColorPath != "" && colorpalette.Exists(o.ColorPath) {
-		x.pathHighlightColor = colorpalette.Get(o.ColorPath)
-	} else {
-		x.pathHighlightColor = colorpalette.Get("cyan")
-	}
-	for _, sp := range o.SearchPath {
-		x.pathHighlighter = append(x.pathHighlighter, x.pathHighlightColor.Sprintf(sp))
-	}
-
-	if o.ColorContent != "" && colorpalette.Exists(o.ColorContent) {
-		x.grepHighlightColor = colorpalette.Get(o.ColorContent)
-	} else {
-		x.grepHighlightColor = colorpalette.Get("red")
-	}
-	for _, sg := range o.SearchGrep {
-		x.grepHighlighter = append(x.grepHighlighter, x.grepHighlightColor.Sprintf(sg))
-	}
 }
 
 func (x *xfg) process() error {
@@ -456,10 +426,6 @@ func (x *xfg) postScanFile(fPath string, fInfo fs.DirEntry, matchedPath path) er
 		fPath = fPath + string(filepath.Separator)
 	}
 
-	if !x.options.NoColor {
-		fPath = x.highlightPath(fPath)
-	}
-
 	matchedPath.path = fPath
 
 	x.result.mu.Lock()
@@ -472,26 +438,6 @@ func (x *xfg) postScanFile(fPath string, fInfo fs.DirEntry, matchedPath path) er
 	}
 
 	return nil
-}
-
-func (x *xfg) highlightPath(fPath string) string {
-	if len(x.searchPathRe) > 0 {
-		for _, re := range x.searchPathRe {
-			fPath = re.ReplaceAllString(fPath, x.pathHighlightColor.Sprintf("$1")+x.pathBaseColor)
-		}
-	}
-
-	if x.options.IgnoreCase {
-		for _, spr := range x.searchPathi {
-			fPath = spr.ReplaceAllString(fPath, x.pathHighlightColor.Sprintf("$1")+x.pathBaseColor)
-		}
-	} else {
-		for i, sp := range x.options.SearchPath {
-			fPath = strings.ReplaceAll(fPath, sp, x.pathHighlighter[i]+x.pathBaseColor)
-		}
-	}
-
-	return x.pathBaseColor + fPath + "\x1b[0m"
 }
 
 type scanFile struct {
@@ -562,24 +508,6 @@ func (x *xfg) isMatchLine(line string) bool {
 	return true // OK, match all
 }
 
-func (x *xfg) highlightLine(gf *scanFile) {
-	if len(x.searchGrepRe) > 0 {
-		for _, re := range x.searchGrepRe {
-			gf.l = re.ReplaceAllString(gf.l, x.grepHighlightColor.Sprintf("$1"))
-		}
-	}
-
-	if x.options.IgnoreCase {
-		for _, sgr := range x.searchGrepi {
-			gf.l = sgr.ReplaceAllString(gf.l, x.grepHighlightColor.Sprintf("$1"))
-		}
-	} else {
-		for i, sg := range x.options.SearchGrep {
-			gf.l = strings.ReplaceAll(gf.l, sg, x.grepHighlighter[i])
-		}
-	}
-}
-
 func (x *xfg) processContentLine(gf *scanFile) {
 	if x.isMatchLine(gf.l) {
 		if !x.options.ShowMatchCount && x.options.withBeforeContextLines {
@@ -594,8 +522,6 @@ func (x *xfg) processContentLine(gf *scanFile) {
 
 		if x.options.ShowMatchCount {
 			gf.l = ""
-		} else if !x.options.NoColor {
-			x.highlightLine(gf)
 		}
 
 		x.optimizeLine(gf)
