@@ -253,7 +253,7 @@ func (x *xfg) isLangFile(fInfo fs.DirEntry) bool {
 	return false
 }
 
-func (x *xfg) isMatchFileType(fInfo fs.DirEntry) bool {
+func (x *xfg) isMatchFileType(fPath string, fInfo fs.DirEntry) bool {
 	switch x.options.Type {
 	case "d", "directory":
 		return fInfo.IsDir()
@@ -269,11 +269,19 @@ func (x *xfg) isMatchFileType(fInfo fs.DirEntry) bool {
 		}
 		return (i.Mode() & 0111) == 0111
 	case "e", "empty":
-		i, err := fInfo.Info()
-		if err != nil {
-			return false // trap error
+		if fInfo.IsDir() {
+			d, err := os.ReadDir(fPath)
+			if err != nil {
+				return false // trap error
+			}
+			return len(d) == 0
+		} else {
+			i, err := fInfo.Info()
+			if err != nil {
+				return false // trap error
+			}
+			return i.Size() == 0
 		}
-		return i.Size() == 0
 	case "s", "socket":
 		return (fInfo.Type() & fs.ModeSocket) == fs.ModeSocket
 	case "p", "pipe":
@@ -295,7 +303,7 @@ func (x *xfg) isSkippablePath(fPath string, fInfo fs.DirEntry) bool {
 	if !x.options.SearchAll {
 		if (len(x.options.Ext) > 0 && !x.isMatchExt(fInfo, x.options.Ext)) ||
 			(len(x.options.Lang) > 0 && !x.isLangFile(fInfo)) ||
-			(x.options.Type != "" && !x.isMatchFileType(fInfo)) {
+			(x.options.Type != "" && !x.isMatchFileType(fPath, fInfo)) {
 			return true
 		}
 	}
