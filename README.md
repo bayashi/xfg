@@ -149,8 +149,9 @@ Regexp keywords you input respect word boundaries by default. You can use `--not
   -u, --unrestricted              The alias of --search-all
       --ignore stringArray        Ignore path to pick up even with '--search-all'
   -f, --search-only-name          Search to only name instead whole path string
+  -t, --type string               Filter by file type: directory (d), symlink (l), executable (x), empty (e), socket (s), pipe (p), block-device (b), char-device (c)
       --ext stringArray           Only search files matching file extension
-      --lang stringArray          Only search files matching language. --type-list prints all support languages
+      --lang stringArray          Only search files matching language. --lang-list prints all support languages
       --lang-list                 Show all supported file extensions for each language
       --abs                       Show absolute paths
   -c, --count                     Show a count of matching lines instead of contents
@@ -191,6 +192,21 @@ ignore = [
 ```
 export XFG_RC_FILE_PATH="/path/to/your_rc_file.toml"
 ```
+
+## File Type Search
+
+You can search for paths by file type charactor on `--type`, `-t` option.
+
+* **d**: `directory` just a directory
+* **l**: `symlink` symbolic link
+* **x**: `executable` executable file (NOT supported on Windows)
+* **e**: `empty` file size is 0. Or, a directory has nothing
+* **s**: `socket` socket file
+* **p**: `pipe` named pipe FIFO
+* **b**: `block-device` device file
+* **c**: `char-device` Unix character device
+
+For example, if you hit `xfg --type d`, then there are only directories.
 
 ## Highlight limitation
 

@@ -253,6 +253,48 @@ func (x *xfg) isLangFile(fInfo fs.DirEntry) bool {
 	return false
 }
 
+func (x *xfg) isMatchFileType(fPath string, fInfo fs.DirEntry) bool {
+	switch x.options.Type {
+	case "d", "directory":
+		return fInfo.IsDir()
+	case "l", "symlink":
+		return (fInfo.Type() & fs.ModeSymlink) == fs.ModeSymlink
+	case "x", "executable":
+		if fInfo.IsDir() || (fInfo.Type()&fs.ModeSymlink) == fs.ModeSymlink {
+			return false
+		}
+		i, err := fInfo.Info()
+		if err != nil {
+			return false // trap error
+		}
+		return (i.Mode() & 0111) == 0111
+	case "e", "empty":
+		if fInfo.IsDir() {
+			d, err := os.ReadDir(fPath)
+			if err != nil {
+				return false // trap error
+			}
+			return len(d) == 0
+		} else {
+			i, err := fInfo.Info()
+			if err != nil {
+				return false // trap error
+			}
+			return i.Size() == 0
+		}
+	case "s", "socket":
+		return (fInfo.Type() & fs.ModeSocket) == fs.ModeSocket
+	case "p", "pipe":
+		return (fInfo.Type() & fs.ModeNamedPipe) == fs.ModeNamedPipe
+	case "b", "block-device":
+		return (fInfo.Type() & fs.ModeDevice) == fs.ModeDevice
+	case "c", "char-device":
+		return (fInfo.Type() & fs.ModeCharDevice) == fs.ModeCharDevice
+	default:
+		panic("not support type") // unreachable here though
+	}
+}
+
 func (x *xfg) isSkippablePath(fPath string, fInfo fs.DirEntry) bool {
 	if x.options.Quiet && x.hasMatchedAny() {
 		return true // already match. skip after all
@@ -260,7 +302,8 @@ func (x *xfg) isSkippablePath(fPath string, fInfo fs.DirEntry) bool {
 
 	if !x.options.SearchAll {
 		if (len(x.options.Ext) > 0 && !x.isMatchExt(fInfo, x.options.Ext)) ||
-			(len(x.options.Lang) > 0 && !x.isLangFile(fInfo)) {
+			(len(x.options.Lang) > 0 && !x.isLangFile(fInfo)) ||
+			(x.options.Type != "" && !x.isMatchFileType(fPath, fInfo)) {
 			return true
 		}
 	}

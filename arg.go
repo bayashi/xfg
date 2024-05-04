@@ -19,6 +19,8 @@ const (
 
 	defaultGroupSeparator string = "--"
 	defaultIndent         string = " "
+
+	supportTypes = "directory (d), symlink (l), executable (x), empty (e), socket (s), pipe (p), block-device (b), char-device (c)"
 )
 
 var (
@@ -43,6 +45,7 @@ type options struct {
 
 	Ignore []string `toml:"ignore"`
 
+	Type string   `toml:"Type"`
 	Lang []string `toml:"lang"`
 	Ext  []string `toml:"ext"`
 
@@ -109,8 +112,9 @@ func (o *options) falgs(d *options) {
 	flag.StringArrayVarP(&o.Ignore, "ignore", "", d.Ignore, "Ignore path to pick up even with '--search-all'")
 	flag.BoolVarP(&o.SearchOnlyName, "search-only-name", "f", d.SearchOnlyName, "Search to only name instead whole path string")
 
+	flag.StringVarP(&o.Type, "type", "t", d.Type, "Filter by file type: "+supportTypes)
 	flag.StringArrayVarP(&o.Ext, "ext", "", d.Ext, "Only search files matching file extension")
-	flag.StringArrayVarP(&o.Lang, "lang", "", d.Lang, "Only search files matching language. --type-list prints all support languages")
+	flag.StringArrayVarP(&o.Lang, "lang", "", d.Lang, "Only search files matching language. --lang-list prints all support languages")
 	flag.BoolVarP(&o.flagLangList, "lang-list", "", false, "Show all supported file extensions for each language")
 
 	flag.BoolVarP(&o.Abs, "abs", "", d.Abs, "Show absolute paths")
@@ -150,6 +154,11 @@ func (cli *runner) parseArgs(d *options) *options {
 	flag.BoolVarP(&flagVersion, "version", "v", false, "Show version and build command info and exit")
 	flag.Parse()
 
+	if o.Type != "" && !o.validateType(o.Type) {
+		cli.putErr(fmt.Sprintf("wrong type `%s`. Supported: %s", o.Type, supportTypes))
+		funcExit(exitErr)
+	}
+
 	if flagHelp {
 		cli.putHelp(fmt.Sprintf("Version %s", getVersion()))
 	} else if flagVersion {
@@ -166,6 +175,18 @@ func (cli *runner) parseArgs(d *options) *options {
 	}
 
 	return o
+}
+
+func (o *options) validateType(typ string) bool {
+	if len(o.Type) == 1 && strings.Contains("fdlxespbc", o.Type) {
+		return true // fine!
+	}
+	if o.Type == "directory" || o.Type == "symlink" || o.Type == "executable" || o.Type == "empty" ||
+		o.Type == "socket" || o.Type == "pipe" || o.Type == "block-device" || o.Type == "char-device" {
+		return true // fine!
+	}
+
+	return false
 }
 
 func (o *options) targetPathFromArgs() {
