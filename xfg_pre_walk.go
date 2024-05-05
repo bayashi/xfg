@@ -4,11 +4,11 @@ import "github.com/bayashi/xfg/internal/xfgutil"
 
 func (x *xfg) preWalkDir() error {
 	if !x.options.SkipGitIgnore {
-		x.gitignore = prepareGitIgnore(x.cli.homeDir, x.options.SearchStart)
+		x.extra.gitignore = prepareGitIgnore(x.cli.homeDir, x.options.SearchStart)
 	}
 
 	if !x.options.SkipXfgIgnore {
-		x.xfgignore = prepareXfgIgnore(x.cli.homeDir, x.options.XfgIgnoreFile)
+		x.extra.xfgignore = prepareXfgIgnore(x.cli.homeDir, x.options.XfgIgnoreFile)
 	}
 
 	if x.options.IgnoreCase {
@@ -21,7 +21,7 @@ func (x *xfg) preWalkDir() error {
 		if searchPathRe, err := xfgutil.CompileRegexps(x.options.SearchPathRe, !x.options.NotWordBoundary); err != nil {
 			return err
 		} else {
-			x.searchPathRe = searchPathRe
+			x.extra.searchPathRe = searchPathRe
 		}
 	}
 
@@ -29,7 +29,7 @@ func (x *xfg) preWalkDir() error {
 		if searchGrepRe, err := xfgutil.CompileRegexps(x.options.SearchGrepRe, !x.options.NotWordBoundary); err != nil {
 			return err
 		} else {
-			x.searchGrepRe = searchGrepRe
+			x.extra.searchGrepRe = searchGrepRe
 		}
 	}
 
@@ -40,14 +40,14 @@ func (x *xfg) prepareRe() error {
 	if searchPathi, err := xfgutil.CompileRegexpsIgnoreCase(x.options.SearchPath); err != nil {
 		return err
 	} else {
-		x.searchPathi = searchPathi
+		x.extra.searchPathi = searchPathi
 	}
 
 	if len(x.options.SearchGrep) > 0 {
 		if searchGrepi, err := xfgutil.CompileRegexpsIgnoreCase(x.options.SearchGrep); err != nil {
 			return err
 		} else {
-			x.searchGrepi = searchGrepi
+			x.extra.searchGrepi = searchGrepi
 		}
 	}
 
@@ -55,7 +55,7 @@ func (x *xfg) prepareRe() error {
 		if ignoreRe, err := xfgutil.CompileRegexpsIgnoreCase(x.options.Ignore); err != nil {
 			return err
 		} else {
-			x.ignoreRe = ignoreRe
+			x.extra.ignoreRe = ignoreRe
 		}
 	}
 

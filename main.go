@@ -13,6 +13,9 @@ import (
 const (
 	exitOK  int = 0
 	exitErr int = 1
+
+	XFG_NO_COLOR_ENV_KEY = "NO_COLOR"
+	XFG_RC_ENV_KEY       = "XFG_RC_FILE_PATH"
 )
 
 var funcExit = func(code int) {

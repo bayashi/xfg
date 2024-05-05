@@ -23,7 +23,7 @@ func (x *xfg) postMatchPath(fPath string, fInfo fs.DirEntry) (err error) {
 		info: fInfo,
 	}
 
-	if (len(x.options.SearchGrep) > 0 || len(x.searchGrepRe) > 0) && isRegularFile(fInfo) {
+	if (len(x.options.SearchGrep) > 0 || len(x.extra.searchGrepRe) > 0) && isRegularFile(fInfo) {
 		matchedPath.contents, err = x.scanFile(fPath)
 		if err != nil {
 			return fmt.Errorf("scanFile() : %w", err)
@@ -131,8 +131,8 @@ func (x *xfg) scanContent(scanner *bufio.Scanner, fPath string) ([]line, error) 
 }
 
 func (x *xfg) isMatchLine(line string) bool {
-	if x.options.IgnoreCase && len(x.searchGrepi) > 0 {
-		for _, sgr := range x.searchGrepi {
+	if x.options.IgnoreCase && len(x.extra.searchGrepi) > 0 {
+		for _, sgr := range x.extra.searchGrepi {
 			if !isMatchRegexp(line, sgr) {
 				return false
 			}
@@ -147,8 +147,8 @@ func (x *xfg) isMatchLine(line string) bool {
 		}
 	}
 
-	if len(x.searchGrepRe) > 0 {
-		for _, re := range x.searchGrepRe {
+	if len(x.extra.searchGrepRe) > 0 {
+		for _, re := range x.extra.searchGrepRe {
 			if !isMatchRegexp(line, re) {
 				return false
 			}

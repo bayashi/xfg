@@ -175,10 +175,10 @@ func (x *xfg) isSkippablePath(fPath string, fInfo fs.DirEntry) bool {
 }
 
 func (x *xfg) isSkippableByIgnoreFile(fPath string) bool {
-	if x.gitignore != nil && x.gitignore.MatchesPath(fPath) {
+	if x.extra.gitignore != nil && x.extra.gitignore.MatchesPath(fPath) {
 		return true // skip a file by .gitignore
 	}
-	if x.xfgignore != nil && x.xfgignore.MatchesPath(fPath) {
+	if x.extra.xfgignore != nil && x.extra.xfgignore.MatchesPath(fPath) {
 		return true // skip a file by .xfgignore
 	}
 
@@ -187,7 +187,7 @@ func (x *xfg) isSkippableByIgnoreFile(fPath string) bool {
 
 func (x *xfg) isIgnorePath(fPath string) bool {
 	if x.options.IgnoreCase {
-		for _, re := range x.ignoreRe {
+		for _, re := range x.extra.ignoreRe {
 			if isMatchRegexp(fPath, re) {
 				return true // ignore
 			}
@@ -212,8 +212,8 @@ func (x *xfg) canSkipPath(fPath string, fInfo fs.DirEntry) bool {
 }
 
 func (x *xfg) _canSkipPath(fPath string) bool {
-	if x.options.IgnoreCase && len(x.searchPathi) > 0 {
-		for _, spr := range x.searchPathi {
+	if x.options.IgnoreCase && len(x.extra.searchPathi) > 0 {
+		for _, spr := range x.extra.searchPathi {
 			if !isMatchRegexp(fPath, spr) {
 				return true // OK, skip
 			}
@@ -226,8 +226,8 @@ func (x *xfg) _canSkipPath(fPath string) bool {
 		}
 	}
 
-	if len(x.searchPathRe) > 0 {
-		for _, re := range x.searchPathRe {
+	if len(x.extra.searchPathRe) > 0 {
+		for _, re := range x.extra.searchPathRe {
 			if !isMatchRegexp(fPath, re) {
 				return true // OK, skip
 			}
