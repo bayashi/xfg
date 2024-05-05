@@ -9,6 +9,11 @@ import (
 	ignore "github.com/sabhiram/go-gitignore"
 )
 
+const (
+	XFG_NO_COLOR_ENV_KEY = "NO_COLOR"
+	XFG_RC_ENV_KEY       = "XFG_RC_FILE_PATH"
+)
+
 type line struct {
 	lc      int32 // line number
 	content string
