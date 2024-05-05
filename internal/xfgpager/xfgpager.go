@@ -1,4 +1,4 @@
-package main
+package xfgpager
 
 /*
 	The most part of this file `pager.go` was copied from https://github.com/jackdoe/go-pager
@@ -17,22 +17,27 @@ import (
 	"github.com/bayashi/xfg/internal/xfgutil"
 )
 
-func (cli *runner) pager(noPager bool, result int) (func(), error) {
-	if !cli.isTTY || noPager {
-		return nil, nil
-	}
+const (
+	exitOK            int = 0
+	XFG_PAGER_ENV_KEY     = "PAGER"
+)
 
-	rows, err := xfgutil.GetTermWindowRows(int(syscall.Stdout))
+var GetTermWindowRows = func() (int, error) {
+	return xfgutil.GetTermWindowRows(int(syscall.Stdout))
+}
+
+func Pager(stdout io.Writer, stderr io.Writer, result int) (io.Writer, func(), error) {
+	rows, err := GetTermWindowRows()
 	if err != nil {
-		return nil, err
+		return nil, nil, err
 	}
 	if rows-1 > result {
-		return nil, nil // No need pager. Don't think about gourp separators
+		return nil, nil, nil // No need pager. Don't think about gourp separators
 	}
 
 	p, err := pagerPath("less", "more", "lv")
 	if err != nil {
-		return nil, err
+		return nil, nil, err
 	}
 
 	if p != "" {
@@ -41,8 +46,8 @@ func (cli *runner) pager(noPager bool, result int) (func(), error) {
 		c := exec.Command(p)
 		r, w := io.Pipe()
 		c.Stdin = r
-		c.Stdout = cli.out
-		c.Stderr = cli.err
+		c.Stdout = stdout
+		c.Stderr = stderr
 		ch := make(chan struct{})
 		go func() {
 			defer close(ch)
@@ -53,15 +58,13 @@ func (cli *runner) pager(noPager bool, result int) (func(), error) {
 			os.Exit(exitOK)
 		}()
 
-		cli.out = w
-
-		return func() {
+		return w, func() {
 			w.Close()
 			<-ch
 		}, nil
 	}
 
-	return nil, nil
+	return nil, nil, nil
 }
 
 func pagerPath(pagers ...string) (string, error) {
