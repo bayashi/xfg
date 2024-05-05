@@ -18,10 +18,6 @@ import (
 )
 
 func (cli *runner) pager(result int) (func(), error) {
-	if !cli.isTTY {
-		return nil, nil
-	}
-
 	rows, err := xfgutil.GetTermWindowRows(int(syscall.Stdout))
 	if err != nil {
 		return nil, err

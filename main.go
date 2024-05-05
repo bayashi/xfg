@@ -101,7 +101,7 @@ func (cli *runner) xfg(o *options) (int, error) {
 		cli.stats.Mark("process")
 	}
 
-	if !x.options.NoPager {
+	if !x.options.NoPager && cli.isTTY {
 		pagerCloser, err := cli.pager(x.result.outputLC)
 		if err != nil {
 			return exitErr, fmt.Errorf("wrong pgaer : %w", err)
