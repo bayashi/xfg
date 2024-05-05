@@ -101,12 +101,14 @@ func (cli *runner) xfg(o *options) (int, error) {
 		cli.stats.Mark("process")
 	}
 
-	pagerCloser, err := cli.pager(o.NoPager, x.result.outputLC)
-	if err != nil {
-		return exitErr, fmt.Errorf("wrong pgaer : %w", err)
-	}
-	if pagerCloser != nil {
-		defer pagerCloser()
+	if !x.options.NoPager {
+		pagerCloser, err := cli.pager(x.result.outputLC)
+		if err != nil {
+			return exitErr, fmt.Errorf("wrong pgaer : %w", err)
+		}
+		if pagerCloser != nil {
+			defer pagerCloser()
+		}
 	}
 
 	if x.options.Stats {
