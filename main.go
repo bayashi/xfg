@@ -5,6 +5,7 @@ import (
 	"io"
 	"os"
 
+	"github.com/bayashi/xfg/internal/xfgpager"
 	"github.com/bayashi/xfg/internal/xfgstats"
 	"github.com/bayashi/xfg/internal/xfgutil"
 )
@@ -102,12 +103,15 @@ func (cli *runner) xfg(o *options) (int, error) {
 	}
 
 	if !x.options.NoPager && cli.isTTY {
-		pagerCloser, err := cli.pager(x.result.outputLC)
+		out, pagerCloser, err := xfgpager.Pager(cli.out, cli.err, x.result.outputLC)
 		if err != nil {
 			return exitErr, fmt.Errorf("wrong pgaer : %w", err)
 		}
 		if pagerCloser != nil {
 			defer pagerCloser()
+		}
+		if out != nil {
+			cli.out = out
 		}
 	}
 
