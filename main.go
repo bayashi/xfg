@@ -113,10 +113,10 @@ func (cli *runner) xfg(o *options) (int, error) {
 		if out != nil {
 			cli.out = out
 		}
-	}
 
-	if x.options.Stats {
-		cli.stats.Mark("pager")
+		if x.options.Stats {
+			cli.stats.Mark("pager")
+		}
 	}
 
 	if err := cli.showResult(x); err != nil {
