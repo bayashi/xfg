@@ -1,7 +1,7 @@
 package main
 
 import (
-	"os"
+	"runtime"
 	"strings"
 
 	flag "github.com/spf13/pflag"
@@ -56,7 +56,7 @@ func expectedDefaultOptions() options {
 }
 
 func isWindowsTestRunner() bool {
-	return os.Getenv("RUNNER_OS") == "Windows"
+	return runtime.GOOS == "windows"
 }
 
 func windowsBK(src string) string {
