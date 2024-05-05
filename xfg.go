@@ -41,12 +41,7 @@ type highlighter struct {
 	grepHighlighter    []string
 }
 
-type xfg struct {
-	cli     *runner
-	options *options
-
-	highlighter highlighter
-
+type extra struct {
 	searchPathi  []*regexp.Regexp
 	searchGrepi  []*regexp.Regexp
 	searchPathRe []*regexp.Regexp
@@ -54,8 +49,14 @@ type xfg struct {
 	ignoreRe     []*regexp.Regexp
 	gitignore    *ignore.GitIgnore
 	xfgignore    *ignore.GitIgnore
+}
 
-	result result
+type xfg struct {
+	cli         *runner
+	options     *options
+	highlighter highlighter
+	extra       extra
+	result      result
 }
 
 func newX(cli *runner, o *options) *xfg {

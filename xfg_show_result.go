@@ -43,14 +43,14 @@ func (x *xfg) setHighlighter() {
 func (x *xfg) highlightPath(fPath string) string {
 	h := x.highlighter
 
-	if len(x.searchPathRe) > 0 {
-		for _, re := range x.searchPathRe {
+	if len(x.extra.searchPathRe) > 0 {
+		for _, re := range x.extra.searchPathRe {
 			fPath = re.ReplaceAllString(fPath, h.pathHighlightColor.Sprintf("$1")+h.pathBaseColor)
 		}
 	}
 
 	if x.options.IgnoreCase {
-		for _, spr := range x.searchPathi {
+		for _, spr := range x.extra.searchPathi {
 			fPath = spr.ReplaceAllString(fPath, h.pathHighlightColor.Sprintf("$1")+h.pathBaseColor)
 		}
 	} else {
@@ -65,14 +65,14 @@ func (x *xfg) highlightPath(fPath string) string {
 func (x *xfg) highlightLine(line string) string {
 	h := x.highlighter
 
-	if len(x.searchGrepRe) > 0 {
-		for _, re := range x.searchGrepRe {
+	if len(x.extra.searchGrepRe) > 0 {
+		for _, re := range x.extra.searchGrepRe {
 			line = re.ReplaceAllString(line, h.grepHighlightColor.Sprintf("$1"))
 		}
 	}
 
 	if x.options.IgnoreCase {
-		for _, sgr := range x.searchGrepi {
+		for _, sgr := range x.extra.searchGrepi {
 			line = sgr.ReplaceAllString(line, h.grepHighlightColor.Sprintf("$1"))
 		}
 	} else {
