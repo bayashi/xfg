@@ -33,15 +33,19 @@ type result struct {
 	alreadyMatchContent bool
 }
 
-type xfg struct {
-	cli     *runner
-	options *options
-
+type highlighter struct {
 	pathBaseColor      string
 	pathHighlightColor *color.Color
 	pathHighlighter    []string
 	grepHighlightColor *color.Color
 	grepHighlighter    []string
+}
+
+type xfg struct {
+	cli     *runner
+	options *options
+
+	highlighter highlighter
 
 	searchPathi  []*regexp.Regexp
 	searchGrepi  []*regexp.Regexp
