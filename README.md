@@ -122,11 +122,16 @@ Regexp keywords you input respect word boundaries by default. You can use `--not
 
 ### .gitignore file
 
-* Support .gitignore file to ignore files and directories by default
-    * Read `.gitignore` file from starting directory to search or HOME directory.
-    * Use `--skip-gitignore` option to avoid reading `.gitignore` file.
-* Support .xfgignore file to ignore files and directories as same as .gitignore by default
-    * `.xfgignore` file should be located in [XDG Base Directory](https://specifications.freedesktop.org/basedir-spec/basedir-spec-latest.html) or HOME directory
+* Read files of git to ignore files or directories by default:
+    * `$XDG_CONFIG_HOME/git/ignore` or `$HOME/.config/git/ignore`
+    * `$GIT_DIR/info/exclude`
+    * A path of `core.excludesFile` if it exists
+    * `$HOME/.gitignore`
+    * A `.gitignore` on the way of searching
+    * Use `--skip-gitignore` option to avoid reading all above files to ignore.
+* Support `.xfgignore` file to ignore files and directories as same as `.gitignore` file by default
+    * `$XDG_CONFIG_HOME/xfg/.xfgignore`
+    * `$HOME/.xfgignore`
     * You can specify `.xfgignore` file path by `--xfgignore-file` option
     * Use `--skip-xfgignore` option to avoid reading `.xfgignore` file
 
