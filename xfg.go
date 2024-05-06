@@ -5,8 +5,8 @@ import (
 	"regexp"
 	"sync"
 
+	"github.com/bayashi/xfg/internal/xfgignore"
 	"github.com/fatih/color"
-	ignore "github.com/sabhiram/go-gitignore"
 )
 
 type line struct {
@@ -37,13 +37,12 @@ type highlighter struct {
 }
 
 type extra struct {
-	searchPathi  []*regexp.Regexp
-	searchGrepi  []*regexp.Regexp
-	searchPathRe []*regexp.Regexp
-	searchGrepRe []*regexp.Regexp
-	ignoreRe     []*regexp.Regexp
-	gitignore    *ignore.GitIgnore
-	xfgignore    *ignore.GitIgnore
+	searchPathi    []*regexp.Regexp
+	searchGrepi    []*regexp.Regexp
+	searchPathRe   []*regexp.Regexp
+	searchGrepRe   []*regexp.Regexp
+	ignoreRe       []*regexp.Regexp
+	ignoreMatchers xfgignore.Matchers
 }
 
 type xfg struct {

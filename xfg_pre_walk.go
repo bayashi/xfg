@@ -1,14 +1,21 @@
 package main
 
-import "github.com/bayashi/xfg/internal/xfgutil"
+import (
+	"github.com/bayashi/xfg/internal/xfgignore"
+	"github.com/bayashi/xfg/internal/xfgutil"
+)
 
 func (x *xfg) preWalkDir() error {
 	if !x.options.SkipGitIgnore {
-		x.extra.gitignore = prepareGitIgnore(x.cli.homeDir, x.options.SearchStart)
+		if ms := xfgignore.SetUpGlobalGitIgnores(x.options.SearchStart, x.cli.homeDir); len(ms) > 0 {
+			x.extra.ignoreMatchers = append(x.extra.ignoreMatchers, ms...)
+		}
 	}
 
 	if !x.options.SkipXfgIgnore {
-		x.extra.xfgignore = prepareXfgIgnore(x.cli.homeDir, x.options.XfgIgnoreFile)
+		if ms := xfgignore.SetupGlobalXFGIgnore(x.options.SearchStart, x.cli.homeDir, x.options.XfgIgnoreFile); len(ms) > 0 {
+			x.extra.ignoreMatchers = append(x.extra.ignoreMatchers, ms...)
+		}
 	}
 
 	if x.options.IgnoreCase {

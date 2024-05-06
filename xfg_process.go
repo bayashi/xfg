@@ -10,7 +10,9 @@ import (
 
 	"golang.org/x/sync/errgroup"
 
+	"github.com/bayashi/xfg/internal/xfgignore"
 	"github.com/bayashi/xfg/internal/xfglangxt"
+	"github.com/monochromegane/go-gitignore"
 )
 
 func (x *xfg) process() error {
@@ -23,7 +25,7 @@ func (x *xfg) process() error {
 	}
 
 	eg := new(errgroup.Group)
-	x.walkDir(eg, x.options.SearchStart)
+	x.walkDir(eg, x.options.SearchStart, x.extra.ignoreMatchers)
 	if err := eg.Wait(); err != nil {
 		return fmt.Errorf("walkDir Wait : %w", err)
 	}
@@ -31,8 +33,13 @@ func (x *xfg) process() error {
 	return nil
 }
 
-func (x *xfg) walkDir(eg *errgroup.Group, dirPath string) {
+func (x *xfg) walkDir(eg *errgroup.Group, dirPath string, ms xfgignore.Matchers) {
 	eg.Go(func() error {
+		if !x.options.SkipGitIgnore {
+			if matcher, err := gitignore.NewGitIgnore(filepath.Join(dirPath, xfgignore.GITIGNORE_FILE_NAME)); err == nil {
+				ms = append(ms, matcher)
+			}
+		}
 		stuff, err := os.ReadDir(dirPath)
 		if err != nil {
 			if errors.Is(err, fs.ErrPermission) {
@@ -49,11 +56,11 @@ func (x *xfg) walkDir(eg *errgroup.Group, dirPath string) {
 				}
 			}
 			if s.IsDir() {
-				x.walkDir(eg, filepath.Join(dirPath, s.Name())) // recursively
+				x.walkDir(eg, filepath.Join(dirPath, s.Name()), ms) // recursively
 			}
 			s := s
 			eg.Go(func() error {
-				return x.walkFile(filepath.Join(dirPath, s.Name()), s)
+				return x.walkFile(filepath.Join(dirPath, s.Name()), s, ms)
 			})
 		}
 
@@ -61,12 +68,12 @@ func (x *xfg) walkDir(eg *errgroup.Group, dirPath string) {
 	})
 }
 
-func (x *xfg) walkFile(fPath string, fInfo fs.DirEntry) error {
+func (x *xfg) walkFile(fPath string, fInfo fs.DirEntry, ms xfgignore.Matchers) error {
 	if x.options.Stats {
 		x.cli.stats.IncrWalkedPaths()
 	}
 
-	if x.isSkippablePath(fPath, fInfo) {
+	if x.isSkippablePath(fPath, fInfo, ms) {
 		return nil
 	}
 
@@ -142,7 +149,7 @@ func (x *xfg) isMatchFileType(fPath string, fInfo fs.DirEntry) bool {
 	}
 }
 
-func (x *xfg) isSkippablePath(fPath string, fInfo fs.DirEntry) bool {
+func (x *xfg) isSkippablePath(fPath string, fInfo fs.DirEntry, ms xfgignore.Matchers) bool {
 	if x.options.Quiet && x.hasMatchedAny() {
 		return true // already match. skip after all
 	}
@@ -166,7 +173,7 @@ func (x *xfg) isSkippablePath(fPath string, fInfo fs.DirEntry) bool {
 	if !x.options.SearchAll {
 		if isDefaultSkipFile(fInfo) ||
 			(!x.options.Hidden && strings.HasPrefix(fInfo.Name(), ".")) ||
-			x.isSkippableByIgnoreFile(fPath) {
+			x.isSkippableByIgnoreFile(fPath, ms) {
 			return true
 		}
 	}
@@ -174,12 +181,13 @@ func (x *xfg) isSkippablePath(fPath string, fInfo fs.DirEntry) bool {
 	return x.canSkipPath(fPath, fInfo)
 }
 
-func (x *xfg) isSkippableByIgnoreFile(fPath string) bool {
-	if x.extra.gitignore != nil && x.extra.gitignore.MatchesPath(fPath) {
-		return true // skip a file by .gitignore
-	}
-	if x.extra.xfgignore != nil && x.extra.xfgignore.MatchesPath(fPath) {
-		return true // skip a file by .xfgignore
+func (x *xfg) isSkippableByIgnoreFile(fPath string, ms xfgignore.Matchers) bool {
+	if len(ms) > 0 {
+		for _, im := range ms {
+			if im.Match(fPath, false) {
+				return true
+			}
+		}
 	}
 
 	return false
