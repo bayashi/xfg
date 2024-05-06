@@ -56,7 +56,11 @@ func (x *xfg) walkDir(eg *errgroup.Group, dirPath string, ms xfgignore.Matchers)
 				}
 			}
 			if s.IsDir() {
-				x.walkDir(eg, filepath.Join(dirPath, s.Name()), ms) // recursively
+				p := filepath.Join(dirPath, s.Name())
+				if !x.options.SearchAll && x.isSkippableByIgnoreFile(p, ms) {
+					continue // skip all stuff in this dir
+				}
+				x.walkDir(eg, p, ms) // recursively
 			}
 			s := s
 			eg.Go(func() error {
