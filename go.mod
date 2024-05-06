@@ -5,7 +5,7 @@ go 1.21.7
 require (
 	github.com/BurntSushi/toml v1.3.2
 	github.com/spf13/pflag v1.0.5
-	golang.org/x/term v0.19.0
+	golang.org/x/term v0.20.0
 )
 
 require (
@@ -24,5 +24,5 @@ require (
 	github.com/mattn/go-isatty v0.0.20
 	github.com/sabhiram/go-gitignore v0.0.0-20210923224102-525f6e181f06
 	golang.org/x/sync v0.7.0
-	golang.org/x/sys v0.19.0 // indirect
+	golang.org/x/sys v0.20.0 // indirect
 )
