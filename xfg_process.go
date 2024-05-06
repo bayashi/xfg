@@ -199,7 +199,7 @@ func (x *xfg) isSkippableByIgnoreFile(fPath string, ms xfgignore.Matchers) bool 
 
 func (x *xfg) isIgnorePath(fPath string) bool {
 	if x.options.IgnoreCase {
-		for _, re := range x.extra.ignoreRe {
+		for _, re := range x.extra.ignoreOptionRe {
 			if isMatchRegexp(fPath, re) {
 				return true // ignore
 			}

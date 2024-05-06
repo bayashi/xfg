@@ -19,7 +19,10 @@ func (x *xfg) preWalkDir() error {
 	}
 
 	if x.options.IgnoreCase {
-		if err := x.prepareRe(); err != nil {
+		if err := x.prepareIgnoreCaseRe(); err != nil {
+			return err
+		}
+		if err := x.prepareIgnoreOption(); err != nil {
 			return err
 		}
 	}
@@ -43,7 +46,7 @@ func (x *xfg) preWalkDir() error {
 	return nil
 }
 
-func (x *xfg) prepareRe() error {
+func (x *xfg) prepareIgnoreCaseRe() error {
 	if searchPathi, err := xfgutil.CompileRegexpsIgnoreCase(x.options.SearchPath); err != nil {
 		return err
 	} else {
@@ -58,11 +61,15 @@ func (x *xfg) prepareRe() error {
 		}
 	}
 
+	return nil
+}
+
+func (x *xfg) prepareIgnoreOption() error {
 	if len(x.options.Ignore) > 0 {
-		if ignoreRe, err := xfgutil.CompileRegexpsIgnoreCase(x.options.Ignore); err != nil {
+		if ignoreOptionRe, err := xfgutil.CompileRegexpsIgnoreCase(x.options.Ignore); err != nil {
 			return err
 		} else {
-			x.extra.ignoreRe = ignoreRe
+			x.extra.ignoreOptionRe = ignoreOptionRe
 		}
 	}
 

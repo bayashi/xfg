@@ -41,7 +41,7 @@ type extra struct {
 	searchGrepi    []*regexp.Regexp
 	searchPathRe   []*regexp.Regexp
 	searchGrepRe   []*regexp.Regexp
-	ignoreRe       []*regexp.Regexp
+	ignoreOptionRe []*regexp.Regexp
 	ignoreMatchers xfgignore.Matchers
 }
 
