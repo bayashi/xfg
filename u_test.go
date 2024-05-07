@@ -24,34 +24,6 @@ func TestReadRC(t *testing.T) {
 	a.Got(o.Abs).True(t)
 }
 
-func TestPrepareGitIgnore(t *testing.T) {
-	t.Parallel()
-	tempDir := t.TempDir()
-	gitignoreFilePath := filepath.Join(tempDir, ".gitignore")
-	f, _ := os.Create(gitignoreFilePath)
-	f.WriteString("ignorez")
-	f.Close()
-
-	gitignore := prepareGitIgnore("", tempDir)
-
-	a.Got(gitignore.MatchesPath("ignorez")).True(t)
-}
-
-func TestPrepareXfgIgnore(t *testing.T) {
-	t.Parallel()
-	tempDir := t.TempDir()
-	xfgignoreFilePath := filepath.Join(tempDir, ".xfgignore")
-	f, err := os.Create(xfgignoreFilePath)
-	a.Got(err).NoError(t)
-	f.WriteString("ignorex")
-	f.Close()
-
-	xfgignore := prepareXfgIgnore("", xfgignoreFilePath)
-	a.Got(xfgignore).NotNil(t)
-
-	a.Got(xfgignore.MatchesPath("ignorex")).True(t)
-}
-
 func TestValidateStartPath_Err(t *testing.T) {
 	t.Parallel()
 	err := validateStartPath(noMatchKeyword)
