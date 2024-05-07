@@ -36,7 +36,7 @@ type highlighter struct {
 	grepHighlighter    []string
 }
 
-type extra struct {
+type xfgExtra struct {
 	searchPathi    []*regexp.Regexp
 	searchGrepi    []*regexp.Regexp
 	searchPathRe   []*regexp.Regexp
@@ -49,7 +49,7 @@ type xfg struct {
 	cli         *runner
 	options     *options
 	highlighter highlighter
-	extra       extra
+	extra       xfgExtra
 	result      result
 }
 
