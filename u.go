@@ -13,7 +13,6 @@ import (
 	"github.com/BurntSushi/toml"
 	"github.com/adrg/xdg"
 	"github.com/bayashi/xfg/internal/xfglangxt"
-	ignore "github.com/sabhiram/go-gitignore"
 )
 
 func defaultOptions() *options {
@@ -52,37 +51,6 @@ func readRC(homeDir string) (*options, error) {
 	}
 
 	return o, nil
-}
-
-func prepareGitIgnore(homeDir string, sPath string) *ignore.GitIgnore {
-	const GIT_IGNOE_FILE_NAME = ".gitignore"
-	// read .gitignore file in start directory to search or home directory
-	// There would be no .gitignore file, then `gitignore` variable will be `nil`.
-	gitignore, _ := ignore.CompileIgnoreFile(filepath.Join(sPath, GIT_IGNOE_FILE_NAME))
-	if gitignore == nil {
-		gitignore, _ = ignore.CompileIgnoreFile(filepath.Join(homeDir, GIT_IGNOE_FILE_NAME))
-	}
-
-	return gitignore
-}
-
-func prepareXfgIgnore(homeDir string, xfgignoreFilePath string) *ignore.GitIgnore {
-	if xfgignoreFilePath != "" {
-		xfgignore, _ := ignore.CompileIgnoreFile(xfgignoreFilePath)
-		if xfgignore != nil {
-			return xfgignore
-		}
-	}
-
-	const XFG_IGNOE_FILE_NAME = ".xfgignore"
-	// read .xfgignore file in XDG Base directory or home directory
-	// There would be no .xfgignore file, then `xfgignore` variable will be `nil`.
-	xfgignore, _ := ignore.CompileIgnoreFile(filepath.Join(xdg.ConfigHome, XFG_IGNOE_FILE_NAME))
-	if xfgignore == nil {
-		xfgignore, _ = ignore.CompileIgnoreFile(filepath.Join(homeDir, XFG_IGNOE_FILE_NAME))
-	}
-
-	return xfgignore
 }
 
 func isBinaryFile(fh *os.File) (bool, error) {
