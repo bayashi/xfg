@@ -40,6 +40,9 @@ func (x *xfg) walkDir(eg *errgroup.Group, dirPath string, ms xfgignore.Matchers)
 				ms = append(ms, matcher)
 			}
 		}
+		if x.options.Quiet && x.hasMatchedAny() {
+			return nil // already match. skip after all
+		}
 		stuff, err := os.ReadDir(dirPath)
 		if err != nil {
 			if errors.Is(err, fs.ErrPermission) {
@@ -52,6 +55,9 @@ func (x *xfg) walkDir(eg *errgroup.Group, dirPath string, ms xfgignore.Matchers)
 		}
 
 		for _, s := range stuff {
+			if x.options.Quiet && x.hasMatchedAny() {
+				break // already match. skip after all
+			}
 			if !x.options.SearchAll {
 				if isDefaultSkipDir(s) || (s.IsDir() && !x.options.Hidden && strings.HasPrefix(s.Name(), ".")) {
 					continue // skip all stuff in this dir
@@ -156,10 +162,6 @@ func (x *xfg) isMatchFileType(fPath string, fInfo fs.DirEntry) bool {
 }
 
 func (x *xfg) isSkippablePath(fPath string, fInfo fs.DirEntry, ms xfgignore.Matchers) bool {
-	if x.options.Quiet && x.hasMatchedAny() {
-		return true // already match. skip after all
-	}
-
 	if !x.options.SearchAll {
 		if (len(x.options.Ext) > 0 && !x.isMatchExt(fInfo, x.options.Ext)) ||
 			(len(x.options.Lang) > 0 && !x.isLangFile(fInfo)) ||
