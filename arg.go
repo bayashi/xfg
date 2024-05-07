@@ -49,24 +49,25 @@ type options struct {
 	Lang []string `toml:"lang"`
 	Ext  []string `toml:"ext"`
 
-	IgnoreCase       bool `toml:"ignore-case"`
-	NoColor          bool `toml:"no-color"`
-	Abs              bool `toml:"abs"`
-	ShowMatchCount   bool `toml:"count"`
-	NoGroupSeparator bool `toml:"no-group-separator"`
-	NoIndent         bool `toml:"no-indent"`
-	Hidden           bool `toml:"hidden"`
-	SkipGitIgnore    bool `toml:"skip-gitignore"`
-	SkipXfgIgnore    bool `toml:"skip-xfgignore"`
-	SearchAll        bool `toml:"search-all"`
-	Unrestricted     bool `toml:"unrestricted"`
-	NoPager          bool `toml:"no-pager"`
-	Quiet            bool `toml:"quiet"`
-	FilesWithMatches bool `toml:"files-with-matches"`
-	Null             bool `toml:"null"`
-	Stats            bool `toml:"stats"`
-	SearchOnlyName   bool `toml:"search-only-name"`
-	NotWordBoundary  bool `toml:"not-word-boundary"`
+	IgnoreCase            bool `toml:"ignore-case"`
+	NoColor               bool `toml:"no-color"`
+	Abs                   bool `toml:"abs"`
+	ShowMatchCount        bool `toml:"count"`
+	NoGroupSeparator      bool `toml:"no-group-separator"`
+	NoIndent              bool `toml:"no-indent"`
+	Hidden                bool `toml:"hidden"`
+	SkipGitIgnore         bool `toml:"skip-gitignore"`
+	SkipXfgIgnore         bool `toml:"skip-xfgignore"`
+	SearchAll             bool `toml:"search-all"`
+	Unrestricted          bool `toml:"unrestricted"`
+	NoPager               bool `toml:"no-pager"`
+	Quiet                 bool `toml:"quiet"`
+	FilesWithMatches      bool `toml:"files-with-matches"`
+	Null                  bool `toml:"null"`
+	Stats                 bool `toml:"stats"`
+	SearchOnlyName        bool `toml:"search-only-name"`
+	NotWordBoundary       bool `toml:"not-word-boundary"`
+	IgnorePermissionError bool `toml:"ignore-permission-error"`
 
 	flagLangList bool
 
@@ -134,6 +135,8 @@ func (o *options) falgs(d *options) {
 
 	flag.StringVarP(&o.Indent, "indent", "", d.Indent, "Indent string for the top of each line")
 	flag.BoolVarP(&o.NoIndent, "no-indent", "", d.NoIndent, "Do not print an indent string")
+
+	flag.BoolVarP(&o.IgnorePermissionError, "ignore-permission-error", "", d.IgnorePermissionError, "Do not print warnings of file permission error")
 
 	flag.StringVarP(&o.XfgIgnoreFile, "xfgignore-file", "", d.XfgIgnoreFile, ".xfgignore file path if you have it except XDG base directory or HOME directory")
 

@@ -45,7 +45,9 @@ func (x *xfg) scanFile(fPath string) ([]line, error) {
 	fh, err := os.Open(fPath)
 	if err != nil {
 		if errors.Is(err, fs.ErrPermission) {
-			x.cli.putErr(err)
+			if !x.options.IgnorePermissionError {
+				x.cli.putErr(err)
+			}
 			return nil, nil
 		}
 		return nil, fmt.Errorf("path `%s` : %w", fPath, err)

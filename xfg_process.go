@@ -43,7 +43,9 @@ func (x *xfg) walkDir(eg *errgroup.Group, dirPath string, ms xfgignore.Matchers)
 		stuff, err := os.ReadDir(dirPath)
 		if err != nil {
 			if errors.Is(err, fs.ErrPermission) {
-				x.cli.putErr(err)
+				if !x.options.IgnorePermissionError {
+					x.cli.putErr(err)
+				}
 				return nil
 			}
 			return err
