@@ -40,6 +40,9 @@ func (x *xfg) walkDir(eg *errgroup.Group, dirPath string, ms xfgignore.Matchers)
 				ms = append(ms, matcher)
 			}
 		}
+		if x.options.Quiet && x.hasMatchedAny() {
+			return nil // already match. skip after all
+		}
 		stuff, err := os.ReadDir(dirPath)
 		if err != nil {
 			if errors.Is(err, fs.ErrPermission) {
@@ -51,27 +54,34 @@ func (x *xfg) walkDir(eg *errgroup.Group, dirPath string, ms xfgignore.Matchers)
 			return err
 		}
 
-		for _, s := range stuff {
-			if !x.options.SearchAll {
-				if isDefaultSkipDir(s) || (s.IsDir() && !x.options.Hidden && strings.HasPrefix(s.Name(), ".")) {
-					continue // skip all stuff in this dir
-				}
-			}
-			if s.IsDir() {
-				p := filepath.Join(dirPath, s.Name())
-				if !x.options.SearchAll && x.isSkippableByIgnoreFile(p, ms) {
-					continue // skip all stuff in this dir
-				}
-				x.walkDir(eg, p, ms) // recursively
-			}
-			s := s
-			eg.Go(func() error {
-				return x.walkFile(filepath.Join(dirPath, s.Name()), s, ms)
-			})
-		}
+		x.walkStuff(stuff, eg, dirPath, ms)
 
 		return nil
 	})
+}
+
+func (x *xfg) walkStuff(stuff []fs.DirEntry, eg *errgroup.Group, dirPath string, ms xfgignore.Matchers) {
+	for _, s := range stuff {
+		if x.options.Quiet && x.hasMatchedAny() {
+			break // already match. skip after all
+		}
+		if !x.options.SearchAll {
+			if isDefaultSkipDir(s) || (s.IsDir() && !x.options.Hidden && strings.HasPrefix(s.Name(), ".")) {
+				continue // skip all stuff in this dir
+			}
+		}
+		if s.IsDir() {
+			p := filepath.Join(dirPath, s.Name())
+			if !x.options.SearchAll && x.isSkippableByIgnoreFile(p, ms) {
+				continue // skip all stuff in this dir
+			}
+			x.walkDir(eg, p, ms) // recursively
+		}
+		s := s
+		eg.Go(func() error {
+			return x.walkFile(filepath.Join(dirPath, s.Name()), s, ms)
+		})
+	}
 }
 
 func (x *xfg) walkFile(fPath string, fInfo fs.DirEntry, ms xfgignore.Matchers) error {
@@ -156,10 +166,6 @@ func (x *xfg) isMatchFileType(fPath string, fInfo fs.DirEntry) bool {
 }
 
 func (x *xfg) isSkippablePath(fPath string, fInfo fs.DirEntry, ms xfgignore.Matchers) bool {
-	if x.options.Quiet && x.hasMatchedAny() {
-		return true // already match. skip after all
-	}
-
 	if !x.options.SearchAll {
 		if (len(x.options.Ext) > 0 && !x.isMatchExt(fInfo, x.options.Ext)) ||
 			(len(x.options.Lang) > 0 && !x.isLangFile(fInfo)) ||
