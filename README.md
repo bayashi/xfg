@@ -173,6 +173,7 @@ Regexp keywords you input respect word boundaries by default. You can use `--not
       --no-group-separator        Do not print a separator between groups of lines
       --indent string             Indent string for the top of each line (default " ")
       --no-indent                 Do not print an indent string
+      --ignore-permission-error   Do not print warnings of file permission error
       --xfgignore-file string     .xfgignore file path if you have it except XDG base directory or HOME directory
       --no-pager                  Do not invoke with the Pager
   -q, --quiet                     Do not write anything to standard output. Exit immediately with zero status if any match is found
