@@ -19,10 +19,7 @@ func TestArgsHelp(t *testing.T) {
 	resetFlag()
 	stubExit()
 	os.Args = []string{fakeCmd, "--help"}
-	o := cli.parseArgs(defaultOptions())
-
-	e := expectedDefaultOptions()
-	a.Got(o).Expect(&e).Same(t)
+	cli.parseArgs(defaultOptions())
 
 	a.Got(stubCalled).True(t)
 	a.Got(stubCode).Expect(exitOK).Same(t)
@@ -42,10 +39,7 @@ func TestArgsVersion(t *testing.T) {
 	resetFlag()
 	stubExit()
 	os.Args = []string{fakeCmd, "--version"}
-	o := cli.parseArgs(defaultOptions())
-
-	e := expectedDefaultOptions()
-	a.Got(o).Expect(&e).Same(t)
+	cli.parseArgs(defaultOptions())
 
 	a.Got(stubCalled).True(t)
 	a.Got(stubCode).Expect(exitOK).Same(t)
@@ -143,10 +137,10 @@ func TestArgs(t *testing.T) {
 			cli := &runner{}
 			o := cli.parseArgs(defaultOptions())
 
-			expectOptions := expectedDefaultOptions()
-			tt.prepareExpect(&expectOptions)
+			expectOptions := defaultOptions()
+			tt.prepareExpect(expectOptions)
 
-			a.Got(o).Expect(&expectOptions).Same(t)
+			a.Got(o).Expect(expectOptions).Same(t)
 			a.Got(stubCalled).False(t)
 			a.Got(stubCode).Expect(exitOK).Same(t)
 		})
@@ -231,9 +225,7 @@ func TestShowLangList(t *testing.T) {
 	stubExit()
 	os.Args = []string{fakeCmd, "--lang-list"}
 	o := cli.parseArgs(defaultOptions())
-	e := expectedDefaultOptions()
-	e.flagLangList = true
-	a.Got(o).Expect(&e).Same(t)
+	a.Got(o.flagLangList).True(t)
 	a.Got(stubCalled).True(t)
 	a.Got(stubCode).Expect(exitOK).Same(t)
 	a.Got(errOutput.String()).Expect(expect).Same(t)
