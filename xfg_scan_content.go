@@ -30,7 +30,7 @@ func (x *xfg) postMatchPath(fPath string, fInfo fs.DirEntry) (err error) {
 		}
 	}
 
-	if x.options.onlyMatchContent && len(matchedPath.contents) == 0 {
+	if x.options.extra.onlyMatchContent && len(matchedPath.contents) == 0 {
 		return nil // not pick up
 	}
 
@@ -104,7 +104,7 @@ func (x *xfg) postScanFile(fPath string, fInfo fs.DirEntry, matchedPath path) er
 func (x *xfg) scanContent(scanner *bufio.Scanner, fPath string) ([]line, error) {
 	gf := &scanFile{
 		lc:     0,
-		blines: make([]line, x.options.actualBeforeContextLines),
+		blines: make([]line, x.options.extra.actualBeforeContextLines),
 	}
 
 	for scanner.Scan() {
@@ -162,14 +162,14 @@ func (x *xfg) isMatchLine(line string) bool {
 
 func (x *xfg) processContentLine(gf *scanFile) {
 	if x.isMatchLine(gf.l) {
-		if !x.options.ShowMatchCount && x.options.withBeforeContextLines {
+		if !x.options.ShowMatchCount && x.options.extra.withBeforeContextLines {
 			for _, bl := range gf.blines {
 				if bl.lc == 0 {
 					continue // skip
 				}
 				gf.matchedContents = append(gf.matchedContents, bl)
 			}
-			gf.blines = make([]line, x.options.actualBeforeContextLines)
+			gf.blines = make([]line, x.options.extra.actualBeforeContextLines)
 		}
 
 		if x.options.ShowMatchCount {
@@ -179,16 +179,16 @@ func (x *xfg) processContentLine(gf *scanFile) {
 		x.optimizeLine(gf)
 		gf.matchedContents = append(gf.matchedContents, line{lc: gf.lc, content: gf.l, matched: true})
 
-		if !x.options.ShowMatchCount && x.options.withAfterContextLines {
-			gf.aline = x.options.actualAfterContextLines // start countdown for `aline`
+		if !x.options.ShowMatchCount && x.options.extra.withAfterContextLines {
+			gf.aline = x.options.extra.actualAfterContextLines // start countdown for `aline`
 		}
 	} else {
 		if !x.options.ShowMatchCount {
-			if x.options.withAfterContextLines && gf.aline > 0 {
+			if x.options.extra.withAfterContextLines && gf.aline > 0 {
 				gf.aline--
 				x.optimizeLine(gf)
 				gf.matchedContents = append(gf.matchedContents, line{lc: gf.lc, content: gf.l})
-			} else if x.options.withBeforeContextLines {
+			} else if x.options.extra.withBeforeContextLines {
 				// rotate blines
 				// join "2nd to last elements of `blines`" and "current `line`"
 				x.optimizeLine(gf)

@@ -174,7 +174,7 @@ func (cli *runner) buildContentOutput(x *xfg, out *string, contents []line, lf s
 }
 
 func (x *xfg) needToShowGroupSeparator(blc int32, lc int32) bool {
-	return (x.options.withAfterContextLines || x.options.withBeforeContextLines) && blc != 0 && lc-blc > 1
+	return (x.options.extra.withAfterContextLines || x.options.extra.withBeforeContextLines) && blc != 0 && lc-blc > 1
 }
 
 func (cli *runner) outputForNonTTY(x *xfg, lf string) error {

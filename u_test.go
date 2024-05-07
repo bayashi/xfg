@@ -8,6 +8,17 @@ import (
 	a "github.com/bayashi/actually"
 )
 
+func TestDefaultOptions(t *testing.T) {
+	d := defaultOptions()
+	a.Got(d).Expect(&options{}).SameType(t)
+	a.Got(d.SearchStart).Expect(".").Same(t)
+	a.Got(d.Indent).Expect(" ").Same(t)
+	a.Got(d.GroupSeparator).Expect("--").Same(t)
+	a.Got(d.ColorPathBase).Expect("yellow").Same(t)
+	a.Got(d.ColorPath).Expect("cyan").Same(t)
+	a.Got(d.ColorContent).Expect("red").Same(t)
+}
+
 func TestReadRC(t *testing.T) {
 	rcFilePath := filepath.Join(t.TempDir(), "test.toml")
 	f, _ := os.Create(rcFilePath)

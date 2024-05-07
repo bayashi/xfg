@@ -28,6 +28,18 @@ var (
 	installFrom = "Source"
 )
 
+// runtime options
+type optionsExtra struct {
+	actualAfterContextLines  uint32
+	actualBeforeContextLines uint32
+	withAfterContextLines    bool
+	withBeforeContextLines   bool
+
+	runWithNoArg bool
+
+	onlyMatchContent bool
+}
+
 type options struct {
 	SearchPath  []string `toml:"path"`
 	SearchGrep  []string `toml:"grep"`
@@ -79,15 +91,7 @@ type options struct {
 	MaxMatchCount uint32 `toml:"max-count"`
 	MaxColumns    uint32 `toml:"max-columns"`
 
-	// runtime options
-	actualAfterContextLines  uint32
-	actualBeforeContextLines uint32
-	withAfterContextLines    bool
-	withBeforeContextLines   bool
-
-	runWithNoArg bool
-
-	onlyMatchContent bool
+	extra optionsExtra
 }
 
 func (o *options) falgs(d *options) {
@@ -147,7 +151,7 @@ func (o *options) falgs(d *options) {
 
 func (cli *runner) parseArgs(d *options) *options {
 	o := &options{}
-	o.runWithNoArg = len(os.Args) == 1
+	o.extra.runWithNoArg = len(os.Args) == 1
 	o.falgs(d)
 
 	flag.CommandLine.SetOutput(cli.err)
@@ -173,7 +177,7 @@ func (cli *runner) parseArgs(d *options) *options {
 	} else {
 		o.targetPathFromArgs()
 		if len(o.SearchGrep) > 0 || len(o.SearchGrepRe) > 0 {
-			o.onlyMatchContent = true
+			o.extra.onlyMatchContent = true
 		}
 	}
 
@@ -208,30 +212,30 @@ func (o *options) prepareContextLines(isTTY bool) {
 		o.AfterContextLines = 0
 		o.BeforeContextLines = 0
 
-		o.actualAfterContextLines = 0
-		o.actualBeforeContextLines = 0
+		o.extra.actualAfterContextLines = 0
+		o.extra.actualBeforeContextLines = 0
 
-		o.withAfterContextLines = false
-		o.withBeforeContextLines = false
+		o.extra.withAfterContextLines = false
+		o.extra.withBeforeContextLines = false
 
 		return
 	}
 
 	if o.AfterContextLines > 0 {
-		o.actualAfterContextLines = o.AfterContextLines
+		o.extra.actualAfterContextLines = o.AfterContextLines
 	} else if o.ContextLines > 0 {
-		o.actualAfterContextLines = o.ContextLines
+		o.extra.actualAfterContextLines = o.ContextLines
 	}
 
-	o.withAfterContextLines = o.ContextLines > 0 || o.AfterContextLines > 0
+	o.extra.withAfterContextLines = o.ContextLines > 0 || o.AfterContextLines > 0
 
 	if o.BeforeContextLines > 0 {
-		o.actualBeforeContextLines = o.BeforeContextLines
+		o.extra.actualBeforeContextLines = o.BeforeContextLines
 	} else if o.ContextLines > 0 {
-		o.actualBeforeContextLines = o.ContextLines
+		o.extra.actualBeforeContextLines = o.ContextLines
 	}
 
-	o.withBeforeContextLines = o.ContextLines > 0 || o.BeforeContextLines > 0
+	o.extra.withBeforeContextLines = o.ContextLines > 0 || o.BeforeContextLines > 0
 }
 
 func (o *options) prepareFromENV() {

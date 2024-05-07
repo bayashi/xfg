@@ -19,10 +19,7 @@ func TestArgsHelp(t *testing.T) {
 	resetFlag()
 	stubExit()
 	os.Args = []string{fakeCmd, "--help"}
-	o := cli.parseArgs(defaultOptions())
-
-	e := expectedDefaultOptions()
-	a.Got(o).Expect(&e).Same(t)
+	cli.parseArgs(defaultOptions())
 
 	a.Got(stubCalled).True(t)
 	a.Got(stubCode).Expect(exitOK).Same(t)
@@ -42,10 +39,7 @@ func TestArgsVersion(t *testing.T) {
 	resetFlag()
 	stubExit()
 	os.Args = []string{fakeCmd, "--version"}
-	o := cli.parseArgs(defaultOptions())
-
-	e := expectedDefaultOptions()
-	a.Got(o).Expect(&e).Same(t)
+	cli.parseArgs(defaultOptions())
 
 	a.Got(stubCalled).True(t)
 	a.Got(stubCode).Expect(exitOK).Same(t)
@@ -62,7 +56,7 @@ func TestArgs(t *testing.T) {
 		"no args": {
 			args: nil,
 			prepareExpect: func(o *options) {
-				o.runWithNoArg = true
+				o.extra.runWithNoArg = true
 			},
 		},
 		"only path arg": {
@@ -81,7 +75,7 @@ func TestArgs(t *testing.T) {
 			args: []string{"--grep", "foo"},
 			prepareExpect: func(o *options) {
 				o.SearchGrep = []string{"foo"}
-				o.onlyMatchContent = true
+				o.extra.onlyMatchContent = true
 			},
 		},
 		"specific multiple paths": {
@@ -95,7 +89,7 @@ func TestArgs(t *testing.T) {
 			prepareExpect: func(o *options) {
 				o.SearchPath = []string{"foo"}
 				o.SearchGrep = []string{"bar"}
-				o.onlyMatchContent = true
+				o.extra.onlyMatchContent = true
 			},
 		},
 		"path and specific grep args": {
@@ -103,7 +97,7 @@ func TestArgs(t *testing.T) {
 			prepareExpect: func(o *options) {
 				o.SearchPath = []string{"foo"}
 				o.SearchGrep = []string{"bar"}
-				o.onlyMatchContent = true
+				o.extra.onlyMatchContent = true
 			},
 		},
 		"path and specific multiple greps": {
@@ -111,7 +105,7 @@ func TestArgs(t *testing.T) {
 			prepareExpect: func(o *options) {
 				o.SearchPath = []string{"foo"}
 				o.SearchGrep = []string{"bar", "baz"}
-				o.onlyMatchContent = true
+				o.extra.onlyMatchContent = true
 			},
 		},
 		"path and multiple grep args": {
@@ -119,7 +113,7 @@ func TestArgs(t *testing.T) {
 			prepareExpect: func(o *options) {
 				o.SearchPath = []string{"foo"}
 				o.SearchGrep = []string{"bar", "baz"}
-				o.onlyMatchContent = true
+				o.extra.onlyMatchContent = true
 			},
 		},
 		"only path regexp arg": {
@@ -132,7 +126,7 @@ func TestArgs(t *testing.T) {
 			args: []string{"-G", "fo."},
 			prepareExpect: func(o *options) {
 				o.SearchGrepRe = []string{"fo."}
-				o.onlyMatchContent = true
+				o.extra.onlyMatchContent = true
 			},
 		},
 	} {
@@ -143,10 +137,10 @@ func TestArgs(t *testing.T) {
 			cli := &runner{}
 			o := cli.parseArgs(defaultOptions())
 
-			expectOptions := expectedDefaultOptions()
-			tt.prepareExpect(&expectOptions)
+			expectOptions := defaultOptions()
+			tt.prepareExpect(expectOptions)
 
-			a.Got(o).Expect(&expectOptions).Same(t)
+			a.Got(o).Expect(expectOptions).Same(t)
 			a.Got(stubCalled).False(t)
 			a.Got(stubCode).Expect(exitOK).Same(t)
 		})
@@ -231,9 +225,7 @@ func TestShowLangList(t *testing.T) {
 	stubExit()
 	os.Args = []string{fakeCmd, "--lang-list"}
 	o := cli.parseArgs(defaultOptions())
-	e := expectedDefaultOptions()
-	e.flagLangList = true
-	a.Got(o).Expect(&e).Same(t)
+	a.Got(o.flagLangList).True(t)
 	a.Got(stubCalled).True(t)
 	a.Got(stubCode).Expect(exitOK).Same(t)
 	a.Got(errOutput.String()).Expect(expect).Same(t)

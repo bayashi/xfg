@@ -168,7 +168,7 @@ func (x *xfg) isSkippablePath(fPath string, fInfo fs.DirEntry, ms xfgignore.Matc
 		}
 	}
 
-	if fInfo.IsDir() && x.options.onlyMatchContent {
+	if fInfo.IsDir() && x.options.extra.onlyMatchContent {
 		return true // Just not pick up only this dir path. It will be searched files and directories in this dir.
 	}
 
