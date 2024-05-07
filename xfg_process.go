@@ -54,30 +54,34 @@ func (x *xfg) walkDir(eg *errgroup.Group, dirPath string, ms xfgignore.Matchers)
 			return err
 		}
 
-		for _, s := range stuff {
-			if x.options.Quiet && x.hasMatchedAny() {
-				break // already match. skip after all
-			}
-			if !x.options.SearchAll {
-				if isDefaultSkipDir(s) || (s.IsDir() && !x.options.Hidden && strings.HasPrefix(s.Name(), ".")) {
-					continue // skip all stuff in this dir
-				}
-			}
-			if s.IsDir() {
-				p := filepath.Join(dirPath, s.Name())
-				if !x.options.SearchAll && x.isSkippableByIgnoreFile(p, ms) {
-					continue // skip all stuff in this dir
-				}
-				x.walkDir(eg, p, ms) // recursively
-			}
-			s := s
-			eg.Go(func() error {
-				return x.walkFile(filepath.Join(dirPath, s.Name()), s, ms)
-			})
-		}
+		x.walkStuff(stuff, eg, dirPath, ms)
 
 		return nil
 	})
+}
+
+func (x *xfg) walkStuff(stuff []fs.DirEntry, eg *errgroup.Group, dirPath string, ms xfgignore.Matchers) {
+	for _, s := range stuff {
+		if x.options.Quiet && x.hasMatchedAny() {
+			break // already match. skip after all
+		}
+		if !x.options.SearchAll {
+			if isDefaultSkipDir(s) || (s.IsDir() && !x.options.Hidden && strings.HasPrefix(s.Name(), ".")) {
+				continue // skip all stuff in this dir
+			}
+		}
+		if s.IsDir() {
+			p := filepath.Join(dirPath, s.Name())
+			if !x.options.SearchAll && x.isSkippableByIgnoreFile(p, ms) {
+				continue // skip all stuff in this dir
+			}
+			x.walkDir(eg, p, ms) // recursively
+		}
+		s := s
+		eg.Go(func() error {
+			return x.walkFile(filepath.Join(dirPath, s.Name()), s, ms)
+		})
+	}
 }
 
 func (x *xfg) walkFile(fPath string, fInfo fs.DirEntry, ms xfgignore.Matchers) error {
