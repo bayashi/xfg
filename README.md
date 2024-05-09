@@ -116,7 +116,8 @@ Regexp keywords you input respect word boundaries by default. You can use `--not
 * Ignored `.git`, `.svn`, `node_modules` or `vendor` directories and files in them by default
 * Files and directories whose names start with a dot are ignored by default
     * Use `-.` or `--hidden` option to search for hidden-files/directories
-        * Still ignore `.git`, `.gitkeep`, `node_modules`, `vendor`, `.gitkeep`, `*.min.js` and `*.mmin.css`
+        * Still ignore `.git`, `.gitkeep`, `.gitkeep`, `.svn`, `node_modules`, `vendor`, `*.min.js` and `*.mmin.css`
+        * With `--hidden` and `--no-default-skip` option, you can search for above default skipping files and directories
 * `-a` or `--search-all` option enables to search for all files and directories
     * You can ignore specific files and directories with `--ignore` option
 
