@@ -70,6 +70,7 @@ type options struct {
 	Hidden                bool `toml:"hidden"`
 	SkipGitIgnore         bool `toml:"skip-gitignore"`
 	SkipXfgIgnore         bool `toml:"skip-xfgignore"`
+	NoDefaultSkip         bool `toml:"no-default-skip"`
 	SearchAll             bool `toml:"search-all"`
 	Unrestricted          bool `toml:"unrestricted"`
 	NoPager               bool `toml:"no-pager"`
@@ -112,6 +113,7 @@ func (o *options) falgs(d *options) {
 	flag.BoolVarP(&o.Hidden, "hidden", ".", d.Hidden, "Enable to search hidden files")
 	flag.BoolVarP(&o.SkipGitIgnore, "skip-gitignore", "", d.SkipGitIgnore, "Search files and directories even if a path matches a line of .gitignore")
 	flag.BoolVarP(&o.SkipXfgIgnore, "skip-xfgignore", "", d.SkipXfgIgnore, "Search files and directories even if a path matches a line of .xfgignore")
+	flag.BoolVarP(&o.NoDefaultSkip, "no-default-skip", "", d.NoDefaultSkip, "Not skip .git, .gitkeep, .gitkeep, .svn, node_modules, vendor, *.min.js and *.mmin.css")
 	flag.BoolVarP(&o.SearchAll, "search-all", "a", d.SearchAll, "Search all files and directories except specific ignoring files and directories")
 	flag.BoolVarP(&o.Unrestricted, "unrestricted", "u", d.Unrestricted, "The alias of --search-all")
 	flag.StringArrayVarP(&o.Ignore, "ignore", "", d.Ignore, "Ignore path to pick up even with '--search-all'")
