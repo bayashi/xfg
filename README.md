@@ -11,7 +11,9 @@ Find paths anyway, then search for contents also, naturally.
 * Recursive search
 * Search both paths and contents by multiple keywords
     * Possible to search by regexp also
-* Ignores hidden files and directories
+* Ignores hidden files and directories by default
+* Support the Unicode
+    * Let's try to search for emojis 😉
 * Respect your `.gitignore`
     * Possible to use specific `.xfgignore` also
 * Support `.xfgrc` file for your default options

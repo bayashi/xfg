@@ -898,6 +898,20 @@ func TestXfg_OK(t *testing.T) {
 			`),
 			expectExitCode: exitOK,
 		},
+		"unicode emoji": {
+			opt: &options{
+				SearchPath: []string{"service-r"},
+				SearchGrep: []string{"😂"},
+				extra: optionsExtra{
+					onlyMatchContent: true,
+				},
+			},
+			expect: here.Doc(`
+                testdata/service-r/emoji.txt
+                3: 😂
+			`),
+			expectExitCode: exitOK,
+		},
 	} {
 		if tt.skipWindows && isWindowsTestRunner() {
 			return
