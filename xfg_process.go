@@ -25,6 +25,7 @@ func (x *xfg) process() error {
 	}
 
 	eg := new(errgroup.Group)
+	x.setUpIgnoreMatchers(x.options.SearchStart)
 	x.walkDir(eg, x.options.SearchStart, x.extra.ignoreMatchers)
 	if err := eg.Wait(); err != nil {
 		return fmt.Errorf("walkDir Wait : %w", err)
