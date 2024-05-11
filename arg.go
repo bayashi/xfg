@@ -178,9 +178,6 @@ func (cli *runner) parseArgs(d *options) *options {
 		funcExit(exitOK)
 	} else {
 		o.targetPathFromArgs()
-		if len(o.SearchGrep) > 0 || len(o.SearchGrepRe) > 0 {
-			o.extra.onlyMatchContent = true
-		}
 	}
 
 	return o
@@ -249,6 +246,12 @@ func (o *options) prepareFromENV() {
 func (o *options) prepareAliases() {
 	if o.Unrestricted {
 		o.SearchAll = true
+	}
+}
+
+func (o *options) prepareRuntimeFlags() {
+	if len(o.SearchGrep) > 0 || len(o.SearchGrepRe) > 0 {
+		o.extra.onlyMatchContent = true
 	}
 }
 

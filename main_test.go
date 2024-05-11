@@ -59,10 +59,7 @@ func TestXfg_OK(t *testing.T) {
 			opt: &options{
 				SearchPath: []string{"service-b"},
 				SearchGrep: []string{"func"},
-				extra: optionsExtra{
-					onlyMatchContent: true,
-				},
-				Indent: defaultIndent,
+				Indent:     defaultIndent,
 			},
 			expect: here.Doc(`
                 testdata/service-b/main.go
@@ -73,10 +70,7 @@ func TestXfg_OK(t *testing.T) {
 		"grep `package b`": {
 			opt: &options{
 				SearchGrep: []string{"package b"},
-				extra: optionsExtra{
-					onlyMatchContent: true,
-				},
-				Indent: defaultIndent,
+				Indent:     defaultIndent,
 			},
 			expect: here.Doc(`
                 testdata/service-b/main.go
@@ -88,10 +82,7 @@ func TestXfg_OK(t *testing.T) {
 			opt: &options{
 				SearchPath: []string{"main"},
 				SearchGrep: []string{"package"},
-				extra: optionsExtra{
-					onlyMatchContent: true,
-				},
-				Indent: defaultIndent,
+				Indent:     defaultIndent,
 			},
 			expect: here.Doc(`
                 testdata/service-a/main.go
@@ -110,11 +101,8 @@ func TestXfg_OK(t *testing.T) {
 		},
 		"service-b grep bar with C1": {
 			opt: &options{
-				SearchPath: []string{"service-b"},
-				SearchGrep: []string{"main"},
-				extra: optionsExtra{
-					onlyMatchContent: true,
-				},
+				SearchPath:   []string{"service-b"},
+				SearchGrep:   []string{"main"},
 				Indent:       defaultIndent,
 				ContextLines: 1,
 			},
@@ -128,11 +116,8 @@ func TestXfg_OK(t *testing.T) {
 		},
 		"service-b grep bar with C2": {
 			opt: &options{
-				SearchPath: []string{"service-b"},
-				SearchGrep: []string{"main"},
-				extra: optionsExtra{
-					onlyMatchContent: true,
-				},
+				SearchPath:   []string{"service-b"},
+				SearchGrep:   []string{"main"},
 				Indent:       defaultIndent,
 				ContextLines: 2,
 			},
@@ -148,11 +133,8 @@ func TestXfg_OK(t *testing.T) {
 		},
 		"service-c grep 56 with C2. Match 2 consecutive lines": {
 			opt: &options{
-				SearchPath: []string{"service-c"},
-				SearchGrep: []string{"56"},
-				extra: optionsExtra{
-					onlyMatchContent: true,
-				},
+				SearchPath:   []string{"service-c"},
+				SearchGrep:   []string{"56"},
 				Indent:       defaultIndent,
 				ContextLines: 2,
 			},
@@ -171,10 +153,7 @@ func TestXfg_OK(t *testing.T) {
 			opt: &options{
 				SearchPath: []string{"service-a"},
 				SearchGrep: []string{"foo"},
-				extra: optionsExtra{
-					onlyMatchContent: true,
-				},
-				Indent: defaultIndent,
+				Indent:     defaultIndent,
 			},
 			expect: here.Doc(`
                 testdata/service-a/main.go
@@ -186,10 +165,7 @@ func TestXfg_OK(t *testing.T) {
 			opt: &options{
 				SearchPath: []string{"service-a"},
 				SearchGrep: []string{"foo"},
-				extra: optionsExtra{
-					onlyMatchContent: true,
-				},
-				Indent: defaultIndent,
+				Indent:     defaultIndent,
 			},
 			expect: here.Doc(`
                 testdata/service-a/main.go
@@ -201,10 +177,7 @@ func TestXfg_OK(t *testing.T) {
 			opt: &options{
 				SearchPath: []string{"service-c"},
 				SearchGrep: []string{"foo"},
-				extra: optionsExtra{
-					onlyMatchContent: true,
-				},
-				Indent: defaultIndent,
+				Indent:     defaultIndent,
 			},
 			expect: here.Doc(`
                 testdata/service-c/main.go
@@ -217,11 +190,8 @@ func TestXfg_OK(t *testing.T) {
 			opt: &options{
 				SearchPath: []string{"service-c"},
 				SearchGrep: []string{"foo"},
-				extra: optionsExtra{
-					onlyMatchContent: true,
-				},
-				Indent:   defaultIndent,
-				NoIndent: true,
+				Indent:     defaultIndent,
+				NoIndent:   true,
 			},
 			expect: here.Doc(`
                 testdata/service-c/main.go
@@ -234,10 +204,7 @@ func TestXfg_OK(t *testing.T) {
 			opt: &options{
 				SearchPath: []string{"service-b"},
 				SearchGrep: []string{"func"},
-				extra: optionsExtra{
-					onlyMatchContent: true,
-				},
-				Indent: "	",
+				Indent:     "	",
 			},
 			expect: here.Doc(`
                 testdata/service-b/main.go
@@ -401,10 +368,7 @@ func TestXfg_OK(t *testing.T) {
 			opt: &options{
 				SearchPath: []string{"service-h"},
 				SearchGrep: []string{"h"},
-				extra: optionsExtra{
-					onlyMatchContent: true,
-				},
-				Indent: defaultIndent,
+				Indent:     defaultIndent,
 			},
 			expect: here.Doc(`
                 testdata/service-h/main.go
@@ -418,11 +382,8 @@ func TestXfg_OK(t *testing.T) {
 		},
 		"service-h with maxMatchCount": {
 			opt: &options{
-				SearchPath: []string{"service-h"},
-				SearchGrep: []string{"h"},
-				extra: optionsExtra{
-					onlyMatchContent: true,
-				},
+				SearchPath:    []string{"service-h"},
+				SearchGrep:    []string{"h"},
 				Indent:        defaultIndent,
 				MaxMatchCount: 3,
 			},
@@ -436,11 +397,8 @@ func TestXfg_OK(t *testing.T) {
 		},
 		"service-h show count": {
 			opt: &options{
-				SearchPath: []string{"service-h"},
-				SearchGrep: []string{"h"},
-				extra: optionsExtra{
-					onlyMatchContent: true,
-				},
+				SearchPath:     []string{"service-h"},
+				SearchGrep:     []string{"h"},
 				ShowMatchCount: true,
 			},
 			expect: here.Doc(`
@@ -450,11 +408,8 @@ func TestXfg_OK(t *testing.T) {
 		},
 		"service-c with contextLines": {
 			opt: &options{
-				SearchPath: []string{"service-c"},
-				SearchGrep: []string{"func"},
-				extra: optionsExtra{
-					onlyMatchContent: true,
-				},
+				SearchPath:     []string{"service-c"},
+				SearchGrep:     []string{"func"},
 				GroupSeparator: defaultGroupSeparator,
 				Indent:         defaultIndent,
 				ContextLines:   1,
@@ -473,11 +428,8 @@ func TestXfg_OK(t *testing.T) {
 		},
 		"service-c with contextLines groupSeparator": {
 			opt: &options{
-				SearchPath: []string{"service-c"},
-				SearchGrep: []string{"func"},
-				extra: optionsExtra{
-					onlyMatchContent: true,
-				},
+				SearchPath:     []string{"service-c"},
+				SearchGrep:     []string{"func"},
 				GroupSeparator: "====",
 				Indent:         defaultIndent,
 				ContextLines:   1,
@@ -498,9 +450,6 @@ func TestXfg_OK(t *testing.T) {
 			opt: &options{
 				SearchPath: []string{"Service-B"},
 				SearchGrep: []string{"FunC"},
-				extra: optionsExtra{
-					onlyMatchContent: true,
-				},
 				Indent:     defaultIndent,
 				IgnoreCase: true,
 			},
@@ -512,11 +461,8 @@ func TestXfg_OK(t *testing.T) {
 		},
 		"service-c with afterContextLines": {
 			opt: &options{
-				SearchPath: []string{"service-c"},
-				SearchGrep: []string{"func"},
-				extra: optionsExtra{
-					onlyMatchContent: true,
-				},
+				SearchPath:        []string{"service-c"},
+				SearchGrep:        []string{"func"},
 				GroupSeparator:    defaultGroupSeparator,
 				Indent:            defaultIndent,
 				AfterContextLines: 1,
@@ -533,11 +479,8 @@ func TestXfg_OK(t *testing.T) {
 		},
 		"service-c with beforeContextLines": {
 			opt: &options{
-				SearchPath: []string{"service-c"},
-				SearchGrep: []string{"func"},
-				extra: optionsExtra{
-					onlyMatchContent: true,
-				},
+				SearchPath:         []string{"service-c"},
+				SearchGrep:         []string{"func"},
 				GroupSeparator:     defaultGroupSeparator,
 				Indent:             defaultIndent,
 				BeforeContextLines: 1,
@@ -572,21 +515,15 @@ func TestXfg_OK(t *testing.T) {
 			opt: &options{
 				SearchPath: []string{noMatchKeyword},
 				SearchGrep: []string{noMatchKeyword},
-				extra: optionsExtra{
-					onlyMatchContent: true,
-				},
-				Quiet: true,
+				Quiet:      true,
 			},
 			expect:         "",
 			expectExitCode: exitErr,
 		},
 		"service-b grep bar with C1 and max-columns": {
 			opt: &options{
-				SearchPath: []string{"service-b"},
-				SearchGrep: []string{"main"},
-				extra: optionsExtra{
-					onlyMatchContent: true,
-				},
+				SearchPath:   []string{"service-b"},
+				SearchGrep:   []string{"main"},
 				Indent:       defaultIndent,
 				ContextLines: 1,
 				MaxColumns:   7,
@@ -635,11 +572,8 @@ func TestXfg_OK(t *testing.T) {
 		},
 		"service-c with contextLines, but no-group-separator": {
 			opt: &options{
-				SearchPath: []string{"service-c"},
-				SearchGrep: []string{"func"},
-				extra: optionsExtra{
-					onlyMatchContent: true,
-				},
+				SearchPath:       []string{"service-c"},
+				SearchGrep:       []string{"func"},
 				GroupSeparator:   defaultGroupSeparator,
 				Indent:           defaultIndent,
 				ContextLines:     1,
@@ -668,11 +602,8 @@ func TestXfg_OK(t *testing.T) {
 		},
 		"service grep bar --files-with-matches": {
 			opt: &options{
-				SearchPath: []string{"service-b"},
-				SearchGrep: []string{"bar"},
-				extra: optionsExtra{
-					onlyMatchContent: true,
-				},
+				SearchPath:       []string{"service-b"},
+				SearchGrep:       []string{"bar"},
 				FilesWithMatches: true,
 			},
 			expect: here.Doc(`
@@ -717,9 +648,6 @@ func TestXfg_OK(t *testing.T) {
 			opt: &options{
 				SearchPath: []string{"service-j"},
 				SearchGrep: []string{"foo"},
-				extra: optionsExtra{
-					onlyMatchContent: true,
-				},
 			},
 			expect:         "", // skiped all
 			expectExitCode: exitOK,
@@ -737,9 +665,6 @@ func TestXfg_OK(t *testing.T) {
 		"search contents by regexp": {
 			opt: &options{
 				SearchGrepRe: []string{"ba(r|z) := \\d+$"},
-				extra: optionsExtra{
-					onlyMatchContent: true,
-				},
 			},
 			expect: here.Doc(`
                 testdata/service-b/main.go
@@ -775,9 +700,6 @@ func TestXfg_OK(t *testing.T) {
 				SearchPath: []string{"bar"},
 				Lang:       []string{"perl"},
 				SearchGrep: []string{"exit"},
-				extra: optionsExtra{
-					onlyMatchContent: true,
-				},
 			},
 			expect: here.Doc(`
                 testdata/service-k/bar.pl
@@ -806,9 +728,6 @@ func TestXfg_OK(t *testing.T) {
 		"not match any words as word boundary regexp by default": {
 			opt: &options{
 				SearchGrepRe: []string{"bound"},
-				extra: optionsExtra{
-					onlyMatchContent: true,
-				},
 			},
 			expect:         "",
 			expectExitCode: exitOK,
@@ -816,9 +735,6 @@ func TestXfg_OK(t *testing.T) {
 		"match words as word boundary regexp by default": {
 			opt: &options{
 				SearchGrepRe: []string{"boundary"},
-				extra: optionsExtra{
-					onlyMatchContent: true,
-				},
 			},
 			expect: here.Doc(`
                 testdata/service-n/foo.txt
@@ -828,10 +744,7 @@ func TestXfg_OK(t *testing.T) {
 		},
 		"just match line as not word boundary regexp": {
 			opt: &options{
-				SearchGrepRe: []string{"bound"},
-				extra: optionsExtra{
-					onlyMatchContent: true,
-				},
+				SearchGrepRe:    []string{"bound"},
 				NotWordBoundary: true,
 			},
 			expect: here.Doc(`
@@ -902,9 +815,6 @@ func TestXfg_OK(t *testing.T) {
 			opt: &options{
 				SearchPath: []string{"service-r"},
 				SearchGrep: []string{"😂"},
-				extra: optionsExtra{
-					onlyMatchContent: true,
-				},
 			},
 			expect: here.Doc(`
                 testdata/service-r/emoji.txt
