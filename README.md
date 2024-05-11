@@ -151,6 +151,7 @@ Regexp keywords you input respect word boundaries by default. You can use `--not
   -., --hidden                    Enable to search hidden files
       --skip-gitignore            Search files and directories even if a path matches a line of .gitignore
       --skip-xfgignore            Search files and directories even if a path matches a line of .xfgignore
+      --no-default-skip           Not skip .git, .gitkeep, .gitkeep, .svn, node_modules, vendor, *.min.js and *.mmin.css
   -a, --search-all                Search all files and directories except specific ignoring files and directories
   -u, --unrestricted              The alias of --search-all
       --ignore stringArray        Ignore path to pick up even with '--search-all'
