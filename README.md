@@ -140,7 +140,7 @@ Regexp keywords you input respect word boundaries by default. You can use `--not
 ```
   -p, --path stringArray          A string to find paths
   -g, --grep stringArray          A string to search for contents
-  -s, --start string              A location to start searching (default ".")
+  -s, --start stringArray         A location to start searching (default [.])
   -i, --ignore-case               Ignore case distinctions to search. Also affects keywords of ignore option
   -P, --path-regexp stringArray   A string to find paths by regular expressions (RE2)
   -G, --grep-regexp stringArray   A string to grep contents by regular expressions (RE2)

@@ -11,7 +11,7 @@ import (
 func TestDefaultOptions(t *testing.T) {
 	d := defaultOptions()
 	a.Got(d).Expect(&options{}).SameType(t)
-	a.Got(d.SearchStart).Expect(".").Same(t)
+	a.Got(d.SearchStart).Expect([]string{"."}).Same(t)
 	a.Got(d.Indent).Expect(" ").Same(t)
 	a.Got(d.GroupSeparator).Expect("--").Same(t)
 	a.Got(d.ColorPathBase).Expect("yellow").Same(t)
@@ -37,7 +37,7 @@ func TestReadRC(t *testing.T) {
 
 func TestValidateStartPath_Err(t *testing.T) {
 	t.Parallel()
-	err := validateStartPath(noMatchKeyword)
+	err := validateStartPath([]string{noMatchKeyword})
 	a.Got(err).NotNil(t)
 	// Linux or Mac: "stat PATH no such file or directory"
 	// Windows       "CreateFile PATH The system cannot find the file specified."
@@ -49,7 +49,7 @@ func TestValidateStartPath_Err(t *testing.T) {
 	f.WriteString("123")
 	f.Close()
 
-	err = validateStartPath(tempFilePath)
+	err = validateStartPath([]string{tempFilePath})
 	a.Got(err).NotNil(t)
 	a.Got(err.Error()).Expect("path `[^`]+` should point to a directory").Match(t)
 }

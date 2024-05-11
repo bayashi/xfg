@@ -25,8 +25,15 @@ func (x *xfg) process() error {
 	}
 
 	eg := new(errgroup.Group)
-	x.setUpIgnoreMatchers(x.options.SearchStart)
-	x.walkDir(eg, x.options.SearchStart, x.extra.ignoreMatchers)
+	for _, startDir := range x.options.SearchStart {
+		startDir := startDir
+		eg.Go(func() error {
+			ms := x.initIgnoreMatchers(startDir)
+			x.walkDir(eg, startDir, ms)
+			return nil
+		})
+	}
+
 	if err := eg.Wait(); err != nil {
 		return fmt.Errorf("walkDir Wait : %w", err)
 	}

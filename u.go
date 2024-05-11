@@ -17,7 +17,7 @@ import (
 
 func defaultOptions() *options {
 	return &options{
-		SearchStart:    ".",
+		SearchStart:    []string{"."},
 		Indent:         defaultIndent,
 		GroupSeparator: defaultGroupSeparator,
 		ColorPathBase:  "yellow",
@@ -78,15 +78,19 @@ func isRegularFile(fInfo fs.DirEntry) bool {
 	return err == nil && fi.Size() > 0
 }
 
-func validateStartPath(startPath string) error {
-	startPath = filepath.Clean(startPath)
-	d, err := os.Stat(startPath)
-	if err != nil {
-		return err
-	}
+func validateStartPath(startPaths []string) error {
+	for i, sp := range startPaths {
+		sp = filepath.Clean(sp)
+		d, err := os.Stat(sp)
+		if err != nil {
+			return err
+		}
 
-	if !d.IsDir() {
-		return fmt.Errorf("path `%s` should point to a directory", startPath)
+		if !d.IsDir() {
+			return fmt.Errorf("path `%s` should point to a directory", startPaths[i])
+		}
+
+		startPaths[i] = sp
 	}
 
 	return nil
