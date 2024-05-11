@@ -39,6 +39,33 @@ func globalHomeDirGitignorePath(homeDir string) string {
 	return filepath.Join(homeDir, GITIGNORE_FILE_NAME)
 }
 
+// e.g. $REPOSITORY_ROOT/.gitignore
+func repoRootDirGitignorePath(rootDir string) string {
+	gitCmd, err := exec.LookPath(GIT)
+	if err != nil {
+		return "" // trap error, probably command not found
+	}
+	repoRoot, err := exec.Command(gitCmd, "rev-parse", "--show-toplevel").Output()
+	if err != nil {
+		return "" // trap error
+	}
+	absRepoRoot, err := filepath.Abs(string(repoRoot))
+	if err != nil {
+		return "" // trap error
+	}
+
+	absRootDir, err := filepath.Abs(rootDir)
+	if err != nil {
+		return "" // trap error
+	}
+
+	if absRootDir == absRepoRoot {
+		return "" // no need to read here. read this later. On each dir.
+	}
+
+	return filepath.Join(absRepoRoot, GITIGNORE_FILE_NAME)
+}
+
 // e.g. $REPOSITORY_ROOT/info/exclude
 func userGitignorePath() string {
 	gitCmd, err := exec.LookPath(GIT)
@@ -88,9 +115,13 @@ func SetUpGlobalGitIgnores(rootDirPath string, homeDir string) Matchers {
 	for _, gitignorePath := range []string{
 		globalObsoleteHomeDirGitignorePath(homeDir),
 		globalHomeDirGitignorePath(homeDir),
+		repoRootDirGitignorePath(rootDirPath),
 		userGitignorePath(),
 		userConfigGitignorePath(),
 	} {
+		if gitignorePath == "" {
+			continue
+		}
 		if matcher, err := gitignore.NewGitIgnore(gitignorePath, rootDirPath); err == nil {
 			ms = append(ms, matcher)
 		}
