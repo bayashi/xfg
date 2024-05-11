@@ -6,18 +6,6 @@ import (
 )
 
 func (x *xfg) preWalkDir() error {
-	if !x.options.SkipGitIgnore {
-		if ms := xfgignore.SetUpGlobalGitIgnores(x.options.SearchStart, x.cli.homeDir); len(ms) > 0 {
-			x.extra.ignoreMatchers = append(x.extra.ignoreMatchers, ms...)
-		}
-	}
-
-	if !x.options.SkipXfgIgnore {
-		if ms := xfgignore.SetupGlobalXFGIgnore(x.options.SearchStart, x.cli.homeDir, x.options.XfgIgnoreFile); len(ms) > 0 {
-			x.extra.ignoreMatchers = append(x.extra.ignoreMatchers, ms...)
-		}
-	}
-
 	if x.options.IgnoreCase {
 		if err := x.prepareIgnoreCaseRe(); err != nil {
 			return err
@@ -74,4 +62,19 @@ func (x *xfg) prepareIgnoreOption() error {
 	}
 
 	return nil
+}
+
+func (x *xfg) setUpIgnoreMatchers(rootDir string) {
+	x.extra.ignoreMatchers = nil
+	if !x.options.SkipGitIgnore {
+		if ms := xfgignore.SetUpGlobalGitIgnores(rootDir, x.cli.homeDir); len(ms) > 0 {
+			x.extra.ignoreMatchers = append(x.extra.ignoreMatchers, ms...)
+		}
+	}
+
+	if !x.options.SkipXfgIgnore {
+		if ms := xfgignore.SetupGlobalXFGIgnore(rootDir, x.cli.homeDir, x.options.XfgIgnoreFile); len(ms) > 0 {
+			x.extra.ignoreMatchers = append(x.extra.ignoreMatchers, ms...)
+		}
+	}
 }
