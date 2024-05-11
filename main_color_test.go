@@ -40,8 +40,7 @@ func TestHighlight(t *testing.T) {
 				SearchGrep: []string{"func"},
 				Indent:     defaultIndent,
 			},
-			expect: "\x1b[93mtestdata/\x1b[96mservice-b\x1b[0m\x1b[93m/\x1b[0m\n" +
-				"\x1b[93mtestdata/\x1b[96mservice-b\x1b[0m\x1b[93m/main.go\x1b[0m\n" +
+			expect: "\x1b[93mtestdata/\x1b[96mservice-b\x1b[0m\x1b[93m/main.go\x1b[0m\n" +
 				" \x1b[91m3\x1b[0m: \x1b[91mfunc\x1b[0m main() {\n",
 		},
 		"service-b grep green": {
@@ -51,8 +50,7 @@ func TestHighlight(t *testing.T) {
 				Indent:       defaultIndent,
 				ColorContent: "green",
 			},
-			expect: "\x1b[93mtestdata/\x1b[96mservice-b\x1b[0m\x1b[93m/\x1b[0m\n" +
-				"\x1b[93mtestdata/\x1b[96mservice-b\x1b[0m\x1b[93m/main.go\x1b[0m\n" +
+			expect: "\x1b[93mtestdata/\x1b[96mservice-b\x1b[0m\x1b[93m/main.go\x1b[0m\n" +
 				" \x1b[92m3\x1b[0m: \x1b[92mfunc\x1b[0m main() {\n",
 		},
 		"serv ice-b": {
@@ -68,8 +66,7 @@ func TestHighlight(t *testing.T) {
 				SearchGrep: []string{"func", "main"},
 				Indent:     defaultIndent,
 			},
-			expect: "\x1b[93mtestdata/\x1b[96mservice-b\x1b[0m\x1b[93m/\x1b[0m\n" +
-				"\x1b[93mtestdata/\x1b[96mservice-b\x1b[0m\x1b[93m/main.go\x1b[0m\n" +
+			expect: "\x1b[93mtestdata/\x1b[96mservice-b\x1b[0m\x1b[93m/main.go\x1b[0m\n" +
 				" \x1b[91m3\x1b[0m: \x1b[91mfunc\x1b[0m \x1b[91mmain\x1b[0m() {\n",
 		},
 		"service-b path base color red": {

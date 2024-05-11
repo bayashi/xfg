@@ -57,6 +57,7 @@ func newX(cli *runner, o *options) *xfg {
 	o.prepareFromENV()
 	o.prepareAliases()
 	o.prepareContextLines(cli.isTTY)
+	o.prepareRuntimeFlags()
 
 	x := &xfg{
 		cli:     cli,

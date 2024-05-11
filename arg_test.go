@@ -75,7 +75,6 @@ func TestArgs(t *testing.T) {
 			args: []string{"--grep", "foo"},
 			prepareExpect: func(o *options) {
 				o.SearchGrep = []string{"foo"}
-				o.extra.onlyMatchContent = true
 			},
 		},
 		"specific multiple paths": {
@@ -89,7 +88,6 @@ func TestArgs(t *testing.T) {
 			prepareExpect: func(o *options) {
 				o.SearchPath = []string{"foo"}
 				o.SearchGrep = []string{"bar"}
-				o.extra.onlyMatchContent = true
 			},
 		},
 		"path and specific grep args": {
@@ -97,7 +95,6 @@ func TestArgs(t *testing.T) {
 			prepareExpect: func(o *options) {
 				o.SearchPath = []string{"foo"}
 				o.SearchGrep = []string{"bar"}
-				o.extra.onlyMatchContent = true
 			},
 		},
 		"path and specific multiple greps": {
@@ -105,7 +102,6 @@ func TestArgs(t *testing.T) {
 			prepareExpect: func(o *options) {
 				o.SearchPath = []string{"foo"}
 				o.SearchGrep = []string{"bar", "baz"}
-				o.extra.onlyMatchContent = true
 			},
 		},
 		"path and multiple grep args": {
@@ -113,7 +109,6 @@ func TestArgs(t *testing.T) {
 			prepareExpect: func(o *options) {
 				o.SearchPath = []string{"foo"}
 				o.SearchGrep = []string{"bar", "baz"}
-				o.extra.onlyMatchContent = true
 			},
 		},
 		"only path regexp arg": {
@@ -126,7 +121,6 @@ func TestArgs(t *testing.T) {
 			args: []string{"-G", "fo."},
 			prepareExpect: func(o *options) {
 				o.SearchGrepRe = []string{"fo."}
-				o.extra.onlyMatchContent = true
 			},
 		},
 	} {
