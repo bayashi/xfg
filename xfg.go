@@ -5,7 +5,6 @@ import (
 	"regexp"
 	"sync"
 
-	"github.com/bayashi/xfg/internal/xfgignore"
 	"github.com/fatih/color"
 )
 
@@ -42,7 +41,6 @@ type xfgExtra struct {
 	searchPathRe   []*regexp.Regexp
 	searchGrepRe   []*regexp.Regexp
 	ignoreOptionRe []*regexp.Regexp
-	ignoreMatchers xfgignore.Matchers
 }
 
 type xfg struct {

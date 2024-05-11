@@ -822,6 +822,29 @@ func TestXfg_OK(t *testing.T) {
 			`),
 			expectExitCode: exitOK,
 		},
+		"multiple start dirs": {
+			opt: &options{
+				SearchStart: []string{"./testdata/service-a", "./testdata/service-b"},
+				SearchPath:  []string{"main"},
+			},
+			expect: here.Doc(`
+                testdata/service-a/main.go
+                testdata/service-b/main.go
+			`),
+			expectExitCode: exitOK,
+		},
+		"multiple start dirs grep": {
+			opt: &options{
+				SearchStart: []string{"./testdata/service-a", "./testdata/service-b"},
+				SearchPath:  []string{"main"},
+				SearchGrep:  []string{"package b"},
+			},
+			expect: here.Doc(`
+                testdata/service-b/main.go
+                1: package b
+			`),
+			expectExitCode: exitOK,
+		},
 	} {
 		if tt.skipWindows && isWindowsTestRunner() {
 			return
@@ -839,7 +862,9 @@ func TestXfg_OK(t *testing.T) {
 
 			tt.opt.NoPager = true
 			tt.opt.NoColor = true
-			tt.opt.SearchStart = "./testdata"
+			if tt.opt.SearchStart == nil {
+				tt.opt.SearchStart = []string{"./testdata"}
+			}
 
 			code, err := cli.xfg(tt.opt)
 

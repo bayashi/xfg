@@ -64,17 +64,19 @@ func (x *xfg) prepareIgnoreOption() error {
 	return nil
 }
 
-func (x *xfg) setUpIgnoreMatchers(rootDir string) {
-	x.extra.ignoreMatchers = nil
+func (x *xfg) initIgnoreMatchers(rootDir string) xfgignore.Matchers {
+	var gms xfgignore.Matchers
 	if !x.options.SkipGitIgnore {
 		if ms := xfgignore.SetUpGlobalGitIgnores(rootDir, x.cli.homeDir); len(ms) > 0 {
-			x.extra.ignoreMatchers = append(x.extra.ignoreMatchers, ms...)
+			gms = append(gms, ms...)
 		}
 	}
 
 	if !x.options.SkipXfgIgnore {
 		if ms := xfgignore.SetupGlobalXFGIgnore(rootDir, x.cli.homeDir, x.options.XfgIgnoreFile); len(ms) > 0 {
-			x.extra.ignoreMatchers = append(x.extra.ignoreMatchers, ms...)
+			gms = append(gms, ms...)
 		}
 	}
+
+	return gms
 }

@@ -43,7 +43,7 @@ type optionsExtra struct {
 type options struct {
 	SearchPath  []string `toml:"path"`
 	SearchGrep  []string `toml:"grep"`
-	SearchStart string   `toml:"start"`
+	SearchStart []string `toml:"start"`
 
 	SearchPathRe []string `toml:"path-regexp"`
 	SearchGrepRe []string `toml:"grep-regexp"`
@@ -98,7 +98,7 @@ type options struct {
 func (o *options) falgs(d *options) {
 	flag.StringArrayVarP(&o.SearchPath, "path", "p", d.SearchPath, "A string to find paths")
 	flag.StringArrayVarP(&o.SearchGrep, "grep", "g", d.SearchGrep, "A string to search for contents")
-	flag.StringVarP(&o.SearchStart, "start", "s", d.SearchStart, "A location to start searching")
+	flag.StringArrayVarP(&o.SearchStart, "start", "s", d.SearchStart, "A location to start searching")
 
 	flag.BoolVarP(&o.IgnoreCase, "ignore-case", "i", d.IgnoreCase, "Ignore case distinctions to search. Also affects keywords of ignore option")
 

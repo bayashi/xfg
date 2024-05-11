@@ -97,7 +97,7 @@ func TestHighlight(t *testing.T) {
 			}
 
 			tt.opt.NoPager = true
-			tt.opt.SearchStart = "./testdata"
+			tt.opt.SearchStart = []string{"./testdata"}
 
 			cli.xfg(tt.opt)
 
@@ -130,7 +130,7 @@ func TestNoColorByENV(t *testing.T) {
 			}
 
 			tt.opt.NoPager = true
-			tt.opt.SearchStart = "./testdata"
+			tt.opt.SearchStart = []string{"./testdata"}
 
 			t.Setenv("NO_COLOR", "1")
 
