@@ -16,10 +16,7 @@ Find paths anyway, then search for contents also, naturally.
     * Let's try to search for emojis 😉
 * Respect your `.gitignore`
     * Possible to use specific `.xfgignore` also
-* Support `.xfgrc` file for your default options
-* support to search specific language files by `--lang` option
-    * `--lang perl` will search for files which extentions are ".pl", ".pm", ".t", ".pod" or ".PL"
-    * `xfg --lang-list` to show all supported languages
+* Invoke your pager to print results automatically
 
 There are so many features. You can check all options in below "Help Options" section.
 
@@ -217,6 +214,14 @@ You can search for paths by file type charactor on `--type`, `-t` option.
 * **c**: `char-device` Unix character device
 
 For example, if you hit `xfg --type d`, then there are only directories.
+
+## Language Search
+
+support to search specific language files by `--lang` option
+
+For example, when you specify `--lang perl` in options, you will search for files which extentions are `.pl`, `.pm`, `.t`, `.pod` or `.PL`.
+
+`xfg --lang-list` prints all supported languages.
 
 ## Highlight limitation
 
