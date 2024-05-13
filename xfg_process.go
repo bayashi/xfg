@@ -86,10 +86,7 @@ func (x *xfg) walkStuff(stuff []fs.DirEntry, eg *errgroup.Group, dirPath string,
 			}
 			x.walkDir(eg, p, ms) // recursively
 		}
-		s := s
-		eg.Go(func() error {
-			return x.walkFile(filepath.Join(dirPath, s.Name()), s, ms)
-		})
+		x.walkFile(filepath.Join(dirPath, s.Name()), s, ms)
 	}
 }
 
