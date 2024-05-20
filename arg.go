@@ -104,7 +104,7 @@ func (o *options) falgs(d *options) {
 
 	flag.StringArrayVarP(&o.SearchPathRe, "path-regexp", "P", d.SearchPathRe, "A string to find paths by regular expressions (RE2)")
 	flag.StringArrayVarP(&o.SearchGrepRe, "grep-regexp", "G", d.SearchGrepRe, "A string to grep contents by regular expressions (RE2)")
-	flag.BoolVarP(&o.NotWordBoundary, "not-word-boundary", "", d.NotWordBoundary, "Not care about word boundary to match by regexp")
+	flag.BoolVarP(&o.NotWordBoundary, "not-word-boundary", "M", d.NotWordBoundary, "Not care about word boundary to match by regexp")
 
 	flag.Uint32VarP(&o.ContextLines, "context", "C", d.ContextLines, "Show several lines before and after the matched one")
 	flag.Uint32VarP(&o.AfterContextLines, "after-context", "A", d.AfterContextLines, "Show several lines after the matched one. Override context option")
