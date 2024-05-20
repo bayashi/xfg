@@ -144,7 +144,7 @@ Regexp keywords you input respect word boundaries by default. You can use `--not
   -i, --ignore-case               Ignore case distinctions to search. Also affects keywords of ignore option
   -P, --path-regexp stringArray   A string to find paths by regular expressions (RE2)
   -G, --grep-regexp stringArray   A string to grep contents by regular expressions (RE2)
-      --not-word-boundary         Not care about word boundary to match by regexp
+  -M, --not-word-boundary         Not care about word boundary to match by regexp
   -C, --context uint32            Show several lines before and after the matched one
   -A, --after-context uint32      Show several lines after the matched one. Override context option
   -B, --before-context uint32     Show several lines before the matched one. Override context option
