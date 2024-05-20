@@ -107,7 +107,7 @@ $ xfg -P "service-[a-g]"
 $ xfg -G "X_[A-Z]+_[A-Z]+"
 ```
 
-Regexp keywords you input respect word boundaries by default. You can use `--not-word-boundary` option to trun it off.
+Regexp keywords you input respect word boundaries by default. You can use `-M` or `--not-word-boundary` option to trun it off.
 
 ### Ignore rules
 
