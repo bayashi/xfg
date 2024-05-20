@@ -845,6 +845,22 @@ func TestXfg_OK(t *testing.T) {
 			`),
 			expectExitCode: exitOK,
 		},
+		"pick *min.js etc with --search-default-skip-stuff": {
+			opt: &options{
+				SearchPath:             []string{"service-q"},
+				SearchDefaultSkipStuff: true,
+			},
+			expect: here.Doc(`
+                testdata/service-q/
+                testdata/service-q/.svn/
+                testdata/service-q/.svn/.gitkeep
+                testdata/service-q/node_modules/
+                testdata/service-q/node_modules/.gitkeep
+                testdata/service-q/service-q.min.css
+                testdata/service-q/service-q.min.js
+			`),
+			expectExitCode: exitOK,
+		},
 	} {
 		if tt.skipWindows && isWindowsTestRunner() {
 			return
