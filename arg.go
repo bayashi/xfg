@@ -61,26 +61,27 @@ type options struct {
 	Lang []string `toml:"lang"`
 	Ext  []string `toml:"ext"`
 
-	IgnoreCase            bool `toml:"ignore-case"`
-	NoColor               bool `toml:"no-color"`
-	Abs                   bool `toml:"abs"`
-	ShowMatchCount        bool `toml:"count"`
-	NoGroupSeparator      bool `toml:"no-group-separator"`
-	NoIndent              bool `toml:"no-indent"`
-	Hidden                bool `toml:"hidden"`
-	SkipGitIgnore         bool `toml:"skip-gitignore"`
-	SkipXfgIgnore         bool `toml:"skip-xfgignore"`
-	NoDefaultSkip         bool `toml:"no-default-skip"`
-	SearchAll             bool `toml:"search-all"`
-	Unrestricted          bool `toml:"unrestricted"`
-	NoPager               bool `toml:"no-pager"`
-	Quiet                 bool `toml:"quiet"`
-	FilesWithMatches      bool `toml:"files-with-matches"`
-	Null                  bool `toml:"null"`
-	Stats                 bool `toml:"stats"`
-	SearchOnlyName        bool `toml:"search-only-name"`
-	NotWordBoundary       bool `toml:"not-word-boundary"`
-	IgnorePermissionError bool `toml:"ignore-permission-error"`
+	IgnoreCase             bool `toml:"ignore-case"`
+	NoColor                bool `toml:"no-color"`
+	Abs                    bool `toml:"abs"`
+	ShowMatchCount         bool `toml:"count"`
+	NoGroupSeparator       bool `toml:"no-group-separator"`
+	NoIndent               bool `toml:"no-indent"`
+	Hidden                 bool `toml:"hidden"`
+	SkipGitIgnore          bool `toml:"skip-gitignore"`
+	SkipXfgIgnore          bool `toml:"skip-xfgignore"`
+	NoDefaultSkip          bool `toml:"no-default-skip"`
+	SearchDefaultSkipStuff bool `toml:"search-default-skip-stuff"`
+	SearchAll              bool `toml:"search-all"`
+	Unrestricted           bool `toml:"unrestricted"`
+	NoPager                bool `toml:"no-pager"`
+	Quiet                  bool `toml:"quiet"`
+	FilesWithMatches       bool `toml:"files-with-matches"`
+	Null                   bool `toml:"null"`
+	Stats                  bool `toml:"stats"`
+	SearchOnlyName         bool `toml:"search-only-name"`
+	NotWordBoundary        bool `toml:"not-word-boundary"`
+	IgnorePermissionError  bool `toml:"ignore-permission-error"`
 
 	flagLangList bool
 
@@ -114,6 +115,7 @@ func (o *options) falgs(d *options) {
 	flag.BoolVarP(&o.SkipGitIgnore, "skip-gitignore", "", d.SkipGitIgnore, "Search files and directories even if a path matches a line of .gitignore")
 	flag.BoolVarP(&o.SkipXfgIgnore, "skip-xfgignore", "", d.SkipXfgIgnore, "Search files and directories even if a path matches a line of .xfgignore")
 	flag.BoolVarP(&o.NoDefaultSkip, "no-default-skip", "", d.NoDefaultSkip, "Not skip .git, .gitkeep, .gitkeep, .svn, node_modules, vendor, *.min.js and *.mmin.css")
+	flag.BoolVarP(&o.SearchDefaultSkipStuff, "search-default-skip-stuff", "n", d.SearchDefaultSkipStuff, "Search for hidden stuff and default skip files and directories)")
 	flag.BoolVarP(&o.SearchAll, "search-all", "a", d.SearchAll, "Search all files and directories except specific ignoring files and directories")
 	flag.BoolVarP(&o.Unrestricted, "unrestricted", "u", d.Unrestricted, "The alias of --search-all")
 	flag.StringArrayVarP(&o.Ignore, "ignore", "", d.Ignore, "Ignore path to pick up even with '--search-all'")

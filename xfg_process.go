@@ -73,7 +73,7 @@ func (x *xfg) walkStuff(stuff []fs.DirEntry, eg *errgroup.Group, dirPath string,
 		if x.options.Quiet && x.hasMatchedAny() {
 			break // already match. skip after all
 		}
-		if !x.options.SearchAll {
+		if !x.options.SearchAll && !x.options.SearchDefaultSkipStuff {
 			if (!x.options.NoDefaultSkip && isDefaultSkipDir(s)) ||
 				(s.IsDir() && !x.options.Hidden && strings.HasPrefix(s.Name(), ".")) {
 				continue // skip all stuff in this dir
@@ -188,7 +188,7 @@ func (x *xfg) isSkippablePath(fPath string, fInfo fs.DirEntry, ms xfgignore.Matc
 		return true
 	}
 
-	if !x.options.SearchAll {
+	if !x.options.SearchAll && !x.options.SearchDefaultSkipStuff {
 		if (!x.options.NoDefaultSkip && isDefaultSkipFile(fInfo)) ||
 			(!x.options.Hidden && strings.HasPrefix(fInfo.Name(), ".")) ||
 			x.isSkippableByIgnoreFile(fPath, ms) {
