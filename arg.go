@@ -19,8 +19,6 @@ const (
 
 	defaultGroupSeparator string = "--"
 	defaultIndent         string = " "
-
-	supportTypes = "directory (d), symlink (l), executable (x), empty (e), socket (s), pipe (p), block-device (b), char-device (c)"
 )
 
 var (
@@ -97,60 +95,60 @@ type options struct {
 }
 
 func (o *options) falgs(d *options) {
-	flag.StringArrayVarP(&o.SearchPath, "path", "p", d.SearchPath, "A string to find paths")
-	flag.StringArrayVarP(&o.SearchGrep, "grep", "g", d.SearchGrep, "A string to search for contents")
-	flag.StringArrayVarP(&o.SearchStart, "start", "s", d.SearchStart, "A location to start searching")
+	flag.StringArrayVarP(&o.SearchPath, "path", "p", d.SearchPath, getMessage("help_SearchPath"))
+	flag.StringArrayVarP(&o.SearchGrep, "grep", "g", d.SearchGrep, getMessage("help_SearchGrep"))
+	flag.StringArrayVarP(&o.SearchStart, "start", "s", d.SearchStart, getMessage("help_SearchStart"))
 
-	flag.BoolVarP(&o.IgnoreCase, "ignore-case", "i", d.IgnoreCase, "Ignore case distinctions to search. Also affects keywords of ignore option")
+	flag.BoolVarP(&o.IgnoreCase, "ignore-case", "i", d.IgnoreCase, getMessage("help_IgnoreCase"))
 
-	flag.StringArrayVarP(&o.SearchPathRe, "path-regexp", "P", d.SearchPathRe, "A string to find paths by regular expressions (RE2)")
-	flag.StringArrayVarP(&o.SearchGrepRe, "grep-regexp", "G", d.SearchGrepRe, "A string to grep contents by regular expressions (RE2)")
-	flag.BoolVarP(&o.NotWordBoundary, "not-word-boundary", "M", d.NotWordBoundary, "Not care about word boundary to match by regexp")
+	flag.StringArrayVarP(&o.SearchPathRe, "path-regexp", "P", d.SearchPathRe, getMessage("help_SearchPathRe"))
+	flag.StringArrayVarP(&o.SearchGrepRe, "grep-regexp", "G", d.SearchGrepRe, getMessage("help_SearchGrepRe"))
+	flag.BoolVarP(&o.NotWordBoundary, "not-word-boundary", "M", d.NotWordBoundary, getMessage("help_NotWordBoundary"))
 
-	flag.Uint32VarP(&o.ContextLines, "context", "C", d.ContextLines, "Show several lines before and after the matched one")
-	flag.Uint32VarP(&o.AfterContextLines, "after-context", "A", d.AfterContextLines, "Show several lines after the matched one. Override context option")
-	flag.Uint32VarP(&o.BeforeContextLines, "before-context", "B", d.BeforeContextLines, "Show several lines before the matched one. Override context option")
+	flag.Uint32VarP(&o.ContextLines, "context", "C", d.ContextLines, getMessage("help_ContextLines"))
+	flag.Uint32VarP(&o.AfterContextLines, "after-context", "A", d.AfterContextLines, getMessage("help_AfterContextLines"))
+	flag.Uint32VarP(&o.BeforeContextLines, "before-context", "B", d.BeforeContextLines, getMessage("help_BeforeContextLines"))
 
-	flag.BoolVarP(&o.Hidden, "hidden", ".", d.Hidden, "Enable to search hidden files")
-	flag.BoolVarP(&o.SkipGitIgnore, "skip-gitignore", "", d.SkipGitIgnore, "Search files and directories even if a path matches a line of .gitignore")
-	flag.BoolVarP(&o.SkipXfgIgnore, "skip-xfgignore", "", d.SkipXfgIgnore, "Search files and directories even if a path matches a line of .xfgignore")
-	flag.BoolVarP(&o.NoDefaultSkip, "no-default-skip", "", d.NoDefaultSkip, "Not skip .git, .gitkeep, .gitkeep, .svn, node_modules, vendor, *.min.js and *.mmin.css")
-	flag.BoolVarP(&o.SearchDefaultSkipStuff, "search-default-skip-stuff", "n", d.SearchDefaultSkipStuff, "Search for hidden stuff and default skip files and directories)")
-	flag.BoolVarP(&o.SearchAll, "search-all", "a", d.SearchAll, "Search all files and directories except specific ignoring files and directories")
-	flag.BoolVarP(&o.Unrestricted, "unrestricted", "u", d.Unrestricted, "The alias of --search-all")
-	flag.StringArrayVarP(&o.Ignore, "ignore", "", d.Ignore, "Ignore path to pick up even with '--search-all'")
-	flag.BoolVarP(&o.SearchOnlyName, "search-only-name", "f", d.SearchOnlyName, "Search to only name instead whole path string")
+	flag.BoolVarP(&o.Hidden, "hidden", ".", d.Hidden, getMessage("help_Hidden"))
+	flag.BoolVarP(&o.SkipGitIgnore, "skip-gitignore", "", d.SkipGitIgnore, getMessage("help_SkipGitIgnore"))
+	flag.BoolVarP(&o.SkipXfgIgnore, "skip-xfgignore", "", d.SkipXfgIgnore, getMessage("help_SkipXfgIgnore"))
+	flag.BoolVarP(&o.NoDefaultSkip, "no-default-skip", "", d.NoDefaultSkip, getMessage("help_NoDefaultSkip"))
+	flag.BoolVarP(&o.SearchDefaultSkipStuff, "search-default-skip-stuff", "n", d.SearchDefaultSkipStuff, getMessage("help_SearchDefaultSkipStuff"))
+	flag.BoolVarP(&o.SearchAll, "search-all", "a", d.SearchAll, getMessage("help_SearchAll"))
+	flag.BoolVarP(&o.Unrestricted, "unrestricted", "u", d.Unrestricted, getMessage("help_Unrestricted"))
+	flag.StringArrayVarP(&o.Ignore, "ignore", "", d.Ignore, getMessage("help_Ignore"))
+	flag.BoolVarP(&o.SearchOnlyName, "search-only-name", "f", d.SearchOnlyName, getMessage("help_SearchOnlyName"))
 
-	flag.StringVarP(&o.Type, "type", "t", d.Type, "Filter by file type: "+supportTypes)
-	flag.StringArrayVarP(&o.Ext, "ext", "", d.Ext, "Only search files matching file extension")
-	flag.StringArrayVarP(&o.Lang, "lang", "", d.Lang, "Only search files matching language. --lang-list prints all support languages")
-	flag.BoolVarP(&o.flagLangList, "lang-list", "", false, "Show all supported file extensions for each language")
+	flag.StringVarP(&o.Type, "type", "t", d.Type, getMessage("help_Type"))
+	flag.StringArrayVarP(&o.Ext, "ext", "", d.Ext, getMessage("help_Ext"))
+	flag.StringArrayVarP(&o.Lang, "lang", "", d.Lang, getMessage("help_Lang"))
+	flag.BoolVarP(&o.flagLangList, "lang-list", "", false, getMessage("help_flagLangList"))
 
-	flag.BoolVarP(&o.Abs, "abs", "", d.Abs, "Show absolute paths")
-	flag.BoolVarP(&o.ShowMatchCount, "count", "c", d.ShowMatchCount, "Show a count of matching lines instead of contents")
-	flag.Uint32VarP(&o.MaxMatchCount, "max-count", "m", d.MaxMatchCount, "Stop reading a file after NUM matching lines")
-	flag.Uint32VarP(&o.MaxColumns, "max-columns", "", d.MaxColumns, "Do not print lines longer than this limit")
-	flag.BoolVarP(&o.FilesWithMatches, "files-with-matches", "l", d.FilesWithMatches, "Only print the names of matching files")
-	flag.BoolVarP(&o.Null, "null", "0", d.Null, "Separate the filenames with \\0, rather than \\n")
+	flag.BoolVarP(&o.Abs, "abs", "", d.Abs, getMessage("help_Abs"))
+	flag.BoolVarP(&o.ShowMatchCount, "count", "c", d.ShowMatchCount, getMessage("help_ShowMatchCount"))
+	flag.Uint32VarP(&o.MaxMatchCount, "max-count", "m", d.MaxMatchCount, getMessage("help_MaxMatchCount"))
+	flag.Uint32VarP(&o.MaxColumns, "max-columns", "", d.MaxColumns, getMessage("help_MaxColumns"))
+	flag.BoolVarP(&o.FilesWithMatches, "files-with-matches", "l", d.FilesWithMatches, getMessage("help_FilesWithMatches"))
+	flag.BoolVarP(&o.Null, "null", "0", d.Null, getMessage("help_Null"))
 
-	flag.BoolVarP(&o.NoColor, "no-color", "", d.NoColor, "Disable colors for an output")
-	flag.StringVarP(&o.ColorPathBase, "color-path-base", "", d.ColorPathBase, "Color name for a path")
-	flag.StringVarP(&o.ColorPath, "color-path", "", d.ColorPath, "Color name to highlight keywords in a path")
-	flag.StringVarP(&o.ColorContent, "color-content", "", d.ColorContent, "Color name to highlight keywords in a content line")
+	flag.BoolVarP(&o.NoColor, "no-color", "", d.NoColor, getMessage("help_NoColor"))
+	flag.StringVarP(&o.ColorPathBase, "color-path-base", "", d.ColorPathBase, getMessage("help_ColorPathBase"))
+	flag.StringVarP(&o.ColorPath, "color-path", "", d.ColorPath, getMessage("help_ColorPath"))
+	flag.StringVarP(&o.ColorContent, "color-content", "", d.ColorContent, getMessage("help_ColorContent"))
 
-	flag.StringVarP(&o.GroupSeparator, "group-separator", "", d.GroupSeparator, "Print this string instead of '--' between groups of lines")
-	flag.BoolVarP(&o.NoGroupSeparator, "no-group-separator", "", d.NoGroupSeparator, "Do not print a separator between groups of lines")
+	flag.StringVarP(&o.GroupSeparator, "group-separator", "", d.GroupSeparator, getMessage("help_GroupSeparator"))
+	flag.BoolVarP(&o.NoGroupSeparator, "no-group-separator", "", d.NoGroupSeparator, getMessage("help_NoGroupSeparator"))
 
-	flag.StringVarP(&o.Indent, "indent", "", d.Indent, "Indent string for the top of each line")
-	flag.BoolVarP(&o.NoIndent, "no-indent", "", d.NoIndent, "Do not print an indent string")
+	flag.StringVarP(&o.Indent, "indent", "", d.Indent, getMessage("help_Indent"))
+	flag.BoolVarP(&o.NoIndent, "no-indent", "", d.NoIndent, getMessage("help_NoIndent"))
 
-	flag.BoolVarP(&o.IgnorePermissionError, "ignore-permission-error", "", d.IgnorePermissionError, "Do not print warnings of file permission error")
+	flag.BoolVarP(&o.IgnorePermissionError, "ignore-permission-error", "", d.IgnorePermissionError, getMessage("help_IgnorePermissionError"))
 
-	flag.StringVarP(&o.XfgIgnoreFile, "xfgignore-file", "", d.XfgIgnoreFile, ".xfgignore file path if you have it except XDG base directory or HOME directory")
+	flag.StringVarP(&o.XfgIgnoreFile, "xfgignore-file", "", d.XfgIgnoreFile, getMessage("help_XfgIgnoreFile"))
 
-	flag.BoolVarP(&o.NoPager, "no-pager", "", d.NoPager, "Do not invoke with the Pager")
-	flag.BoolVarP(&o.Quiet, "quiet", "q", d.Quiet, "Do not write anything to standard output. Exit immediately with zero status if any match is found")
-	flag.BoolVarP(&o.Stats, "stats", "", d.Stats, "Print runtime stats after searching result")
+	flag.BoolVarP(&o.NoPager, "no-pager", "", d.NoPager, getMessage("help_NoPager"))
+	flag.BoolVarP(&o.Quiet, "quiet", "q", d.Quiet, getMessage("help_Quiet"))
+	flag.BoolVarP(&o.Stats, "stats", "", d.Stats, getMessage("help_Stats"))
 }
 
 func (cli *runner) parseArgs(d *options) *options {
@@ -161,8 +159,8 @@ func (cli *runner) parseArgs(d *options) *options {
 	flag.CommandLine.SetOutput(cli.err)
 	flag.CommandLine.SortFlags = false
 	var flagHelp, flagVersion bool
-	flag.BoolVarP(&flagHelp, "help", "h", false, "Show help (This message) and exit")
-	flag.BoolVarP(&flagVersion, "version", "v", false, "Show version and build command info and exit")
+	flag.BoolVarP(&flagHelp, "help", "h", false, getMessage("help_Help"))
+	flag.BoolVarP(&flagVersion, "version", "v", false, getMessage("help_Version"))
 	flag.Parse()
 
 	if o.Type != "" && !o.validateType() {
