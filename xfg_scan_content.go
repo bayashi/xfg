@@ -116,6 +116,10 @@ func (x *xfg) scanContent(scanner *bufio.Scanner, fPath string) ([]line, error) 
 
 		x.processContentLine(gf)
 
+		if x.options.FilesWithMatches && len(gf.matchedContents) > 0 {
+			break
+		}
+
 		if x.options.MaxMatchCount != 0 && int(x.options.MaxMatchCount) <= len(gf.matchedContents) {
 			break
 		}
