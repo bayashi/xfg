@@ -121,8 +121,8 @@ var message = map[string]map[string]string{
 		"ja": "1行の長さが指定した長さを超える場合、表示しない",
 	},
 	"help_FilesWithMatches": {
-		"en": "Only print the names of matching files",
-		"ja": "ファイルのみを表示する",
+		"en": "Print only the paths with at least one match",
+		"ja": "マッチするファイルパスのみを表示する。ディレクトリパスやマッチしたコンテンツ自体は表示しない",
 	},
 	"help_Null": {
 		"en": "Separate the filenames with \\0, rather than \\n",
