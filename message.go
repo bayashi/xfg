@@ -120,6 +120,10 @@ var message = map[string]map[string]string{
 		"en": "Do not print lines longer than this limit",
 		"ja": "1行の長さが指定した長さを超える場合、表示しない",
 	},
+	"help_MaxDepth": {
+		"en": "Maximum depth of directories to search",
+		"ja": "探索するディレクトリの深さ",
+	},
 	"help_FilesWithMatches": {
 		"en": "Print only the paths with at least one match",
 		"ja": "マッチするファイルパスのみを表示する。ディレクトリパスやマッチしたコンテンツ自体は表示しない",

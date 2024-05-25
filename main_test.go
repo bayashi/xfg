@@ -861,6 +861,42 @@ func TestXfg_OK(t *testing.T) {
 			`),
 			expectExitCode: exitOK,
 		},
+		"Not pick up any due to maxDepth": {
+			opt: &options{
+				SearchPath: []string{"service-s"},
+				SearchGrep: []string{"bar"},
+				MaxDepth:   2,
+			},
+			expect:         "",
+			expectExitCode: exitOK,
+		},
+		"Pick up d3, however, not pick up d4.txt due to maxDepth": {
+			opt: &options{
+				SearchPath: []string{"service-s"},
+				SearchGrep: []string{"bar"},
+				MaxDepth:   3,
+			},
+			expect: here.Doc(`
+                testdata/service-s/d3/d3.txt
+                1: bar
+			`),
+			expectExitCode: exitOK,
+		},
+		"Pick up until d4 by enough maxDepth": {
+			opt: &options{
+				SearchPath: []string{"service-s"},
+				SearchGrep: []string{"bar"},
+				MaxDepth:   4,
+			},
+			expect: here.Doc(`
+                testdata/service-s/d3/d3.txt
+                1: bar
+                
+                testdata/service-s/d3/d4/d4.txt
+                1: bar
+			`),
+			expectExitCode: exitOK,
+		},
 	} {
 		if tt.skipWindows && isWindowsTestRunner() {
 			return
