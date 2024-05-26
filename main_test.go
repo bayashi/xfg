@@ -918,7 +918,7 @@ func TestXfg_OK(t *testing.T) {
 				tt.opt.SearchStart = []string{"./testdata"}
 			}
 			if tt.opt.MaxDepth == 0 {
-				tt.opt.MaxDepth = 255
+				tt.opt.MaxDepth = defaultMaxDepth
 			}
 
 			code, err := cli.xfg(tt.opt)
