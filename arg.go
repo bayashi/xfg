@@ -19,6 +19,7 @@ const (
 
 	defaultGroupSeparator string = "--"
 	defaultIndent         string = " "
+	defaultMaxDepth       uint32 = 255
 )
 
 var (

@@ -98,7 +98,7 @@ func TestHighlight(t *testing.T) {
 
 			tt.opt.NoPager = true
 			tt.opt.SearchStart = []string{"./testdata"}
-			tt.opt.MaxDepth = 255
+			tt.opt.MaxDepth = defaultMaxDepth
 
 			cli.xfg(tt.opt)
 
@@ -132,7 +132,7 @@ func TestNoColorByENV(t *testing.T) {
 
 			tt.opt.NoPager = true
 			tt.opt.SearchStart = []string{"./testdata"}
-			tt.opt.MaxDepth = 255
+			tt.opt.MaxDepth = defaultMaxDepth
 
 			t.Setenv("NO_COLOR", "1")
 
