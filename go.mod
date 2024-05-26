@@ -20,7 +20,7 @@ require (
 	github.com/adrg/xdg v0.4.0
 	github.com/bayashi/actually v0.27.0
 	github.com/bayashi/colorpalette v0.0.3
-	github.com/fatih/color v1.16.0
+	github.com/fatih/color v1.17.0
 	github.com/mattn/go-colorable v0.1.13 // indirect
 	github.com/mattn/go-isatty v0.0.20
 	github.com/monochromegane/go-gitignore v0.0.0-20200626010858-205db1a8cc00
