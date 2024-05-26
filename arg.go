@@ -90,6 +90,7 @@ type options struct {
 
 	MaxMatchCount uint32 `toml:"max-count"`
 	MaxColumns    uint32 `toml:"max-columns"`
+	MaxDepth      uint32 `toml:"max-depth"`
 
 	extra optionsExtra
 }
@@ -128,6 +129,7 @@ func (o *options) falgs(d *options) {
 	flag.BoolVarP(&o.ShowMatchCount, "count", "c", d.ShowMatchCount, getMessage("help_ShowMatchCount"))
 	flag.Uint32VarP(&o.MaxMatchCount, "max-count", "m", d.MaxMatchCount, getMessage("help_MaxMatchCount"))
 	flag.Uint32VarP(&o.MaxColumns, "max-columns", "", d.MaxColumns, getMessage("help_MaxColumns"))
+	flag.Uint32VarP(&o.MaxDepth, "max-depth", "", d.MaxDepth, getMessage("help_MaxDepth"))
 	flag.BoolVarP(&o.FilesWithMatches, "files-with-matches", "l", d.FilesWithMatches, getMessage("help_FilesWithMatches"))
 	flag.BoolVarP(&o.Null, "null", "0", d.Null, getMessage("help_Null"))
 

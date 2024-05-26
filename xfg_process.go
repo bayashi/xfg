@@ -29,7 +29,8 @@ func (x *xfg) process() error {
 		startDir := startDir
 		eg.Go(func() error {
 			ms := x.initIgnoreMatchers(startDir)
-			x.walkDir(eg, startDir, ms)
+			var maxDepth uint32 = 1
+			x.walkDir(eg, startDir, ms, maxDepth)
 			return nil
 		})
 	}
@@ -41,8 +42,14 @@ func (x *xfg) process() error {
 	return nil
 }
 
-func (x *xfg) walkDir(eg *errgroup.Group, dirPath string, ms xfgignore.Matchers) {
+func (x *xfg) walkDir(eg *errgroup.Group, dirPath string, ms xfgignore.Matchers, maxDepth uint32) {
 	eg.Go(func() error {
+		if maxDepth > x.options.MaxDepth {
+			fmt.Printf("%s, %#v\n", dirPath, maxDepth)
+			return nil
+		} else {
+			maxDepth++
+		}
 		if !x.options.SkipGitIgnore {
 			if matcher, err := gitignore.NewGitIgnore(filepath.Join(dirPath, xfgignore.GITIGNORE_FILE_NAME)); err == nil {
 				ms = append(ms, matcher)
@@ -62,13 +69,13 @@ func (x *xfg) walkDir(eg *errgroup.Group, dirPath string, ms xfgignore.Matchers)
 			return err
 		}
 
-		x.walkStuff(stuff, eg, dirPath, ms)
+		x.walkStuff(stuff, eg, dirPath, ms, maxDepth)
 
 		return nil
 	})
 }
 
-func (x *xfg) walkStuff(stuff []fs.DirEntry, eg *errgroup.Group, dirPath string, ms xfgignore.Matchers) {
+func (x *xfg) walkStuff(stuff []fs.DirEntry, eg *errgroup.Group, dirPath string, ms xfgignore.Matchers, maxDepth uint32) {
 	for _, s := range stuff {
 		if x.options.Quiet && x.hasMatchedAny() {
 			break // already match. skip after all
@@ -84,7 +91,7 @@ func (x *xfg) walkStuff(stuff []fs.DirEntry, eg *errgroup.Group, dirPath string,
 			if !x.options.SearchAll && x.isSkippableByIgnoreFile(p, ms) {
 				continue // skip all stuff in this dir
 			}
-			x.walkDir(eg, p, ms) // recursively
+			x.walkDir(eg, p, ms, maxDepth) // recursively
 		}
 		x.walkFile(filepath.Join(dirPath, s.Name()), s, ms)
 	}

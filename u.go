@@ -23,6 +23,7 @@ func defaultOptions() *options {
 		ColorPathBase:  "yellow",
 		ColorPath:      "cyan",
 		ColorContent:   "red",
+		MaxDepth:       255,
 	}
 }
 
