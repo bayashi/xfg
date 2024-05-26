@@ -45,7 +45,6 @@ func (x *xfg) process() error {
 func (x *xfg) walkDir(eg *errgroup.Group, dirPath string, ms xfgignore.Matchers, maxDepth uint32) {
 	eg.Go(func() error {
 		if maxDepth > x.options.MaxDepth {
-			fmt.Printf("%s, %#v\n", dirPath, maxDepth)
 			return nil
 		} else {
 			maxDepth++
