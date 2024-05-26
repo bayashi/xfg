@@ -44,12 +44,11 @@ func (x *xfg) process() error {
 
 func (x *xfg) walkDir(eg *errgroup.Group, dirPath string, ms xfgignore.Matchers, maxDepth uint32) {
 	eg.Go(func() error {
-		if x.options.MaxDepth > 0 {
-			if maxDepth > x.options.MaxDepth {
-				return nil
-			} else {
-				maxDepth++
-			}
+		if maxDepth > x.options.MaxDepth {
+			fmt.Printf("%s, %#v\n", dirPath, maxDepth)
+			return nil
+		} else {
+			maxDepth++
 		}
 		if !x.options.SkipGitIgnore {
 			if matcher, err := gitignore.NewGitIgnore(filepath.Join(dirPath, xfgignore.GITIGNORE_FILE_NAME)); err == nil {
