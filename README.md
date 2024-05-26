@@ -172,7 +172,7 @@ Summary of switches to turn off ignore rules:
   -c, --count                       Show a count of matching lines instead of contents
   -m, --max-count uint32            Stop reading a file after NUM matching lines
       --max-columns uint32          Do not print lines longer than this limit
-      --max-depth uint32            Maximum depth of directories to search
+      --max-depth uint32            Maximum depth of directories to search (default 255)
   -l, --files-with-matches          Print only the paths with at least one match
   -0, --null                        Separate the filenames with \0, rather than \n
       --no-color                    Disable colors for an output
