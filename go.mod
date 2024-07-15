@@ -17,7 +17,7 @@ require (
 
 require (
 	github.com/MakeNowJust/heredoc/v2 v2.0.1
-	github.com/adrg/xdg v0.4.0
+	github.com/adrg/xdg v0.5.0
 	github.com/bayashi/actually v0.27.0
 	github.com/bayashi/colorpalette v0.0.3
 	github.com/fatih/color v1.17.0
@@ -25,5 +25,5 @@ require (
 	github.com/mattn/go-isatty v0.0.20
 	github.com/monochromegane/go-gitignore v0.0.0-20200626010858-205db1a8cc00
 	golang.org/x/sync v0.7.0
-	golang.org/x/sys v0.20.0 // indirect
+	golang.org/x/sys v0.22.0 // indirect
 )
