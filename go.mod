@@ -15,13 +15,13 @@ require (
 	github.com/davecgh/go-spew v1.1.1 // indirect
 	github.com/google/go-cmp v0.6.0 // indirect
 	github.com/pmezard/go-difflib v1.0.0 // indirect
-	github.com/yassinebenaid/godump v0.9.1 // indirect
+	github.com/yassinebenaid/godump v0.10.0 // indirect
 )
 
 require (
 	github.com/MakeNowJust/heredoc/v2 v2.0.1
 	github.com/adrg/xdg v0.4.0
-	github.com/bayashi/actually v0.29.0
+	github.com/bayashi/actually v0.30.0
 	github.com/bayashi/colorpalette v0.0.3
 	github.com/fatih/color v1.17.0
 	github.com/mattn/go-colorable v0.1.13 // indirect
