@@ -22,11 +22,12 @@ changelog:
     - Merge remote-tracking branch
     - Merge branch
 brews:
-  - tap:
+  - repository:
       owner: bayashi
       name: homebrew-tap
       token: "{{ .Env.HOMEBREW_TAP_GITHUB_TOKEN }}"
-    folder: Formula
+    license: "MIT"
+    directory: Formula
     homepage: https://github.com/bayashi/xfg
     description: "Do `find` paths by a keyword, and also search for contents like a `grep` in one command."
     test: |
