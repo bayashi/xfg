@@ -7,7 +7,7 @@ toolchain go1.22.4
 require (
 	github.com/BurntSushi/toml v1.4.0
 	github.com/spf13/pflag v1.0.5
-	golang.org/x/term v0.23.0
+	golang.org/x/term v0.28.0
 )
 
 require (
@@ -28,5 +28,5 @@ require (
 	github.com/mattn/go-isatty v0.0.20
 	github.com/monochromegane/go-gitignore v0.0.0-20200626010858-205db1a8cc00
 	golang.org/x/sync v0.7.0
-	golang.org/x/sys v0.23.0 // indirect
+	golang.org/x/sys v0.29.0 // indirect
 )
