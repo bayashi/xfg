@@ -2,7 +2,7 @@ module github.com/bayashi/xfg
 
 go 1.21.11
 
-toolchain go1.22.4
+toolchain go1.24.1
 
 require (
 	github.com/BurntSushi/toml v1.4.0
@@ -11,17 +11,17 @@ require (
 )
 
 require (
-	github.com/bayashi/witness v0.0.21 // indirect
 	github.com/davecgh/go-spew v1.1.1 // indirect
-	github.com/google/go-cmp v0.6.0 // indirect
+	github.com/google/go-cmp v0.7.0 // indirect
 	github.com/pmezard/go-difflib v1.0.0 // indirect
-	github.com/yassinebenaid/godump v0.9.1 // indirect
+	github.com/yassinebenaid/godump v0.11.1 // indirect
+	google.golang.org/protobuf v1.36.2 // indirect
 )
 
 require (
 	github.com/MakeNowJust/heredoc/v2 v2.0.1
 	github.com/adrg/xdg v0.4.0
-	github.com/bayashi/actually v0.29.0
+	github.com/bayashi/actually v0.34.1
 	github.com/bayashi/colorpalette v0.0.3
 	github.com/fatih/color v1.18.0
 	github.com/mattn/go-colorable v0.1.13 // indirect
