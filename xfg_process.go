@@ -91,11 +91,11 @@ func (x *xfg) walkStuff(stuff []fs.DirEntry, eg *errgroup.Group, dirPath string,
 			}
 			x.walkDir(eg, p, ms, currentDepth) // recursively
 		}
-		x.walkFile(filepath.Join(dirPath, s.Name()), s, ms)
+		x.walkFile(eg, filepath.Join(dirPath, s.Name()), s, ms)
 	}
 }
 
-func (x *xfg) walkFile(fPath string, fInfo fs.DirEntry, ms xfgignore.Matchers) error {
+func (x *xfg) walkFile(eg *errgroup.Group, fPath string, fInfo fs.DirEntry, ms xfgignore.Matchers) error {
 	if x.options.Stats {
 		x.cli.stats.IncrWalkedPaths()
 	}
@@ -108,7 +108,11 @@ func (x *xfg) walkFile(fPath string, fInfo fs.DirEntry, ms xfgignore.Matchers) e
 		x.cli.stats.IncrWalkedContents()
 	}
 
-	return x.postMatchPath(fPath, fInfo)
+	eg.Go(func() error {
+		return x.postMatchPath(fPath, fInfo)
+	})
+
+	return nil
 }
 
 func (x *xfg) isMatchExt(fInfo fs.DirEntry, extensions []string) bool {

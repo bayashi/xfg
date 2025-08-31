@@ -103,7 +103,9 @@ func (cli *runner) showResult(x *xfg) error {
 		lf = "\x00"
 	}
 
-	sort.Slice(x.result.paths, func(i, j int) bool { return x.result.paths[i].path < x.result.paths[j].path })
+	if x.options.KeepResultOrder {
+		sort.Slice(x.result.paths, func(i, j int) bool { return x.result.paths[i].path < x.result.paths[j].path })
+	}
 
 	if cli.isTTY {
 		if !x.options.NoColor {
