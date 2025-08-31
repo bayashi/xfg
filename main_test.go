@@ -920,6 +920,7 @@ func TestXfg_OK(t *testing.T) {
 			if tt.opt.MaxDepth == 0 {
 				tt.opt.MaxDepth = defaultMaxDepth
 			}
+			tt.opt.KeepResultOrder = true
 
 			code, err := cli.xfg(tt.opt)
 

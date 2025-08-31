@@ -61,6 +61,7 @@ type options struct {
 	Ext  []string `toml:"ext"`
 
 	IgnoreCase             bool `toml:"ignore-case"`
+	KeepResultOrder        bool `toml:"keep-result-order"`
 	NoColor                bool `toml:"no-color"`
 	Abs                    bool `toml:"abs"`
 	ShowMatchCount         bool `toml:"count"`
@@ -102,6 +103,7 @@ func (o *options) falgs(d *options) {
 	flag.StringArrayVarP(&o.SearchStart, "start", "s", d.SearchStart, getMessage("help_SearchStart"))
 
 	flag.BoolVarP(&o.IgnoreCase, "ignore-case", "i", d.IgnoreCase, getMessage("help_IgnoreCase"))
+	flag.BoolVarP(&o.KeepResultOrder, "", "", d.KeepResultOrder, getMessage("help_KeepResultOrder"))
 
 	flag.StringArrayVarP(&o.SearchPathRe, "path-regexp", "P", d.SearchPathRe, getMessage("help_SearchPathRe"))
 	flag.StringArrayVarP(&o.SearchGrepRe, "grep-regexp", "G", d.SearchGrepRe, getMessage("help_SearchGrepRe"))

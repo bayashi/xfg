@@ -28,6 +28,10 @@ var message = map[string]map[string]string{
 		"en": "Ignore case distinctions to search. Also affects keywords of ignore option",
 		"ja": "検索ワードの大文字小文字を区別しない。--ignore オプションでも有効化される",
 	},
+	"help_KeepResultOrder": {
+		"en": "Keep the order of result display",
+		"ja": "検索結果の順序を保持する",
+	},
 	"help_SearchPathRe": {
 		"en": "A string to find paths by regular expressions (RE2)",
 		"ja": "パスを検索するための正規表現 (RE2)",

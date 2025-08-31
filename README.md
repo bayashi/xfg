@@ -149,6 +149,7 @@ Summary of switches to turn off ignore rules:
   -g, --grep stringArray            A string to search for contents
   -s, --start stringArray           A location to start searching (default [.])
   -i, --ignore-case                 Ignore case distinctions to search. Also affects keywords of ignore option
+      --keep-result-order           Keep the order of result display
   -P, --path-regexp stringArray     A string to find paths by regular expressions (RE2)
   -G, --grep-regexp stringArray     A string to grep contents by regular expressions (RE2)
   -M, --not-word-boundary           Not care about word boundary to match by regexp
