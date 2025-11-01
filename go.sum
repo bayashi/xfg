@@ -4,8 +4,8 @@ github.com/MakeNowJust/heredoc/v2 v2.0.1 h1:rlCHh70XXXv7toz95ajQWOWQnN4WNLt0TdpZ
 github.com/MakeNowJust/heredoc/v2 v2.0.1/go.mod h1:6/2Abh5s+hc3g9nbWLe9ObDIOhaRrqsyY9MWy+4JdRM=
 github.com/adrg/xdg v0.4.0 h1:RzRqFcjH4nE5C6oTAxhBtoE2IRyjBSa62SCbyPidvls=
 github.com/adrg/xdg v0.4.0/go.mod h1:N6ag73EX4wyxeaoeHctc1mas01KZgsj5tYiAIwqJE/E=
-github.com/bayashi/actually v0.34.1 h1:X99Z0eLFZpdO2+BNocugDTWGLkR6n4fyiiocrdg0Pu8=
-github.com/bayashi/actually v0.34.1/go.mod h1:Dyg+gy0ZVsiap/5crVaJmfiuk3qhFrdfqC367hWb4TU=
+github.com/bayashi/actually v0.38.0 h1:ZOSxJ0DvhLBJrApYV3SX3WBBbXfrUrRH/gdHYfj1hFc=
+github.com/bayashi/actually v0.38.0/go.mod h1:Dyg+gy0ZVsiap/5crVaJmfiuk3qhFrdfqC367hWb4TU=
 github.com/bayashi/colorpalette v0.0.3 h1:EPdBPQfWte/IJGB/XVpoQ5yUggDz8fMcIHjWt5PUusA=
 github.com/bayashi/colorpalette v0.0.3/go.mod h1:b5035mgIaDywdFLZbSJEbeMQu6Pz8Gu+GcIcc4qJ4lg=
 github.com/davecgh/go-spew v1.1.0/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=
