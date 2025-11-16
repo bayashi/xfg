@@ -25,7 +25,7 @@ func (x *xfg) setHighlighter() {
 		h.pathHighlightColor = colorpalette.Get("cyan")
 	}
 	for _, sp := range o.SearchPath {
-		h.pathHighlighter = append(h.pathHighlighter, h.pathHighlightColor.Sprintf(sp))
+		h.pathHighlighter = append(h.pathHighlighter, h.pathHighlightColor.Sprintf("%s", sp))
 	}
 
 	if o.ColorContent != "" && colorpalette.Exists(o.ColorContent) {
@@ -34,7 +34,7 @@ func (x *xfg) setHighlighter() {
 		h.grepHighlightColor = colorpalette.Get("red")
 	}
 	for _, sg := range o.SearchGrep {
-		h.grepHighlighter = append(h.grepHighlighter, h.grepHighlightColor.Sprintf(sg))
+		h.grepHighlighter = append(h.grepHighlighter, h.grepHighlightColor.Sprintf("%s", sg))
 	}
 
 	x.highlighter = h
