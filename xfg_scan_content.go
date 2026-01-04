@@ -94,6 +94,11 @@ func (x *xfg) postScanFile(fPath string, fInfo fs.DirEntry, matchedPath path) er
 	x.result.outputLC = x.result.outputLC + len(matchedPath.contents) + 1
 	x.result.mu.Unlock()
 
+	// Send to streaming channel if KeepResultOrder is false
+	if !x.options.KeepResultOrder && !x.options.Quiet && x.resultChan != nil {
+		x.resultChan <- matchedPath
+	}
+
 	if x.options.Stats {
 		x.cli.stats.AddPickedLC(len(matchedPath.contents))
 	}
