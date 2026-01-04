@@ -97,6 +97,28 @@ func (cli *runner) preXfg() (*options, error) {
 func (cli *runner) xfg(o *options) (int, error) {
 	x := newX(cli, o)
 
+	// Initialize pager before process() for streaming display
+	if !x.options.NoPager && cli.isTTY {
+		if !x.options.KeepResultOrder {
+			// For streaming, initialize pager before process()
+			// Use a large value to force pager usage since we don't know the result count yet
+			out, pagerCloser, err := xfgpager.Pager(cli.out, cli.err, 999999)
+			if err != nil {
+				return exitErr, fmt.Errorf("wrong pgaer : %w", err)
+			}
+			if pagerCloser != nil {
+				defer pagerCloser()
+			}
+			if out != nil {
+				cli.out = out
+			}
+
+			if x.options.Stats {
+				cli.stats.Mark("pager")
+			}
+		}
+	}
+
 	if err := x.process(); err != nil {
 		return exitErr, fmt.Errorf("process() : %w", err)
 	}
@@ -105,7 +127,8 @@ func (cli *runner) xfg(o *options) (int, error) {
 		cli.stats.Mark("process")
 	}
 
-	if !x.options.NoPager && cli.isTTY {
+	// Initialize pager after process() for non-streaming display
+	if !x.options.NoPager && cli.isTTY && x.options.KeepResultOrder {
 		out, pagerCloser, err := xfgpager.Pager(cli.out, cli.err, x.result.outputLC)
 		if err != nil {
 			return exitErr, fmt.Errorf("wrong pgaer : %w", err)

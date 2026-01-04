@@ -24,6 +24,13 @@ func (x *xfg) process() error {
 		x.cli.stats.Mark("preWalkDir")
 	}
 
+	// Start streaming display goroutine if KeepResultOrder is false
+	if !x.options.KeepResultOrder && !x.options.Quiet {
+		x.resultChan = make(chan path, streamResultChanBufferSize)
+		x.streamDone = make(chan bool)
+		go x.streamDisplay()
+	}
+
 	eg := new(errgroup.Group)
 	for _, startDir := range x.options.SearchStart {
 		startDir := startDir
@@ -36,6 +43,12 @@ func (x *xfg) process() error {
 
 	if err := eg.Wait(); err != nil {
 		return fmt.Errorf("walkDir Wait : %w", err)
+	}
+
+	// Close channel and wait for streaming display to finish
+	if !x.options.KeepResultOrder && !x.options.Quiet {
+		close(x.resultChan)
+		<-x.streamDone
 	}
 
 	return nil

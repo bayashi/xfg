@@ -20,6 +20,8 @@ const (
 	defaultGroupSeparator string = "--"
 	defaultIndent         string = " "
 	defaultMaxDepth       uint32 = 255
+
+	streamResultChanBufferSize int = 100
 )
 
 var (

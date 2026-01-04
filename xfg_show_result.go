@@ -94,6 +94,12 @@ func (cli *runner) showResult(x *xfg) error {
 		return nil
 	}
 
+	// If KeepResultOrder is false, results are already displayed via streaming
+	if !x.options.KeepResultOrder {
+		cli.exitCode = exitOK
+		return nil
+	}
+
 	if x.options.NoIndent {
 		x.options.Indent = ""
 	}
@@ -103,9 +109,7 @@ func (cli *runner) showResult(x *xfg) error {
 		lf = "\x00"
 	}
 
-	if x.options.KeepResultOrder {
-		sort.Slice(x.result.paths, func(i, j int) bool { return x.result.paths[i].path < x.result.paths[j].path })
-	}
+	sort.Slice(x.result.paths, func(i, j int) bool { return x.result.paths[i].path < x.result.paths[j].path })
 
 	if cli.isTTY {
 		if !x.options.NoColor {
@@ -177,6 +181,102 @@ func (cli *runner) buildContentOutput(x *xfg, out *string, contents []line, lf s
 
 func (x *xfg) needToShowGroupSeparator(blc int32, lc int32) bool {
 	return (x.options.extra.withAfterContextLines || x.options.extra.withBeforeContextLines) && blc != 0 && lc-blc > 1
+}
+
+// streamDisplay displays results as they arrive via channel
+func (x *xfg) streamDisplay() {
+	if x.options.NoIndent {
+		x.options.Indent = ""
+	}
+
+	lf := "\n"
+	if x.options.Null {
+		lf = "\x00"
+	}
+
+	if x.cli.isTTY {
+		if !x.options.NoColor {
+			x.setHighlighter()
+		}
+		x.cli.streamDisplayTTY(x, lf)
+	} else {
+		x.cli.streamDisplayNonTTY(x, lf)
+	}
+
+	x.streamDone <- true
+}
+
+func (cli *runner) streamDisplayTTY(x *xfg, lf string) {
+	writer := bufio.NewWriter(cli.out)
+
+	for p := range x.resultChan {
+		if x.options.FilesWithMatches && p.info.IsDir() {
+			continue
+		}
+
+		out := p.path
+		if !x.options.NoColor {
+			out = x.highlightPath(out)
+		}
+		if x.options.ShowMatchCount && !p.info.IsDir() {
+			out = out + fmt.Sprintf(":%d", len(p.contents))
+		}
+		out = out + lf
+
+		if !x.options.ShowMatchCount && !x.options.FilesWithMatches {
+			if len(p.contents) > 0 {
+				var blc int32 = 0
+				for _, line := range p.contents {
+					if !x.options.NoGroupSeparator && x.needToShowGroupSeparator(blc, line.lc) {
+						out = out + x.options.Indent + x.options.GroupSeparator + lf
+					}
+					lc := fmt.Sprintf("%d", line.lc)
+					if !x.options.NoColor && line.matched {
+						lc = x.highlighter.grepHighlightColor.Sprint(lc)
+						line.content = x.highlightLine(line.content)
+					}
+					out = out + fmt.Sprintf("%s%s: %s%s", x.options.Indent, lc, line.content, lf)
+					blc = line.lc
+				}
+				out = out + lf
+			}
+		}
+
+		if x.options.Stats {
+			x.cli.stats.AddOutputLC(strings.Count(out, lf))
+		}
+
+		if err := xfgutil.Output(writer, out); err != nil {
+			break // Error handling: just break on error
+		}
+	}
+}
+
+func (cli *runner) streamDisplayNonTTY(x *xfg, lf string) {
+	writer := bufio.NewWriter(cli.out)
+
+	for p := range x.resultChan {
+		out := ""
+		if len(p.contents) > 0 && !x.options.FilesWithMatches {
+			for _, l := range p.contents {
+				if l.matched {
+					out = out + fmt.Sprintf("%s:%d:%s%s", p.path, l.lc, l.content, lf)
+				}
+			}
+		} else {
+			if !x.options.FilesWithMatches || !p.info.IsDir() {
+				out = out + fmt.Sprintf("%s%s", p.path, lf)
+			}
+		}
+
+		if x.options.Stats {
+			x.cli.stats.AddOutputLC(strings.Count(out, lf))
+		}
+
+		if err := xfgutil.Output(writer, out); err != nil {
+			break // Error handling: just break on error
+		}
+	}
 }
 
 func (cli *runner) outputForNonTTY(x *xfg, lf string) error {
