@@ -168,6 +168,10 @@ var message = map[string]map[string]string{
 		"en": "Do not print an indent string",
 		"ja": "コンテンツ行をインデントしない",
 	},
+	"help_NoFilename": {
+		"en": "Never display matching file paths in search results. This option is ignored when searching only paths without content search",
+		"ja": "検索結果でマッチしたファイルパスを表示しない。コンテンツを検索しないパスの検索だけの時は無効",
+	},
 	"help_IgnorePermissionError": {
 		"en": "Do not print warnings of file permission error",
 		"ja": "ファイル権限エラーを無視して、警告表示をしない",
