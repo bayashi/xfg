@@ -170,12 +170,19 @@ func (cli *runner) buildContentOutput(x *xfg, out *string, contents []line, lf s
 		if !x.options.NoGroupSeparator && x.needToShowGroupSeparator(blc, line.lc) {
 			*out = *out + x.options.Indent + x.options.GroupSeparator + lf
 		}
-		lc := fmt.Sprintf("%d", line.lc)
-		if !x.options.NoColor && line.matched {
-			lc = x.highlighter.grepHighlightColor.Sprint(lc)
-			line.content = x.highlightLine(line.content)
+		if x.options.NoLineNumber {
+			if !x.options.NoColor && line.matched {
+				line.content = x.highlightLine(line.content)
+			}
+			*out = *out + fmt.Sprintf("%s%s%s", x.options.Indent, line.content, lf)
+		} else {
+			lc := fmt.Sprintf("%d", line.lc)
+			if !x.options.NoColor && line.matched {
+				lc = x.highlighter.grepHighlightColor.Sprint(lc)
+				line.content = x.highlightLine(line.content)
+			}
+			*out = *out + fmt.Sprintf("%s%s: %s%s", x.options.Indent, lc, line.content, lf)
 		}
-		*out = *out + fmt.Sprintf("%s%s: %s%s", x.options.Indent, lc, line.content, lf)
 		blc = line.lc
 	}
 
@@ -236,12 +243,19 @@ func (cli *runner) streamDisplayTTY(x *xfg, lf string) {
 					if !x.options.NoGroupSeparator && x.needToShowGroupSeparator(blc, line.lc) {
 						out = out + x.options.Indent + x.options.GroupSeparator + lf
 					}
-					lc := fmt.Sprintf("%d", line.lc)
-					if !x.options.NoColor && line.matched {
-						lc = x.highlighter.grepHighlightColor.Sprint(lc)
-						line.content = x.highlightLine(line.content)
+					if x.options.NoLineNumber {
+						if !x.options.NoColor && line.matched {
+							line.content = x.highlightLine(line.content)
+						}
+						out = out + fmt.Sprintf("%s%s%s", x.options.Indent, line.content, lf)
+					} else {
+						lc := fmt.Sprintf("%d", line.lc)
+						if !x.options.NoColor && line.matched {
+							lc = x.highlighter.grepHighlightColor.Sprint(lc)
+							line.content = x.highlightLine(line.content)
+						}
+						out = out + fmt.Sprintf("%s%s: %s%s", x.options.Indent, lc, line.content, lf)
 					}
-					out = out + fmt.Sprintf("%s%s: %s%s", x.options.Indent, lc, line.content, lf)
 					blc = line.lc
 				}
 				if !(x.options.NoFilename && x.options.extra.onlyMatchContent) {
@@ -268,10 +282,18 @@ func (cli *runner) streamDisplayNonTTY(x *xfg, lf string) {
 		if len(p.contents) > 0 && !x.options.FilesWithMatches {
 			for _, l := range p.contents {
 				if l.matched {
-					if x.options.NoFilename && x.options.extra.onlyMatchContent {
-						out = out + fmt.Sprintf("%d:%s%s", l.lc, l.content, lf)
+					if x.options.NoLineNumber {
+						if x.options.NoFilename && x.options.extra.onlyMatchContent {
+							out = out + fmt.Sprintf("%s%s", l.content, lf)
+						} else {
+							out = out + fmt.Sprintf("%s:%s%s", p.path, l.content, lf)
+						}
 					} else {
-						out = out + fmt.Sprintf("%s:%d:%s%s", p.path, l.lc, l.content, lf)
+						if x.options.NoFilename && x.options.extra.onlyMatchContent {
+							out = out + fmt.Sprintf("%d:%s%s", l.lc, l.content, lf)
+						} else {
+							out = out + fmt.Sprintf("%s:%d:%s%s", p.path, l.lc, l.content, lf)
+						}
 					}
 				}
 			}
@@ -300,10 +322,18 @@ func (cli *runner) outputForNonTTY(x *xfg, lf string) error {
 		if len(p.contents) > 0 && !x.options.FilesWithMatches {
 			for _, l := range p.contents {
 				if l.matched {
-					if x.options.NoFilename && x.options.extra.onlyMatchContent {
-						out = out + fmt.Sprintf("%d:%s%s", l.lc, l.content, lf)
+					if x.options.NoLineNumber {
+						if x.options.NoFilename && x.options.extra.onlyMatchContent {
+							out = out + fmt.Sprintf("%s%s", l.content, lf)
+						} else {
+							out = out + fmt.Sprintf("%s:%s%s", p.path, l.content, lf)
+						}
 					} else {
-						out = out + fmt.Sprintf("%s:%d:%s%s", p.path, l.lc, l.content, lf)
+						if x.options.NoFilename && x.options.extra.onlyMatchContent {
+							out = out + fmt.Sprintf("%d:%s%s", l.lc, l.content, lf)
+						} else {
+							out = out + fmt.Sprintf("%s:%d:%s%s", p.path, l.lc, l.content, lf)
+						}
 					}
 				}
 			}

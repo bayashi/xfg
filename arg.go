@@ -85,6 +85,7 @@ type options struct {
 	NotWordBoundary        bool `toml:"not-word-boundary"`
 	IgnorePermissionError  bool `toml:"ignore-permission-error"`
 	NoFilename             bool `toml:"no-filename"`
+	NoLineNumber           bool `toml:"no-line-number"`
 
 	flagLangList bool
 
@@ -152,6 +153,8 @@ func (o *options) falgs(d *options) {
 
 	flag.BoolVarP(&o.IgnorePermissionError, "ignore-permission-error", "", d.IgnorePermissionError, getMessage("help_IgnorePermissionError"))
 	flag.BoolVarP(&o.NoFilename, "no-filename", "", d.NoFilename, getMessage("help_NoFilename"))
+	flag.BoolVarP(&o.NoLineNumber, "no-line-number", "", d.NoLineNumber, getMessage("help_NoLineNumber"))
+	flag.BoolVar(&o.NoLineNumber, "nonu", d.NoLineNumber, getMessage("help_NoLineNumberAlias"))
 
 	flag.StringVarP(&o.XfgIgnoreFile, "xfgignore-file", "", d.XfgIgnoreFile, getMessage("help_XfgIgnoreFile"))
 

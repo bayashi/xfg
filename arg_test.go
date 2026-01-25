@@ -123,6 +123,18 @@ func TestArgs(t *testing.T) {
 				o.SearchGrepRe = []string{"fo."}
 			},
 		},
+		"--no-line-number": {
+			args: []string{"--no-line-number"},
+			prepareExpect: func(o *options) {
+				o.NoLineNumber = true
+			},
+		},
+		"--nonu": {
+			args: []string{"--nonu"},
+			prepareExpect: func(o *options) {
+				o.NoLineNumber = true
+			},
+		},
 	} {
 		t.Run(tname, func(t *testing.T) {
 			resetFlag()
