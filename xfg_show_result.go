@@ -131,19 +131,22 @@ func (cli *runner) outputForTTY(x *xfg, lf string) error {
 		if x.options.FilesWithMatches && p.info.IsDir() {
 			continue
 		}
-		out := p.path
-		if !x.options.NoColor {
-			out = x.highlightPath(out)
+		out := ""
+		if !(x.options.NoFilename && x.options.extra.onlyMatchContent) {
+			out = p.path
+			if !x.options.NoColor {
+				out = x.highlightPath(out)
+			}
+			if x.options.ShowMatchCount && !p.info.IsDir() {
+				out = out + fmt.Sprintf(":%d", len(p.contents))
+			}
+			out = out + lf
 		}
-		if x.options.ShowMatchCount && !p.info.IsDir() {
-			out = out + fmt.Sprintf(":%d", len(p.contents))
-		}
-		out = out + lf
 
 		if !x.options.ShowMatchCount && !x.options.FilesWithMatches {
 			if len(p.contents) > 0 {
 				cli.buildContentOutput(x, &out, p.contents, lf)
-				if len(x.result.paths)-1 != i {
+				if !(x.options.NoFilename && x.options.extra.onlyMatchContent) && len(x.result.paths)-1 != i {
 					out = out + lf
 				}
 			}
@@ -214,14 +217,17 @@ func (cli *runner) streamDisplayTTY(x *xfg, lf string) {
 			continue
 		}
 
-		out := p.path
-		if !x.options.NoColor {
-			out = x.highlightPath(out)
+		out := ""
+		if !(x.options.NoFilename && x.options.extra.onlyMatchContent) {
+			out = p.path
+			if !x.options.NoColor {
+				out = x.highlightPath(out)
+			}
+			if x.options.ShowMatchCount && !p.info.IsDir() {
+				out = out + fmt.Sprintf(":%d", len(p.contents))
+			}
+			out = out + lf
 		}
-		if x.options.ShowMatchCount && !p.info.IsDir() {
-			out = out + fmt.Sprintf(":%d", len(p.contents))
-		}
-		out = out + lf
 
 		if !x.options.ShowMatchCount && !x.options.FilesWithMatches {
 			if len(p.contents) > 0 {
@@ -238,7 +244,9 @@ func (cli *runner) streamDisplayTTY(x *xfg, lf string) {
 					out = out + fmt.Sprintf("%s%s: %s%s", x.options.Indent, lc, line.content, lf)
 					blc = line.lc
 				}
-				out = out + lf
+				if !(x.options.NoFilename && x.options.extra.onlyMatchContent) {
+					out = out + lf
+				}
 			}
 		}
 
@@ -260,12 +268,18 @@ func (cli *runner) streamDisplayNonTTY(x *xfg, lf string) {
 		if len(p.contents) > 0 && !x.options.FilesWithMatches {
 			for _, l := range p.contents {
 				if l.matched {
-					out = out + fmt.Sprintf("%s:%d:%s%s", p.path, l.lc, l.content, lf)
+					if x.options.NoFilename && x.options.extra.onlyMatchContent {
+						out = out + fmt.Sprintf("%d:%s%s", l.lc, l.content, lf)
+					} else {
+						out = out + fmt.Sprintf("%s:%d:%s%s", p.path, l.lc, l.content, lf)
+					}
 				}
 			}
 		} else {
 			if !x.options.FilesWithMatches || !p.info.IsDir() {
-				out = out + fmt.Sprintf("%s%s", p.path, lf)
+				if !(x.options.NoFilename && x.options.extra.onlyMatchContent) {
+					out = out + fmt.Sprintf("%s%s", p.path, lf)
+				}
 			}
 		}
 
@@ -286,12 +300,18 @@ func (cli *runner) outputForNonTTY(x *xfg, lf string) error {
 		if len(p.contents) > 0 && !x.options.FilesWithMatches {
 			for _, l := range p.contents {
 				if l.matched {
-					out = out + fmt.Sprintf("%s:%d:%s%s", p.path, l.lc, l.content, lf)
+					if x.options.NoFilename && x.options.extra.onlyMatchContent {
+						out = out + fmt.Sprintf("%d:%s%s", l.lc, l.content, lf)
+					} else {
+						out = out + fmt.Sprintf("%s:%d:%s%s", p.path, l.lc, l.content, lf)
+					}
 				}
 			}
 		} else {
 			if !x.options.FilesWithMatches || !p.info.IsDir() {
-				out = out + fmt.Sprintf("%s%s", p.path, lf)
+				if !(x.options.NoFilename && x.options.extra.onlyMatchContent) {
+					out = out + fmt.Sprintf("%s%s", p.path, lf)
+				}
 			}
 		}
 

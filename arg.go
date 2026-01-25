@@ -84,6 +84,7 @@ type options struct {
 	SearchOnlyName         bool `toml:"search-only-name"`
 	NotWordBoundary        bool `toml:"not-word-boundary"`
 	IgnorePermissionError  bool `toml:"ignore-permission-error"`
+	NoFilename             bool `toml:"no-filename"`
 
 	flagLangList bool
 
@@ -150,6 +151,7 @@ func (o *options) falgs(d *options) {
 	flag.BoolVarP(&o.NoIndent, "no-indent", "", d.NoIndent, getMessage("help_NoIndent"))
 
 	flag.BoolVarP(&o.IgnorePermissionError, "ignore-permission-error", "", d.IgnorePermissionError, getMessage("help_IgnorePermissionError"))
+	flag.BoolVarP(&o.NoFilename, "no-filename", "", d.NoFilename, getMessage("help_NoFilename"))
 
 	flag.StringVarP(&o.XfgIgnoreFile, "xfgignore-file", "", d.XfgIgnoreFile, getMessage("help_XfgIgnoreFile"))
 

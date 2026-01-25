@@ -611,6 +611,37 @@ func TestXfg_OK(t *testing.T) {
 			`),
 			expectExitCode: exitOK,
 		},
+		"service-b grep func --no-filename": {
+			opt: &options{
+				SearchPath: []string{"service-b"},
+				SearchGrep: []string{"func"},
+				NoFilename: true,
+				Indent:     defaultIndent,
+			},
+			expect:         " 3: func main() {\n",
+			expectExitCode: exitOK,
+		},
+		"service grep package --no-filename": {
+			opt: &options{
+				SearchPath: []string{"main"},
+				SearchGrep: []string{"package"},
+				NoFilename: true,
+				Indent:     defaultIndent,
+			},
+			expect:         " 1: package a\n 1: package b\n 1: package c\n 1: package h\n",
+			expectExitCode: exitOK,
+		},
+		"service-b --no-filename (ignored when path search only)": {
+			opt: &options{
+				SearchPath: []string{"service-b"},
+				NoFilename: true,
+			},
+			expect: here.Doc(`
+                testdata/service-b/
+                testdata/service-b/main.go
+			`),
+			expectExitCode: exitOK,
+		},
 		"service-b --search-only-name": {
 			opt: &options{
 				SearchPath:     []string{"a.dat"},
