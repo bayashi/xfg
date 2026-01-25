@@ -644,10 +644,10 @@ func TestXfg_OK(t *testing.T) {
 		},
 		"service-b grep func --no-line-number": {
 			opt: &options{
-				SearchPath:  []string{"service-b"},
-				SearchGrep:  []string{"func"},
+				SearchPath:   []string{"service-b"},
+				SearchGrep:   []string{"func"},
 				NoLineNumber: true,
-				Indent:      defaultIndent,
+				Indent:       defaultIndent,
 			},
 			expect: here.Doc(`
                 testdata/service-b/main.go
@@ -657,10 +657,10 @@ func TestXfg_OK(t *testing.T) {
 		},
 		"service grep package --no-line-number": {
 			opt: &options{
-				SearchPath:  []string{"main"},
-				SearchGrep:  []string{"package"},
+				SearchPath:   []string{"main"},
+				SearchGrep:   []string{"package"},
 				NoLineNumber: true,
-				Indent:      defaultIndent,
+				Indent:       defaultIndent,
 			},
 			expect: here.Doc(`
                 testdata/service-a/main.go
