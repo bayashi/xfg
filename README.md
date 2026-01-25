@@ -185,6 +185,8 @@ Summary of switches to turn off ignore rules:
       --indent string               Indent string for the top of each line (default " ")
       --no-indent                   Do not print an indent string
       --no-filename                 Never display matching file paths in search results. This option is ignored when searching only paths without content search
+      --no-line-number              Do not print line numbers in search results
+      --nonu                        Alias for --no-line-number
       --ignore-permission-error     Do not print warnings of file permission error
       --xfgignore-file string       .xfgignore file path if you have it except XDG base directory or HOME directory
       --no-pager                    Do not invoke with the Pager

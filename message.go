@@ -172,6 +172,14 @@ var message = map[string]map[string]string{
 		"en": "Never display matching file paths in search results. This option is ignored when searching only paths without content search",
 		"ja": "検索結果でマッチしたファイルパスを表示しない。コンテンツを検索しないパスの検索だけの時は無効",
 	},
+	"help_NoLineNumber": {
+		"en": "Do not print line numbers in search results",
+		"ja": "検索結果に行番号を表示しない",
+	},
+	"help_NoLineNumberAlias": {
+		"en": "Alias for --no-line-number",
+		"ja": "--no-line-number のエイリアスです",
+	},
 	"help_IgnorePermissionError": {
 		"en": "Do not print warnings of file permission error",
 		"ja": "ファイル権限エラーを無視して、警告表示をしない",

@@ -642,6 +642,41 @@ func TestXfg_OK(t *testing.T) {
 			`),
 			expectExitCode: exitOK,
 		},
+		"service-b grep func --no-line-number": {
+			opt: &options{
+				SearchPath:   []string{"service-b"},
+				SearchGrep:   []string{"func"},
+				NoLineNumber: true,
+				Indent:       defaultIndent,
+			},
+			expect: here.Doc(`
+                testdata/service-b/main.go
+                 func main() {
+			`),
+			expectExitCode: exitOK,
+		},
+		"service grep package --no-line-number": {
+			opt: &options{
+				SearchPath:   []string{"main"},
+				SearchGrep:   []string{"package"},
+				NoLineNumber: true,
+				Indent:       defaultIndent,
+			},
+			expect: here.Doc(`
+                testdata/service-a/main.go
+                 package a
+                
+                testdata/service-b/main.go
+                 package b
+                
+                testdata/service-c/main.go
+                 package c
+                
+                testdata/service-h/main.go
+                 package h
+			`),
+			expectExitCode: exitOK,
+		},
 		"service-b --search-only-name": {
 			opt: &options{
 				SearchPath:     []string{"a.dat"},
@@ -988,6 +1023,27 @@ func TestNonTTY(t *testing.T) {
 		"service-b func --files-with-matches --null": {
 			args:           []string{"service-b", "func", "--files-with-matches", "--null"},
 			expect:         "testdata/service-b/main.go\x00",
+			expectExitCode: exitOK,
+		},
+		"service-b func --no-line-number": {
+			args: []string{"service-b", "func", "--no-line-number"},
+			expect: here.Doc(`
+			    testdata/service-b/main.go:func main() {
+			`),
+			expectExitCode: exitOK,
+		},
+		"service-b func --nonu": {
+			args: []string{"service-b", "func", "--nonu"},
+			expect: here.Doc(`
+			    testdata/service-b/main.go:func main() {
+			`),
+			expectExitCode: exitOK,
+		},
+		"service-b func --no-line-number --no-filename": {
+			args: []string{"service-b", "func", "--no-line-number", "--no-filename"},
+			expect: here.Doc(`
+			    func main() {
+			`),
 			expectExitCode: exitOK,
 		},
 	} {
