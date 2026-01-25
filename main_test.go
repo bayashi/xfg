@@ -618,7 +618,7 @@ func TestXfg_OK(t *testing.T) {
 				NoFilename: true,
 				Indent:     defaultIndent,
 			},
-			expect: " 3: func main() {\n",
+			expect:         " 3: func main() {\n",
 			expectExitCode: exitOK,
 		},
 		"service grep package --no-filename": {
@@ -628,7 +628,7 @@ func TestXfg_OK(t *testing.T) {
 				NoFilename: true,
 				Indent:     defaultIndent,
 			},
-			expect: " 1: package a\n 1: package b\n 1: package c\n 1: package h\n",
+			expect:        " 1: package a\n 1: package b\n 1: package c\n 1: package h\n",
 			expectExitCode: exitOK,
 		},
 		"service-b --no-filename (ignored when path search only)": {
