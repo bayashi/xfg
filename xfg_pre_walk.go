@@ -1,7 +1,10 @@
 package main
 
 import (
+	"strings"
+
 	"github.com/bayashi/xfg/internal/xfgignore"
+	"github.com/bayashi/xfg/internal/xfglangxt"
 	"github.com/bayashi/xfg/internal/xfgutil"
 )
 
@@ -31,7 +34,35 @@ func (x *xfg) preWalkDir() error {
 		}
 	}
 
+	x.prepareSearchExts()
+	x.prepareSearchLangExts()
+
 	return nil
+}
+
+func (x *xfg) prepareSearchExts() {
+	if len(x.options.Ext) == 0 {
+		return
+	}
+	exts := make([]string, 0, len(x.options.Ext))
+	for _, ext := range x.options.Ext {
+		if !strings.HasPrefix(ext, ".") {
+			ext = "." + ext
+		}
+		exts = append(exts, ext)
+	}
+	x.extra.searchExts = exts
+}
+
+func (x *xfg) prepareSearchLangExts() {
+	if len(x.options.Lang) == 0 {
+		return
+	}
+	var exts []string
+	for _, l := range x.options.Lang {
+		exts = append(exts, xfglangxt.Get(l)...)
+	}
+	x.extra.searchLangExts = exts
 }
 
 func (x *xfg) prepareIgnoreCaseRe() error {

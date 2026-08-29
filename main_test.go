@@ -791,6 +791,35 @@ func TestXfg_OK(t *testing.T) {
 			`),
 			expectExitCode: exitOK,
 		},
+		"search path by extension excludes other extensions": {
+			opt: &options{
+				SearchPath: []string{"service-b"},
+				Ext:        []string{"pl"},
+			},
+			expect:         "",
+			expectExitCode: exitOK,
+		},
+		"search path by multiple extensions": {
+			opt: &options{
+				Ext: []string{"pl", "go"},
+			},
+			expect: here.Doc(`
+                testdata/service-a/main.go
+                testdata/service-b/main.go
+                testdata/service-c/main.go
+                testdata/service-h/main.go
+                testdata/service-k/bar.pl
+			`),
+			expectExitCode: exitOK,
+		},
+		"search path by language excludes non-lang files": {
+			opt: &options{
+				SearchPath: []string{"service-b"},
+				Lang:       []string{"perl"},
+			},
+			expect:         "",
+			expectExitCode: exitOK,
+		},
 		"not match any words as word boundary regexp by default": {
 			opt: &options{
 				SearchGrepRe: []string{"bound"},

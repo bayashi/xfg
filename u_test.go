@@ -8,6 +8,46 @@ import (
 	a "github.com/bayashi/actually"
 )
 
+func TestIsBinaryFile(t *testing.T) {
+	t.Parallel()
+
+	t.Run("text without NUL", func(t *testing.T) {
+		t.Parallel()
+		p := filepath.Join(t.TempDir(), "text.txt")
+		a.Got(os.WriteFile(p, []byte("hello\nworld\n"), 0o644)).NoError(t)
+		fh, err := os.Open(p)
+		a.Got(err).NoError(t)
+		defer fh.Close()
+		got, err := isBinaryFile(fh)
+		a.Got(err).NoError(t)
+		a.Got(got).False(t)
+	})
+
+	t.Run("binary with NUL", func(t *testing.T) {
+		t.Parallel()
+		p := filepath.Join(t.TempDir(), "bin.dat")
+		a.Got(os.WriteFile(p, []byte("hel\x00lo"), 0o644)).NoError(t)
+		fh, err := os.Open(p)
+		a.Got(err).NoError(t)
+		defer fh.Close()
+		got, err := isBinaryFile(fh)
+		a.Got(err).NoError(t)
+		a.Got(got).True(t)
+	})
+
+	t.Run("short text", func(t *testing.T) {
+		t.Parallel()
+		p := filepath.Join(t.TempDir(), "short.txt")
+		a.Got(os.WriteFile(p, []byte("x"), 0o644)).NoError(t)
+		fh, err := os.Open(p)
+		a.Got(err).NoError(t)
+		defer fh.Close()
+		got, err := isBinaryFile(fh)
+		a.Got(err).NoError(t)
+		a.Got(got).False(t)
+	})
+}
+
 func TestDefaultOptions(t *testing.T) {
 	d := defaultOptions()
 	a.Got(d).Expect(&options{}).SameType(t)

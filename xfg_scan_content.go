@@ -12,7 +12,9 @@ import (
 type scanFile struct {
 	lc     int32  // line count
 	l      string // line text
-	blines []line // slice for before lines
+	blines []line // ring buffer for before-context lines
+	bpos   int    // next write index in blines
+	bcount int    // filled count in blines (0..len(blines))
 	aline  uint32 // the count for after lines
 
 	matchedContents []line // result
@@ -94,9 +96,8 @@ func (x *xfg) postScanFile(fPath string, fInfo fs.DirEntry, matchedPath path) er
 	x.result.outputLC = x.result.outputLC + len(matchedPath.contents) + 1
 	x.result.mu.Unlock()
 
-	// Send to streaming channel if KeepResultOrder is false
-	if !x.options.KeepResultOrder && !x.options.Quiet && x.resultChan != nil {
-		x.resultChan <- matchedPath
+	if x.deliverChan != nil {
+		x.deliverChan <- matchedPath
 	}
 
 	if x.options.Stats {
@@ -172,13 +173,9 @@ func (x *xfg) isMatchLine(line string) bool {
 func (x *xfg) processContentLine(gf *scanFile) {
 	if x.isMatchLine(gf.l) {
 		if !x.options.ShowMatchCount && x.options.extra.withBeforeContextLines {
-			for _, bl := range gf.blines {
-				if bl.lc == 0 {
-					continue // skip
-				}
-				gf.matchedContents = append(gf.matchedContents, bl)
-			}
-			gf.blines = make([]line, x.options.extra.actualBeforeContextLines)
+			x.appendBeforeContext(gf)
+			gf.bpos = 0
+			gf.bcount = 0
 		}
 
 		if x.options.ShowMatchCount {
@@ -198,12 +195,38 @@ func (x *xfg) processContentLine(gf *scanFile) {
 				x.optimizeLine(gf)
 				gf.matchedContents = append(gf.matchedContents, line{lc: gf.lc, content: gf.l})
 			} else if x.options.extra.withBeforeContextLines {
-				// rotate blines
-				// join "2nd to last elements of `blines`" and "current `line`"
 				x.optimizeLine(gf)
-				gf.blines = append(gf.blines[1:], line{lc: gf.lc, content: gf.l})
+				x.pushBeforeContext(gf, line{lc: gf.lc, content: gf.l})
 			}
 		}
+	}
+}
+
+func (x *xfg) pushBeforeContext(gf *scanFile, l line) {
+	gf.blines[gf.bpos] = l
+	gf.bpos++
+	if gf.bpos >= len(gf.blines) {
+		gf.bpos = 0
+	}
+	if gf.bcount < len(gf.blines) {
+		gf.bcount++
+	}
+}
+
+func (x *xfg) appendBeforeContext(gf *scanFile) {
+	if gf.bcount == 0 {
+		return
+	}
+	start := 0
+	if gf.bcount == len(gf.blines) {
+		start = gf.bpos
+	}
+	for i := 0; i < gf.bcount; i++ {
+		idx := start + i
+		if idx >= len(gf.blines) {
+			idx -= len(gf.blines)
+		}
+		gf.matchedContents = append(gf.matchedContents, gf.blines[idx])
 	}
 }
 
