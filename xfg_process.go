@@ -12,7 +12,6 @@ import (
 	"golang.org/x/sync/errgroup"
 
 	"github.com/bayashi/xfg/internal/xfgignore"
-	"github.com/bayashi/xfg/internal/xfglangxt"
 	"github.com/bayashi/xfg/internal/xfgutil"
 	"github.com/monochromegane/go-gitignore"
 )
@@ -178,8 +177,9 @@ func (x *xfg) isMatchExt(fInfo fs.DirEntry) bool {
 }
 
 func (x *xfg) isLangFile(fInfo fs.DirEntry) bool {
-	for _, l := range x.options.Lang {
-		if xfglangxt.IsLangFile(l, fInfo.Name()) {
+	name := fInfo.Name()
+	for _, ext := range x.extra.searchLangExts {
+		if strings.HasSuffix(name, ext) {
 			return true
 		}
 	}
@@ -232,7 +232,7 @@ func (x *xfg) isMatchFileType(fPath string, fInfo fs.DirEntry) bool {
 func (x *xfg) isSkippablePath(fPath string, fInfo fs.DirEntry, ms xfgignore.Matchers) bool {
 	if !x.options.SearchAll {
 		if (len(x.extra.searchExts) > 0 && !x.isMatchExt(fInfo)) ||
-			(len(x.options.Lang) > 0 && !x.isLangFile(fInfo)) ||
+			(len(x.extra.searchLangExts) > 0 && !x.isLangFile(fInfo)) ||
 			(x.options.Type != "" && !x.isMatchFileType(fPath, fInfo)) {
 			return true
 		}

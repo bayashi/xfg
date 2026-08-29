@@ -42,6 +42,7 @@ type xfgExtra struct {
 	searchGrepRe   []*regexp.Regexp
 	ignoreOptionRe []*regexp.Regexp
 	searchExts     []string // --ext values normalized with leading "."
+	searchLangExts []string // flattened extensions for --lang
 }
 
 type xfg struct {
