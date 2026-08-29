@@ -21,7 +21,9 @@ const (
 	defaultIndent         string = " "
 	defaultMaxDepth       uint32 = 255
 
-	streamResultChanBufferSize int = 100
+	streamResultChanBufferSize        int = 100
+	streamDeliverChanBufferMultiplier int = 10 // deliverChan buffer = resultChan buffer * this; absorbs display backpressure
+	scanWorkersNumberMultiplier       int = 1  // scan workers number = procs * multiplier factor
 )
 
 var (

@@ -49,8 +49,9 @@ type xfg struct {
 	highlighter highlighter
 	extra       xfgExtra
 	result      result
-	resultChan  chan path // Channel for streaming results when KeepResultOrder is false
-	streamDone  chan bool // Channel to signal streaming display goroutine completion
+	resultChan  chan path // streaming display input
+	deliverChan chan path // scan → resultChan handoff; larger buffer than resultChan
+	streamDone  chan bool // closed when streamDisplay finishes
 }
 
 func newX(cli *runner, o *options) *xfg {

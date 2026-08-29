@@ -12,6 +12,7 @@ import (
 
 	"github.com/bayashi/xfg/internal/xfgignore"
 	"github.com/bayashi/xfg/internal/xfglangxt"
+	"github.com/bayashi/xfg/internal/xfgutil"
 	"github.com/monochromegane/go-gitignore"
 )
 
@@ -24,29 +25,49 @@ func (x *xfg) process() error {
 		x.cli.stats.Mark("preWalkDir")
 	}
 
-	// Start streaming display goroutine if KeepResultOrder is false
-	if !x.options.KeepResultOrder && !x.options.Quiet {
+	streaming := !x.options.KeepResultOrder && !x.options.Quiet
+	deliverDone := make(chan struct{})
+	if streaming {
 		x.resultChan = make(chan path, streamResultChanBufferSize)
+		x.deliverChan = make(chan path, streamResultChanBufferSize*streamDeliverChanBufferMultiplier)
 		x.streamDone = make(chan bool)
+		go func() {
+			defer close(deliverDone)
+			for p := range x.deliverChan {
+				x.resultChan <- p
+			}
+		}()
 		go x.streamDisplay()
 	}
 
-	eg := new(errgroup.Group)
+	walkEg := new(errgroup.Group)
+	scanEg := new(errgroup.Group)
+	procs := x.cli.procs
+	if procs <= 0 {
+		procs = xfgutil.Procs()
+	}
+	scanEg.SetLimit(procs * scanWorkersNumberMultiplier)
+
 	for _, startDir := range x.options.SearchStart {
 		startDir := startDir
-		eg.Go(func() error {
+		walkEg.Go(func() error {
 			ms := x.initIgnoreMatchers(startDir)
-			x.walkDir(eg, startDir, ms, uint32(1))
+			x.walkDir(walkEg, scanEg, startDir, ms, uint32(1))
 			return nil
 		})
 	}
 
-	if err := eg.Wait(); err != nil {
+	if err := walkEg.Wait(); err != nil {
 		return fmt.Errorf("walkDir Wait : %w", err)
 	}
 
-	// Close channel and wait for streaming display to finish
-	if !x.options.KeepResultOrder && !x.options.Quiet {
+	if err := scanEg.Wait(); err != nil {
+		return fmt.Errorf("scanFile Wait : %w", err)
+	}
+
+	if streaming {
+		close(x.deliverChan)
+		<-deliverDone
 		close(x.resultChan)
 		<-x.streamDone
 	}
@@ -54,8 +75,8 @@ func (x *xfg) process() error {
 	return nil
 }
 
-func (x *xfg) walkDir(eg *errgroup.Group, dirPath string, ms xfgignore.Matchers, currentDepth uint32) {
-	eg.Go(func() error {
+func (x *xfg) walkDir(walkEg, scanEg *errgroup.Group, dirPath string, ms xfgignore.Matchers, currentDepth uint32) {
+	walkEg.Go(func() error {
 		if currentDepth > x.options.MaxDepth {
 			return nil
 		} else {
@@ -80,13 +101,13 @@ func (x *xfg) walkDir(eg *errgroup.Group, dirPath string, ms xfgignore.Matchers,
 			return err
 		}
 
-		x.walkStuff(stuff, eg, dirPath, ms, currentDepth)
+		x.walkStuff(stuff, walkEg, scanEg, dirPath, ms, currentDepth)
 
 		return nil
 	})
 }
 
-func (x *xfg) walkStuff(stuff []fs.DirEntry, eg *errgroup.Group, dirPath string, ms xfgignore.Matchers, currentDepth uint32) {
+func (x *xfg) walkStuff(stuff []fs.DirEntry, walkEg, scanEg *errgroup.Group, dirPath string, ms xfgignore.Matchers, currentDepth uint32) {
 	for _, s := range stuff {
 		if x.options.Quiet && x.hasMatchedAny() {
 			break // already match. skip after all
@@ -102,13 +123,13 @@ func (x *xfg) walkStuff(stuff []fs.DirEntry, eg *errgroup.Group, dirPath string,
 			if !x.options.SearchAll && x.isSkippableByIgnoreFile(p, ms) {
 				continue // skip all stuff in this dir
 			}
-			x.walkDir(eg, p, ms, currentDepth) // recursively
+			x.walkDir(walkEg, scanEg, p, ms, currentDepth) // recursively
 		}
-		x.walkFile(eg, filepath.Join(dirPath, s.Name()), s, ms)
+		x.walkFile(scanEg, filepath.Join(dirPath, s.Name()), s, ms)
 	}
 }
 
-func (x *xfg) walkFile(eg *errgroup.Group, fPath string, fInfo fs.DirEntry, ms xfgignore.Matchers) error {
+func (x *xfg) walkFile(scanEg *errgroup.Group, fPath string, fInfo fs.DirEntry, ms xfgignore.Matchers) error {
 	if x.options.Stats {
 		x.cli.stats.IncrWalkedPaths()
 	}
@@ -121,7 +142,7 @@ func (x *xfg) walkFile(eg *errgroup.Group, fPath string, fInfo fs.DirEntry, ms x
 		x.cli.stats.IncrWalkedContents()
 	}
 
-	eg.Go(func() error {
+	scanEg.Go(func() error {
 		return x.postMatchPath(fPath, fInfo)
 	})
 
