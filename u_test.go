@@ -40,8 +40,8 @@ func TestValidateStartPath_Err(t *testing.T) {
 	err := validateStartPath([]string{noMatchKeyword})
 	a.Got(err).NotNil(t)
 	// Linux or Mac: "stat PATH no such file or directory"
-	// Windows       "CreateFile PATH The system cannot find the file specified."
-	a.Got(err.Error()).Expect(`^(stat|CreateFile) `).Match(t)
+	// Windows       "CreateFile PATH ..." or "GetFileAttributesEx PATH ..."
+	a.Got(err.Error()).Expect(`^(stat|CreateFile|GetFileAttributesEx) `).Match(t)
 
 	tempDir := t.TempDir()
 	tempFilePath := filepath.Join(tempDir, "foo")
