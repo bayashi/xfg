@@ -6,6 +6,7 @@ import (
 	"io/fs"
 	"os"
 	"path/filepath"
+	"slices"
 	"strings"
 
 	"golang.org/x/sync/errgroup"
@@ -82,11 +83,6 @@ func (x *xfg) walkDir(walkEg, scanEg *errgroup.Group, dirPath string, ms xfgigno
 		} else {
 			currentDepth++
 		}
-		if !x.options.SkipGitIgnore {
-			if matcher, err := gitignore.NewGitIgnore(filepath.Join(dirPath, xfgignore.GITIGNORE_FILE_NAME)); err == nil {
-				ms = append(ms, matcher)
-			}
-		}
 		if x.options.Quiet && x.hasMatchedAny() {
 			return nil // already match. skip after all
 		}
@@ -101,10 +97,31 @@ func (x *xfg) walkDir(walkEg, scanEg *errgroup.Group, dirPath string, ms xfgigno
 			return err
 		}
 
+		if !x.options.SkipGitIgnore {
+			if matcher := x.loadDirGitIgnore(dirPath, stuff); matcher != nil {
+				// Clone before append so sibling walks do not share the backing array.
+				ms = append(slices.Clone(ms), matcher)
+			}
+		}
+
 		x.walkStuff(stuff, walkEg, scanEg, dirPath, ms, currentDepth)
 
 		return nil
 	})
+}
+
+func (x *xfg) loadDirGitIgnore(dirPath string, stuff []fs.DirEntry) gitignore.IgnoreMatcher {
+	for _, s := range stuff {
+		if s.Name() != xfgignore.GITIGNORE_FILE_NAME || s.IsDir() {
+			continue
+		}
+		matcher, err := gitignore.NewGitIgnore(filepath.Join(dirPath, xfgignore.GITIGNORE_FILE_NAME))
+		if err != nil {
+			return nil
+		}
+		return matcher
+	}
+	return nil
 }
 
 func (x *xfg) walkStuff(stuff []fs.DirEntry, walkEg, scanEg *errgroup.Group, dirPath string, ms xfgignore.Matchers, currentDepth uint32) {
