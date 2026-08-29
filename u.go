@@ -8,12 +8,22 @@ import (
 	"path/filepath"
 	"regexp"
 	"strings"
+	"sync"
 	"syscall"
 
 	"github.com/BurntSushi/toml"
 	"github.com/adrg/xdg"
 	"github.com/bayashi/xfg/internal/xfglangxt"
 )
+
+const binaryCheckBufSize = 8000
+
+var binaryCheckBufPool = sync.Pool{
+	New: func() any {
+		b := make([]byte, binaryCheckBufSize)
+		return &b
+	},
+}
 
 func defaultOptions() *options {
 	return &options{
@@ -55,7 +65,10 @@ func readRC(homeDir string) (*options, error) {
 }
 
 func isBinaryFile(fh *os.File) (bool, error) {
-	dat := make([]byte, 8000)
+	bufp := binaryCheckBufPool.Get().(*[]byte)
+	defer binaryCheckBufPool.Put(bufp)
+	dat := *bufp
+
 	n, err := fh.Read(dat)
 	if err != nil {
 		return false, fmt.Errorf("could not read fh : %w", err)
