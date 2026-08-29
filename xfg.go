@@ -41,6 +41,7 @@ type xfgExtra struct {
 	searchPathRe   []*regexp.Regexp
 	searchGrepRe   []*regexp.Regexp
 	ignoreOptionRe []*regexp.Regexp
+	searchExts     []string // --ext values normalized with leading "."
 }
 
 type xfg struct {

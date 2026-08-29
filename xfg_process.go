@@ -166,12 +166,10 @@ func (x *xfg) walkFile(scanEg *errgroup.Group, fPath string, fInfo fs.DirEntry, 
 	return nil
 }
 
-func (x *xfg) isMatchExt(fInfo fs.DirEntry, extensions []string) bool {
-	for _, ext := range extensions {
-		if !strings.HasPrefix(ext, ".") {
-			ext = "." + ext
-		}
-		if strings.HasSuffix(fInfo.Name(), ext) {
+func (x *xfg) isMatchExt(fInfo fs.DirEntry) bool {
+	name := fInfo.Name()
+	for _, ext := range x.extra.searchExts {
+		if strings.HasSuffix(name, ext) {
 			return true
 		}
 	}
@@ -233,7 +231,7 @@ func (x *xfg) isMatchFileType(fPath string, fInfo fs.DirEntry) bool {
 
 func (x *xfg) isSkippablePath(fPath string, fInfo fs.DirEntry, ms xfgignore.Matchers) bool {
 	if !x.options.SearchAll {
-		if (len(x.options.Ext) > 0 && !x.isMatchExt(fInfo, x.options.Ext)) ||
+		if (len(x.extra.searchExts) > 0 && !x.isMatchExt(fInfo)) ||
 			(len(x.options.Lang) > 0 && !x.isLangFile(fInfo)) ||
 			(x.options.Type != "" && !x.isMatchFileType(fPath, fInfo)) {
 			return true
